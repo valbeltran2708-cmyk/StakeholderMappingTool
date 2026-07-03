@@ -159,11 +159,9 @@ def _nodes_svg(nodes):
     out = []
     for n in nodes:
         f, lines = fit_label(n['label'], n['r'])
-        tf, halo = text_color(n.get('fill'))
         lh = f * 1.18
         sy = -(len(lines) - 1) * lh / 2
-        style = (f"fill:{tf};paint-order:stroke;stroke:{halo};stroke-width:2.4px;"
-                 f"stroke-linejoin:round")
+        style = "fill:#ffffff;stroke:none;paint-order:normal;stroke-width:0"
         text = ''.join(
             f"<text text-anchor='middle' dominant-baseline='middle' y='{round(sy + j * lh, 1)}' "
             f"font-size='{f}' style='{style}'>{esc(line)}</text>"

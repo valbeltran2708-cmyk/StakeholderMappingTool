@@ -1,0 +1,2 @@
+[console_scripts]
+stakeholder-map = stakeholder_map.cli:main
