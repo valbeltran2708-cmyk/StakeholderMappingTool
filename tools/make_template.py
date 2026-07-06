@@ -26,8 +26,25 @@ from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.datavalidation import DataValidation
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'src'))
-from stakeholder_map.config import (ARUP_INK, ARUP_RED, DEFAULT_CATEGORY_COLORS,
-                                    DEFAULT_REL_STYLES)  # noqa: E402
+from stakeholder_map.config import ARUP_INK, ARUP_RED  # noqa: E402
+
+# Sugerencias genéricas de partida (edítalas o bórralas en el Excel;
+# no hay nada del dominio de un proyecto en particular).
+SUGERENCIA_ESFERAS = [
+    ('Gobierno', '#4E79A7'),
+    ('Sector privado', '#F28E2B'),
+    ('Academia', '#B07AA1'),
+    ('Sociedad civil', '#59A14F'),
+    ('Banca y cooperación', '#EDC948'),
+]
+SUGERENCIA_RELACIONES = [
+    ('Coordinación', '#5B9BD5', 'Sólida'),
+    ('Regulación / fiscalización', '#D62728', 'Sólida'),
+    ('Financiación', '#2CA02C', 'Sólida'),
+    ('Provisión de datos', '#8C564B', 'Sólida'),
+    ('Participación / diálogo', '#17BECF', 'Sólida'),
+    ('Tensión / dependencia', '#FF7F0E', 'Punteada'),
+]
 
 MAXR = 400  # filas cubiertas por las validaciones
 
@@ -101,21 +118,17 @@ def build(path):
                                  'automático.',
           })
 
-    for i, (cat, col) in enumerate(DEFAULT_CATEGORY_COLORS.items(), start=2):
+    for i, (cat, col) in enumerate(SUGERENCIA_ESFERAS, start=2):
         cfg.cell(row=i, column=1, value=cat)
         c = cfg.cell(row=i, column=2, value=col)
         c.fill = PatternFill('solid', fgColor=col.lstrip('#'))
         c.font = Font(color='FFFFFF', bold=True, size=9)
-    r = 2
-    for typ, sty in DEFAULT_REL_STYLES.items():
-        if not typ:
-            continue
+    for r, (typ, col, sty) in enumerate(SUGERENCIA_RELACIONES, start=2):
         cfg.cell(row=r, column=4, value=typ)
-        c = cfg.cell(row=r, column=5, value=sty['color'])
-        c.fill = PatternFill('solid', fgColor=sty['color'].lstrip('#'))
+        c = cfg.cell(row=r, column=5, value=col)
+        c.fill = PatternFill('solid', fgColor=col.lstrip('#'))
         c.font = Font(color='FFFFFF', bold=True, size=9)
-        cfg.cell(row=r, column=6, value='Punteada' if sty['dash'] else 'Sólida')
-        r += 1
+        cfg.cell(row=r, column=6, value=sty)
     for i, v in enumerate(['Bajo', 'Medio', 'Alto'], start=2):
         cfg.cell(row=i, column=8, value=v)
         cfg.cell(row=i, column=9, value=v)
@@ -176,13 +189,6 @@ def build(path):
                    'de la lista.')
     _dv(st, f'B2:B{MAXR}', f"'01_Stakeholders'!$A$2:$A${MAXR}",
         prompt='Nombre exacto de la entidad padre (de la columna A).')
-    ejemplo = ['(Ejemplo) Ministerio de Transporte', '', 'Entidad', 'Dimensión A',
-               list(DEFAULT_CATEGORY_COLORS)[0], 'Risk Reduction; Climate Finance',
-               'Rectoría de la política sectorial',
-               'Alto', 'Alto', 'Borra esta fila al llenar la plantilla']
-    for j, v in enumerate(ejemplo, start=1):
-        st.cell(row=2, column=j, value=v).font = NOTE_FONT
-
     # ---------- 02_Relaciones ----------
     rel = wb.create_sheet('02_Relaciones')
     rel_headers = ['Desde / entidad origen', 'Hacia / entidad destino',

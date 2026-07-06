@@ -16,7 +16,6 @@
     <label class='chk'><input id='showEdges' type='checkbox' checked onchange='filters()'> Relaciones</label>
     <label class='chk'><input id='showSub' type='checkbox' checked onchange='filters()'> Subdivisiones</label>
     <label class='chk'><input id='showRings' type='checkbox' checked onchange='filters()'> Anillos de interés</label>
-    <label class='chk'><input id='showSect' type='checkbox' checked onchange='filters()'> Sectores por esfera</label>
     <label class='chk'><input id='polColor' type='checkbox' onchange='togglePolColor()'> Color por efecto (polaridad)</label>
     <label class='formlabel'>Separación de anillos <span id='spreadVal' class='small'>1.00×</span></label>
     <input id='spread' type='range' min='0.45' max='1.6' step='0.05' value='1' oninput='setSpread(this.value)'>
@@ -86,7 +85,7 @@
   </details>
 </aside>
 <main>
-  <div class='search'><input id='search' placeholder='Buscar stakeholder…' oninput='searchNode()'></div>
+  <div class='search'><input id='search' placeholder='Buscar stakeholder…' oninput='searchInput()' onkeydown='searchKey(event)' autocomplete='off'><button class='sclr' onclick='searchClear()' title='Limpiar'>×</button><ul id='searchResults' class='sres hidden'></ul></div>
   <div class='zoom'><button onclick='zoomBy(1.2)'>+</button><button onclick='zoomBy(.83)'>−</button><button onclick='resetView()'>⌂</button></div>
   <div class='bar'><button onclick='toggleRight()'>Panel detalle</button><button onclick='toggleFloatLegend()'>Leyenda</button></div>
   <div id='floatLegend' class='floatLegend hidden'><button class='xbtn' onclick='toggleFloatLegend()' title='Cerrar'>×</button><div id='floatLegendBody'></div></div>
@@ -94,7 +93,7 @@
   <div id='tip' class='tip hidden'></div>
   <svg id='svg' viewBox='0 0 %%W%% %%H%%'>
     <defs><marker id='arrow' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto'><path d='M0,0 L10,5 L0,10 Z' fill='#667'/></marker></defs>
-    %%QGRID%%%%RINGS%%<g id='sectors'></g><g id='focusSpokes'></g>%%EDGES%%%%NODES%%%%RING_LABELS%%
+    %%QGRID%%%%RINGS%%<g id='focusSpokes'></g>%%EDGES%%%%NODES%%%%RING_LABELS%%
   </svg>
 </main>
 <aside id='right' class='right rightHidden'><div class='card'><button class='xbtn' onclick='closeRight()' title='Cerrar'>×</button><div id='details'><div class='dtitle'>Selecciona un stakeholder</div><p class='small'>Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local.</p></div></div></aside>

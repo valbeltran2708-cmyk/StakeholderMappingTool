@@ -10,7 +10,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from .config import CX, CY, THEME_PALETTE
+from .config import (CX, CY, THEME_PALETTE, CATEGORY_PALETTE, REL_PALETTE,
+                     MULTI_STROKE)
 from .normalize import clean, cell_val, norm_pol, slug, parse_tags
 from .scales import build_scale, radius_for_rank, size_for_rank, to_num
 from .excel_io import sheet, load_scales, load_style_config, load_unified_config
@@ -150,8 +151,6 @@ def read_data(path):
                          "('Stakeholder / entidad').")
     st = st[st.label != ''].copy()
     st['level'] = st.level.replace({'Entity': 'Entidad', 'Subdivision': 'Subdivisión'})
-    st['source'] = st.source.replace({'Energy': 'Energía', 'Resilience': 'Resiliencia',
-                                      'Both': 'Ambos'})
 
     st['id'] = st.apply(lambda r: r.id or slug(r.label), axis=1)
     st['interest'] = st.interest.apply(cell_val)
@@ -224,10 +223,12 @@ def read_data(path):
         warnings.append(f"{len(orphan_sub)} subdivisión(es) cuyo padre no existe: "
                         f"{', '.join(orphan_sub[:6])}")
     cats_used = set(st[st.category != ''].category)
-    no_color = [c for c in cats_used if c not in cat_colors]
+    no_color = sorted(c for c in cats_used if c not in cat_colors)
+    for i, c in enumerate(no_color):
+        cat_colors[c] = CATEGORY_PALETTE[i % len(CATEGORY_PALETTE)]
     if no_color:
-        warnings.append(f"Esferas sin color en la configuración (uso gris): "
-                        f"{', '.join(sorted(no_color)[:6])}")
+        warnings.append(f"Esferas sin color en la configuración; se asignó color "
+                        f"automático: {', '.join(no_color[:6])}")
 
     # ---- Layout radial: semilla por categoría/interés, luego resolver solapes ----
     main = st[st.level.str.lower() != 'subdivisión'].copy()
@@ -275,7 +276,7 @@ def read_data(path):
             'r': size_for_rank(prank(r.power), NP),
             'ir': round(irank(r.interest), 3), 'pr': round(prank(r.power), 3),
             'fill': cat_colors.get(r.category, '#BFBFBF'),
-            'stroke': src_colors.get(r.source, '#667085'),
+            'stroke': MULTI_STROKE if r.id in themes_by_id else src_colors.get(r.source, '#667085'),
             'themes': themes_by_id.get(r.id, [{'theme': r.source, 'interest': r.interest,
                                                'power': r.power,
                                                'ir': round(irank(r.interest), 3),
@@ -334,6 +335,9 @@ def read_data(path):
         except Exception:
             strength = 2
         typ = r.type or 'Relación'
+        if typ not in rel_styles:
+            rel_styles[typ] = {'color': REL_PALETTE[len([k for k in rel_styles if k]) % len(REL_PALETTE)],
+                               'dash': False}
         style = rel_styles.get(typ, rel_styles[''])
         d = clean(r.direction).lower()
         directed = not (('bidirec' in d) or ('no dir' in d) or ('ambas' in d)

@@ -71,7 +71,9 @@ def test_generate_end_to_end(tmp_path):
     assert data['net_r'] >= 8
     by_label = {n['label']: n for n in data['nodes']}
     assert 0 < by_label['ONG aislada']['ir'] < 1      # 1.4 en escala 1..5 -> rango fraccionario
-    assert by_label['Operador']['multi'] is True      # fusión multi-tema
+    assert by_label['Operador']['multi'] is True      # fusión multi-dimensión
+    assert by_label['Operador']['stroke'] == '#111111'  # borde propio de multi
+    assert "value='__multi__'" in html                 # opción de filtro
     assert len(by_label['Operador']['themes']) == 2
 
     # Nodo Operador toma el interés MÁXIMO de sus temas (5 > 4.1)

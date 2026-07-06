@@ -22,8 +22,6 @@ reordenan sin huecos y sin solaparse.
 Además exporta tablas (XLSX de coordenadas y CSVs) y, desde el propio
 HTML, imágenes PNG/SVG y un CSV de estrategia por actor.
 
-Los datos de `examples/` son ficticios, solo para demostración.
-
 ## Instalación
 
 Requiere Python 3.9+.
@@ -88,13 +86,6 @@ Reglas que conviene conocer:
   exporta (`stakeholder_map_coordinates.xlsx`) como entrada rápida, y las
   hojas separadas `03A/03B/03D` del formato antiguo.
 
-Prueba todo con el dataset de ejemplo:
-
-```bash
-python tools/make_demo_data.py
-stakeholder-map -i examples/ejemplo_movilidad.xlsx -o outputs/ --open
-```
-
 ## Estructura del repositorio: qué tocar para qué
 
 ```
@@ -122,10 +113,9 @@ stakeholder-map/
 │           └── app.js              ← Interacción Y motor de layout dinámico
 │                                     (reordena con cada filtro en las 3 vistas)
 ├── tools/
-│   ├── make_template.py            Genera la plantilla Excel
-│   └── make_demo_data.py           Genera el dataset ficticio de ejemplo
+│   └── make_template.py            Genera la plantilla Excel (sin datos de ejemplo)
 ├── tests/                          pytest: escalas, red sin solapes, config, end-to-end
-├── examples/                       Se genera localmente con tools/ (no versionado)
+├── examples/                       Carpeta local para la plantilla generada (no versionada)
 └── docs/                           Presentación explicativa (.pptx) y material de apoyo
 ```
 

@@ -1,5 +1,36 @@
 # Changelog
 
+## 1.4.0 (2026-07-06)
+
+### Cambiado
+- La agrupación por esferas en la vista radial se mantiene como criterio de
+  ORGANIZACIÓN, pero ya no se dibujan líneas divisorias ni rótulos de
+  sector (se elimina también la casilla "Sectores por esfera").
+- Buscador rediseñado: lista de sugerencias con esfera y dimensión de cada
+  coincidencia, búsqueda insensible a tildes, Enter selecciona la primera,
+  Escape y botón × limpian, y si el actor está oculto por los filtros se
+  abre igual su ficha con un aviso.
+- Al aislar los actores clave (u otro filtro pequeño) en la vista radial,
+  el zoom conserva el contexto de los anillos en lugar de cerrarse sobre
+  el grupo (piso de zoom solo en radial).
+- Panel izquierdo más ancho (352px) y lista de actores clave con más aire.
+
+### Nuevo
+- Entidades presentes en varias dimensiones: borde negro propio con
+  entrada "En ambas dimensiones" (o "En varias" si hay más de dos) en la
+  leyenda, y opción equivalente en el filtro de Dimensión para ver SOLO
+  esas entidades. Con una dimensión filtrada siguen apareciendo, como
+  hasta ahora.
+
+### Limpieza
+- El repositorio queda general, sin datos ni residuos de ejemplo: se
+  elimina tools/make_demo_data.py y el mapeo legado de dimensiones del
+  proyecto original; los colores por defecto cableados desaparecen y las
+  esferas o tipos de relación sin color en 03_Config reciben color
+  automático de una paleta neutra; la plantilla trae sugerencias
+  genéricas y ya no incluye fila de ejemplo.
+
+
 ## 1.3.0 (2026-07-06)
 
 ### Nuevo

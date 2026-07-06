@@ -90,26 +90,24 @@ NET_FILL = 0.36  # factor de ocupación: menor valor = círculos más pequeños
 # ---------------------------------------------------------------------------
 # Paletas por defecto (03A / 03B del Excel las sobreescriben)
 # ---------------------------------------------------------------------------
-DEFAULT_CATEGORY_COLORS = {
-    'Gobierno Central': '#4E79A7',
-    'Sector energía / institución pública': '#5B9BD5',
-    'Subdivisión institucional': '#B8D7F0',
-    'Gobernanza Interinstitucional y territorial': '#8E6BBE',
-    'Academia y Centro de Investigación': '#FFC000',
-    'Sociedad civil / ONG': '#2FB7C4',
-    '': '#BFBFBF',
-}
-
+# Sin colores de ejemplo cableados: las esferas y los tipos de relación
+# toman su color de 03_Config; a lo que no tenga color se le asigna uno
+# automático de estas paletas (determinista por orden alfabético).
+DEFAULT_CATEGORY_COLORS = {}
+CATEGORY_PALETTE = ['#4E79A7', '#F28E2B', '#59A14F', '#E15759', '#B07AA1',
+                    '#76B7B2', '#EDC948', '#FF9DA7', '#9C755F', '#6B8ABC']
 DEFAULT_REL_STYLES = {
-    'Coordinación':               {'color': '#5B9BD5', 'dash': False},
-    'Regulación / fiscalización': {'color': '#D62728', 'dash': False},
-    'Provisión de datos':         {'color': '#2CA02C', 'dash': False},
-    'Validación técnica':         {'color': '#9467BD', 'dash': False},
-    'Participación / diálogo':    {'color': '#17BECF', 'dash': False},
-    'Tensión / dependencia':      {'color': '#FF7F0E', 'dash': True},
-    'Subdivisión institucional':  {'color': '#999999', 'dash': True},
     '': {'color': '#999999', 'dash': False},
 }
+REL_PALETTE = ['#5B9BD5', '#D62728', '#2CA02C', '#9467BD', '#17BECF',
+               '#FF7F0E', '#8C564B', '#7F7F7F']
+
+# Borde de las entidades presentes en varias dimensiones a la vez
+# (etiqueta "En ambas/varias dimensiones" en la leyenda y el filtro).
+MULTI_STROKE = '#111111'
+
+# Tipo de relación que la herramienta genera automáticamente (padre -> subdivisión)
+DEFAULT_REL_STYLES['Subdivisión institucional'] = {'color': '#999999', 'dash': True}
 
 # Paleta para asignar color de borde a CUALQUIER tema/fuente presente
 THEME_PALETTE = ['#0B5394', '#38761D', '#7B1FA2', '#B45309', '#0E7490',

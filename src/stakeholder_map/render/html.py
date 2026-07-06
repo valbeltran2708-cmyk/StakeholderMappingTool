@@ -14,7 +14,8 @@ from importlib import resources
 from ..config import (W, H, CX, CY, THEME, APP_TITLE, RING_LABEL_PREFIX,
                       QUAD_MX, QUAD_MY, QUAD_R_MAX, QUAD_R_MIN,
                       R_IN, R_OUT, S_MIN, S_MAX, LABEL_FONT_MIN,
-                      UI_LANG, AXIS_LABELS, NET_R_MAX, NET_R_MIN, NET_FILL)
+                      UI_LANG, AXIS_LABELS, NET_R_MAX, NET_R_MIN, NET_FILL,
+                      MULTI_STROKE)
 from ..scales import radius_for_rank
 
 
@@ -177,18 +178,10 @@ def _nodes_svg(nodes):
     out = []
     for n in nodes:
         f, lines = fit_label(n['label'], n['r'])
-<<<<<<< Updated upstream
-        tf, halo = text_color(n.get('fill'))
-        lh = f * 1.18
-        sy = -(len(lines) - 1) * lh / 2
-        style = (f"fill:{tf};paint-order:stroke;stroke:{halo};stroke-width:2.4px;"
-                 f"stroke-linejoin:round")
-=======
         tf = text_color(n.get('fill'))
         lh = f * 1.18
         sy = -(len(lines) - 1) * lh / 2
         style = f"fill:{tf}"
->>>>>>> Stashed changes
         text = ''.join(
             f"<text text-anchor='middle' dominant-baseline='middle' y='{round(sy + j * lh, 1)}' "
             f"font-size='{f}' style='{style}'>{esc(line)}</text>"
@@ -219,6 +212,12 @@ def _legends(nodes, edges, rel_styles):
         f"<div class='legend clk' data-src=\"{esc(s)}\" onclick='filterSrc(this.dataset.src)'>"
         f"<span class='sw' style='border:3px solid {esc(c)};background:#fff'></span>{esc(s)}</div>"
         for s, c in sorted(srcs.items()))
+    multi_label = ('En ambas dimensiones' if len(srcs) == 2 else 'En varias dimensiones')
+    if any(n.get('multi') for n in nodes):
+        legend_src += (f"<div class='legend clk' data-src='__multi__' "
+                       f"onclick='filterSrc(this.dataset.src)'>"
+                       f"<span class='sw' style='border:3px solid {MULTI_STROKE};"
+                       f"background:#fff'></span>{esc(multi_label)}</div>")
     types_used = sorted({e['type'] for e in edges})
     legend_rel = ''.join(
         f"<div class='legend clk' data-type=\"{esc(t)}\" onclick='filterType(this.dataset.type)'>"
@@ -229,6 +228,8 @@ def _legends(nodes, edges, rel_styles):
     options_cat = ''.join(f"<option value='{esc(k)}'>{esc(k)}</option>" for k in sorted(cats))
     sources = sorted({n.get('source', '') for n in nodes if n.get('source', '')})
     options_src = ''.join(f"<option value='{esc(s)}'>{esc(s)}</option>" for s in sources)
+    if any(n.get('multi') for n in nodes):
+        options_src += f"<option value='__multi__'>{esc(multi_label)}</option>"
     types_opts = ''.join(f"<option value='{esc(t)}'>{esc(t)}</option>" for t in types_used)
     return legend_cat, legend_src, legend_rel, options_cat, options_src, types_opts
 
