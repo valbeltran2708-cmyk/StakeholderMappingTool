@@ -19,6 +19,7 @@ def _demo_xlsx(path):
         'Descripción / función': ['d1', 'd2', 'd3', 'd3', 'd4', 'd5'],
         'Interés en el proyecto': [4.5, 3.2, 5, 4.1, 2.7, 1.4],
         'Poder / influencia': [4.8, 5, 3.3, 3.1, 2.2, 1.1],
+        'Importancia en el proyecto': ['Alta', 'Media', 'Media', 'Alta', 'Baja', ''],
         'Notas': [''] * 6,
     })
     rel = pd.DataFrame({
@@ -39,6 +40,7 @@ def _demo_xlsx(path):
         'Estilo de línea': ['Sólida', '', '', '', ''],
         'Escala de interés': ['1', '2', '3', '4', '5'],
         'Escala de poder': ['1', '2', '3', '4', '5'],
+        'Escala de importancia': ['Baja', 'Media', 'Alta', '', ''],
         'Temas / fuentes': ['Tema A', 'Tema B', '', '', ''],
         'Color HEX  ': ['#0B5394', '#38761D', '', '', ''],
     })
@@ -81,6 +83,11 @@ def test_generate_end_to_end(tmp_path):
 
     # Relación automática padre -> subdivisión
     assert res['n_edges'] == 3
+
+    # Importancia: fusión por rango máximo, casillas en el HTML y (Sin valor)
+    assert by_label['Operador']['importance'] == 'Alta'
+    assert "class='impF'" in html and '(Sin valor)' in html
+    assert html.index('value="Baja"') < html.index('value="Alta"')
 
     # Color de tema definido en 03_Config aplicado al borde del nodo
     assert by_label['Ministerio']['stroke'] == '#0B5394'

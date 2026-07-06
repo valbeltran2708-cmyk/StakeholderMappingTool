@@ -91,9 +91,9 @@ def build(path):
     cfg.title = '03_Config'
     _head(cfg,
           ['Esfera', 'Color HEX', '', 'Tipo de relación', 'Color HEX',
-           'Estilo de línea', '', 'Escala de interés', 'Escala de poder', '',
-           'Dimensiones', 'Color HEX'],
-          [26, 12, 3, 30, 12, 16, 3, 18, 18, 3, 28, 12],
+           'Estilo de línea', '', 'Escala de interés', 'Escala de poder',
+           'Escala de importancia', '', 'Dimensiones', 'Color HEX'],
+          [26, 12, 3, 30, 12, 16, 3, 18, 18, 20, 3, 28, 12],
           comments={
               'Esfera': 'Una esfera por fila (columna A) con su color en la '
                            'columna B (#RRGGBB). Añade o cambia libremente: las '
@@ -110,6 +110,10 @@ def build(path):
                                    'No mezcles etiquetas y números.',
               'Escala de poder': 'Igual que la escala de interés: etiquetas O números, '
                                  'de menor a mayor.',
+              'Escala de importancia': 'Niveles de importancia del actor para el '
+                                       'proyecto, de MENOR a MAYOR (ej. Baja / Media / '
+                                       'Alta). Alimenta las casillas del filtro '
+                                       '"Importancia en el proyecto".',
               'Dimensiones': 'Dimensiones de análisis (ej. Electrificación de '
                                  'flota, Resiliencia climática). Alimenta el desplegable '
                                  'de "Tema / fuente" en las dos hojas de datos. El color '
@@ -133,10 +137,12 @@ def build(path):
         cfg.cell(row=i, column=8, value=v)
         cfg.cell(row=i, column=9, value=v)
     cfg.cell(row=6, column=8, value='(o números: 1,2,3,4,5)').font = NOTE_FONT
+    for i, v in enumerate(['Baja', 'Media', 'Alta'], start=2):
+        cfg.cell(row=i, column=10, value=v)
     for i, (t, col) in enumerate([('Dimensión A', '#0B5394'), ('Dimensión B', '#38761D')],
                                  start=2):
-        cfg.cell(row=i, column=11, value=t)
-        c = cfg.cell(row=i, column=12, value=col)
+        cfg.cell(row=i, column=12, value=t)
+        c = cfg.cell(row=i, column=13, value=col)
         c.fill = PatternFill('solid', fgColor=col.lstrip('#'))
         c.font = Font(color='FFFFFF', bold=True, size=9)
     _dv(cfg, f'F2:F{MAXR}', '"Sólida,Punteada"', strict=True)
@@ -145,8 +151,9 @@ def build(path):
     st = wb.create_sheet('01_Stakeholders')
     st_headers = ['Stakeholder / entidad', 'Entidad padre / grupo', 'Nivel',
                   'Dimensión', 'Esfera', 'Categorías', 'Descripción / función',
-                  'Interés en el proyecto', 'Poder / influencia', 'Notas']
-    _head(st, st_headers, [34, 26, 14, 22, 24, 30, 40, 20, 20, 30], comments={
+                  'Interés en el proyecto', 'Poder / influencia',
+                  'Importancia en el proyecto', 'Notas']
+    _head(st, st_headers, [34, 26, 14, 22, 24, 30, 40, 20, 20, 22, 30], comments={
         'Stakeholder / entidad': 'Nombre visible del actor. Obligatorio.\n\n'
                                  'Multi-tema: repite el MISMO nombre en otra fila con '
                                  'otra "Dimensión" y sus propios interés/poder; la '
@@ -173,10 +180,14 @@ def build(path):
                                   'y números en la columna.',
         'Poder / influencia': 'Igual que Interés: etiqueta de la escala o número con '
                               'decimales. Define el TAMAÑO del círculo.',
+        'Importancia en el proyecto': 'Nivel de importancia del actor para el '
+                                      'proyecto (escala definida en 03_Config, '
+                                      'col. J). En la herramienta se filtra con '
+                                      'casillas por nivel.',
         'Notas': 'Contexto adicional; aparece en el panel de detalle.',
     })
     _dv(st, f'C2:C{MAXR}', '"Entidad,Subdivisión"', strict=True)
-    _dv(st, f'D2:D{MAXR}', f"'03_Config'!$K$2:$K${MAXR}",
+    _dv(st, f'D2:D{MAXR}', f"'03_Config'!$L$2:$L${MAXR}",
         prompt='Dimensión definida en 03_Config (puedes escribir una nueva).')
     _dv(st, f'E2:E{MAXR}', f"'03_Config'!$A$2:$A${MAXR}",
         prompt='Esfera definida en 03_Config (puedes escribir una nueva).')
@@ -187,6 +198,8 @@ def build(path):
             prompt='Elige un nivel de la escala O escribe un número con decimales '
                    '(ej. 3.5) para diferenciar entidades. Acepta el aviso al salir '
                    'de la lista.')
+    _dv(st, f'J2:J{MAXR}', f"'03_Config'!$J$2:$J${MAXR}",
+        prompt='Nivel de importancia definido en 03_Config (col. J).')
     _dv(st, f'B2:B{MAXR}', f"'01_Stakeholders'!$A$2:$A${MAXR}",
         prompt='Nombre exacto de la entidad padre (de la columna A).')
     # ---------- 02_Relaciones ----------
@@ -221,7 +234,7 @@ def build(path):
     dvf.add(f'D2:D{MAXR}')
     _dv(rel, f'E2:E{MAXR}', '"De origen a destino,Bidireccional"', strict=True)
     _dv(rel, f'F2:F{MAXR}', '"Positiva,Negativa,Neutral"', strict=True)
-    _dv(rel, f'G2:G{MAXR}', f"'03_Config'!$K$2:$K${MAXR}",
+    _dv(rel, f'G2:G{MAXR}', f"'03_Config'!$L$2:$L${MAXR}",
         prompt='Dimensión definida en 03_Config (puedes escribir una nueva).')
 
     top = PatternFill('solid', fgColor=ARUP_RED.lstrip('#'))

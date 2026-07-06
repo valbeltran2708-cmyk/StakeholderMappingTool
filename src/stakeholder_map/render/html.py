@@ -254,6 +254,21 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
     else:
         tag_filter = ''
 
+    imp_levels = [v for v in (scale.get('importance_order') or [])]
+    any_imp = any((n.get('importance') or '') != '' for n in nodes)
+    if imp_levels and any_imp:
+        none_needed = any((n.get('importance') or '') == '' for n in nodes)
+        rows = ''.join(
+            f"<label class='chk'><input type='checkbox' class='impF' "
+            f"value=\"{esc(v)}\" checked onchange='filters()'> {esc(v)}</label>"
+            for v in imp_levels)
+        if none_needed:
+            rows += ("<label class='chk'><input type='checkbox' class='impF' "
+                     "value='__none__' checked onchange='filters()'> (Sin valor)</label>")
+        imp_filter = ("<label class='formlabel'>Importancia en el proyecto</label>" + rows)
+    else:
+        imp_filter = ''
+
     warn_html = ('<p class="small ok">Sin advertencias de validación.</p>' if not warnings
                  else ''.join(f"<div class='warn'>{esc(w)}</div>" for w in warnings[:14]))
 
@@ -291,6 +306,7 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
             ('%%EDGE_COUNT%%', str(len(edges))),
             ('%%OPTIONS_CAT%%', options_cat),
             ('%%TAG_FILTER%%', tag_filter),
+            ('%%IMP_FILTER%%', imp_filter),
             ('%%OPTIONS_SRC%%', options_src),
             ('%%TYPES_OPTS%%', types_opts),
             ('%%LEGEND_CAT%%', legend_cat),

@@ -13,7 +13,8 @@ import pandas as pd
 from .config import (CX, CY, THEME_PALETTE, CATEGORY_PALETTE, REL_PALETTE,
                      MULTI_STROKE)
 from .normalize import clean, cell_val, norm_pol, slug, parse_tags
-from .scales import build_scale, radius_for_rank, size_for_rank, to_num
+from .scales import (build_scale, radius_for_rank, size_for_rank, to_num,
+                     order_scale)
 from .excel_io import sheet, load_scales, load_style_config, load_unified_config
 from .layouts import resolve_overlaps, add_network_layout, add_quadrant_coords
 
@@ -28,6 +29,8 @@ NODE_RENAMES = {
     'Categorías': 'tags', 'Categorias': 'tags', 'Etiquetas': 'tags',
     'Descripción / función': 'description',
     'Dimensión': 'source', 'Dimension': 'source',
+    'Importancia en el proyecto': 'importance', 'Importancia': 'importance',
+    'Importance': 'importance', 'Project importance': 'importance',
     'Descripcion / funcion': 'description', 'Interés en el proyecto': 'interest',
     'Interes en el proyecto': 'interest', 'Poder / influencia': 'power',
     'Notas': 'notes',
@@ -67,6 +70,8 @@ def _load_styles_and_scales(path, warnings):
             scales_cfg['interest'] = uni['scales']['interest']
         if uni['scales']['power']:
             scales_cfg['power'] = uni['scales']['power']
+        if uni['scales'].get('importance'):
+            scales_cfg['importance'] = uni['scales']['importance']
         theme_colors = dict(uni.get('theme_colors') or {})
     return cat_colors, rel_styles, scales_cfg, theme_colors
 
@@ -122,6 +127,7 @@ def read_data(path):
                                      'power': n.get('power', ''),
                                      'ir': n['ir'], 'pr': n['pr']}])
             n.setdefault('multi', False)
+            n['importance'] = cell_val(n.get('importance', ''))
             tv = n.get('tags', [])
             if not isinstance(tv, list):
                 tv = str(tv).strip().strip('[]')
@@ -140,7 +146,8 @@ def read_data(path):
 
     st = st.rename(columns=NODE_RENAMES)
     for col in ['id', 'label', 'parent_id', 'parent_name', 'level', 'source',
-                'category', 'tags', 'description', 'interest', 'power', 'notes']:
+                'category', 'tags', 'description', 'interest', 'power',
+                'importance', 'notes']:
         if col not in st.columns:
             st[col] = ''
         st[col] = st[col].apply(clean)
@@ -155,9 +162,16 @@ def read_data(path):
     st['id'] = st.apply(lambda r: r.id or slug(r.label), axis=1)
     st['interest'] = st.interest.apply(cell_val)
     st['power'] = st.power.apply(cell_val)
+    st['importance'] = st.importance.apply(cell_val)
 
     # Escala dinámica (categórica o numérica continua)
     scale = build_scale(list(st.interest), list(st.power), scales_cfg)
+    imp_order = order_scale(list(st.importance), scales_cfg.get('importance'))
+    scale['importance_order'] = imp_order
+    _imp_rank = {v: i for i, v in enumerate(imp_order)}
+
+    def imprank(v):
+        return _imp_rank.get(v, -1)
     irank, prank = scale['irank'], scale['prank']
     _warn_scale_quality(st, scale, warnings)
 
@@ -175,6 +189,7 @@ def read_data(path):
                  for _, rr in g.iterrows()]
         base['interest'] = max(g['interest'], key=irank)
         base['power'] = max(g['power'], key=prank)
+        base['importance'] = max(g['importance'], key=imprank)
         gi = g.assign(_sc=g['interest'].map(irank) + g['power'].map(prank))
         base['source'] = gi.sort_values('_sc', ascending=False).iloc[0]['source']
         seen_t = []
@@ -216,6 +231,11 @@ def read_data(path):
         if faltan:
             warnings.append(f"{len(faltan)} stakeholder(s) {msg}: "
                             f"{', '.join(faltan[:6])}{'…' if len(faltan) > 6 else ''}")
+    if st.importance.ne('').any():
+        sin_imp = st[st.importance == ''].label.tolist()
+        if sin_imp:
+            warnings.append(f"{len(sin_imp)} stakeholder(s) sin importancia: "
+                            f"{', '.join(sin_imp[:6])}{'…' if len(sin_imp) > 6 else ''}")
     orphan_sub = st[(st.level.str.lower() == 'subdivisión')
                     & (~st.parent_id.isin(idset_tmp))
                     & (st.parent_id != '')].label.tolist()
@@ -272,6 +292,7 @@ def read_data(path):
             'source': r.source, 'category': r.category, 'description': r.description,
             'interest': r.interest, 'power': r.power, 'notes': r.notes,
             'tags': list(r.tags) if isinstance(r.tags, list) else parse_tags(r.tags),
+            'importance': r.importance,
             'x': round(p['x'], 2), 'y': round(p['y'], 2),
             'r': size_for_rank(prank(r.power), NP),
             'ir': round(irank(r.interest), 3), 'pr': round(prank(r.power), 3),

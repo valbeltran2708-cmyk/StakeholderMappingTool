@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
 """Herramienta de stakeholder mapping: Excel -> HTML interactivo + tablas."""
-__version__ = '1.4.0'
+__version__ = '1.5.0'
 from .core import read_data, generate
 __all__ = ['read_data', 'generate', '__version__']

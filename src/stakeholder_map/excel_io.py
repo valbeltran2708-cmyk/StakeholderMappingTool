@@ -23,7 +23,7 @@ def sheet(path, names):
 def load_scales(path, warnings):
     """Lee 03D_Escalas si existe: orden explícito de niveles de interés y poder."""
     df, _ = sheet(path, ['03D_Escalas', '03D_Scales', 'Escalas', 'Scales'])
-    out = {'interest': [], 'power': []}
+    out = {'interest': [], 'power': [], 'importance': []}
     if df is None or df.empty:
         return out
     for c in df.columns:
@@ -33,6 +33,8 @@ def load_scales(path, warnings):
             out['interest'] = vals
         elif 'poder' in lc or 'power' in lc:
             out['power'] = vals
+        elif 'importan' in lc:
+            out['importance'] = vals
     return out
 
 
@@ -102,7 +104,8 @@ def load_unified_config(path, warnings):
         j = find(lambda c: 'hex' in c or 'color' in c, i + 1)
         return j if 0 <= j <= i + 2 else -1
 
-    out = {'cat_colors': {}, 'rel_styles': {}, 'scales': {'interest': [], 'power': []},
+    out = {'cat_colors': {}, 'rel_styles': {},
+           'scales': {'interest': [], 'power': [], 'importance': []},
            'themes': [], 'theme_colors': {}, 'sheet': name}
 
     ci = find(lambda c: 'esfera' in c)
@@ -148,6 +151,9 @@ def load_unified_config(path, warnings):
     pi = find(lambda c: 'poder' in c or 'power' in c)
     if pi >= 0:
         out['scales']['power'] = [cell_val(v) for v in df.iloc[:, pi].tolist() if cell_val(v)]
+    mi = find(lambda c: 'importan' in c)
+    if mi >= 0:
+        out['scales']['importance'] = [cell_val(v) for v in df.iloc[:, mi].tolist() if cell_val(v)]
 
     tj = find(lambda c: 'tema' in c or 'fuente' in c or 'theme' in c or 'dimensi' in c)
     if tj >= 0:

@@ -1,5 +1,26 @@
 # Changelog
 
+## 1.5.0 (2026-07-06)
+
+### Nuevo
+- Filtro "Importancia en el proyecto" por casillas: un checkbox por nivel
+  de la escala (seleccionables individualmente) más "(Sin valor)" cuando
+  hay actores sin dato. Compone con los demás filtros y el mapa se
+  reordena con la selección. El filtro solo aparece si los datos traen la
+  columna.
+- Nueva columna J "Importancia en el proyecto" en 01_Stakeholders (Notas
+  pasa a K) con desplegable, y columna J "Escala de importancia" en
+  03_Config (Dimensiones pasa a L y su color a M), con niveles de menor a
+  mayor (sugerencia: Baja / Media / Alta). Los archivos con el orden
+  antiguo de columnas siguen funcionando porque la lectura es por nombre
+  de cabecera.
+- La importancia se muestra en la ficha del actor y se exporta en el CSV
+  de estrategia. En actores presentes en varias dimensiones se toma la
+  MAYOR importancia entre sus filas (mismo criterio de riesgo que interés
+  y poder). Se avisa en validación si la columna se usa pero quedan
+  actores sin valor.
+
+
 ## 1.4.0 (2026-07-06)
 
 ### Cambiado
