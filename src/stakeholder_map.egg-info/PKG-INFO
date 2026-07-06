@@ -1,13 +1,24 @@
+Metadata-Version: 2.4
+Name: stakeholder-map
+Version: 1.1.0
+Summary: Mapa interactivo de stakeholders (poder-interés, red de conexiones y matriz de Mendelow) a partir de un Excel.
+Author: Arup Bogotá - Transport Planning
+License: Uso interno
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+Requires-Dist: pandas>=2.0
+Requires-Dist: openpyxl>=3.1
+Provides-Extra: dev
+Requires-Dist: pytest>=7; extra == "dev"
+
 # Mapa interactivo de stakeholders
 
 Herramienta en Python que convierte un Excel estructurado en un mapa
 interactivo de stakeholders en un solo archivo HTML (sin servidor, sin
 dependencias en el navegador), con tres vistas:
 
-1. **Poder–interés (radial)**: distancia al centro = interés (el máximo
-   llega casi al centro), tamaño del círculo = poder, color = esfera,
-   borde = dimensión. El plano se divide en sectores por esfera con arco
-   proporcional al número de actores visibles.
+1. **Poder–interés (radial)**: distancia al centro = interés, tamaño del
+   círculo = poder, color = categoría, borde = tema/fuente.
 2. **Conexiones (red)**: distribución por relaciones (systems thinking),
    círculos de tamaño uniforme.
 3. **Cuadrante (Mendelow)**: matriz interés x poder con las cuatro zonas
@@ -58,9 +69,9 @@ Genera la plantilla con `python tools/make_template.py` (queda en
 
 | Hoja | Contenido |
 |---|---|
-| `01_Stakeholders` | Un actor por fila: nombre, nivel (Entidad/Subdivisión), entidad padre, dimensión, esfera, categorías (etiquetas múltiples opcionales separadas por ";"), descripción, interés, poder, notas. |
+| `01_Stakeholders` | Un actor por fila: nombre, nivel (Entidad/Subdivisión), entidad padre, tema/fuente, categoría, descripción, interés, poder, notas. |
 | `02_Relaciones` | Una relación por fila: origen, destino, tipo, fuerza 1-5, dirección, efecto (positiva/negativa/neutral), tema, descripción. |
-| `03_Config` | TODA la configuración en una hoja: esferas + color, tipos de relación + color + estilo de línea, escalas de interés y poder, y dimensiones + color (el color de la dimensión define el borde de los nodos y la leyenda). Las listas desplegables de las hojas de datos se alimentan de aquí. |
+| `03_Config` | TODA la configuración en una hoja: categorías + color, tipos de relación + color + estilo de línea, escalas de interés y poder, y temas + color (el color del tema define el borde de los nodos y la leyenda). Las listas desplegables de las hojas de datos se alimentan de aquí. |
 
 Reglas que conviene conocer:
 
@@ -71,13 +82,11 @@ Reglas que conviene conocer:
   relativa entre entidades; los anillos y la matriz usan las marcas
   enteras de la escala. No mezcles etiquetas y números en una misma
   columna (la herramienta lo detecta y avisa).
-- **Multi-dimensión.** Repite el mismo nombre de actor en varias filas, una
-  por dimensión, con puntuaciones propias. Se fusionan en un nodo (interés/poder =
-  el mayor, criterio de mayor riesgo) y el desglose por dimensión queda
-  disponible en el panel de detalle y en el filtro "Dimensión", que
-  reposiciona y redimensiona cada actor según esa dimensión. Las columnas
-  con los nombres antiguos ("Tema / fuente", "Temas / fuentes") siguen
-  siendo aceptadas.
+- **Multi-tema.** Repite el mismo nombre de actor en varias filas, una por
+  tema, con puntuaciones propias. Se fusionan en un nodo (interés/poder =
+  el mayor, criterio de mayor riesgo) y el desglose por tema queda
+  disponible en el panel de detalle y en el filtro "Fuente / tema", que
+  reposiciona y redimensiona cada actor según ese tema.
 - **Subdivisiones.** `Nivel = Subdivisión` + nombre exacto del padre en
   `Entidad padre / grupo`. Click en la entidad padre abre su mapa local.
 - **Validaciones amables.** Los desplegables de interés/poder, categoría,
@@ -183,8 +192,8 @@ Recomendaciones:
 
 - La escala continua asume interpolación lineal entre el mínimo y el
   máximo de la escala; no hay transformaciones logarítmicas.
-- En la fusión multi-dimensión, el consolidado toma el MAYOR interés/poder
-  entre dimensiones (criterio conservador de riesgo); otros criterios (promedio,
+- En la fusión multi-tema, el consolidado toma el MAYOR interés/poder
+  entre temas (criterio conservador de riesgo); otros criterios (promedio,
   ponderado) requerirían tocar `core.py`.
 - El modelo poder-interés no captura actitud/sentimiento del actor
   (apoyo u oposición se registra por relación, no por nodo); está en el

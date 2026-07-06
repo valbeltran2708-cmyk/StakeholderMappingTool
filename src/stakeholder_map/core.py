@@ -11,11 +11,10 @@ from pathlib import Path
 import pandas as pd
 
 from .config import CX, CY, THEME_PALETTE
-from .normalize import clean, cell_val, norm_pol, slug
+from .normalize import clean, cell_val, norm_pol, slug, parse_tags
 from .scales import build_scale, radius_for_rank, size_for_rank, to_num
 from .excel_io import sheet, load_scales, load_style_config, load_unified_config
-from .layouts import (resolve_overlaps, add_network_layout,
-                      add_quadrant_coords, add_theme_layouts)
+from .layouts import resolve_overlaps, add_network_layout, add_quadrant_coords
 
 NODE_RENAMES = {
     'entity_id': 'id', 'entity_name': 'label', 'parent_id': 'parent_id',
@@ -24,7 +23,10 @@ NODE_RENAMES = {
     'influence_power': 'power', 'notes': 'notes',
     'Stakeholder / entidad': 'label', 'Entidad padre / grupo': 'parent_name',
     'Nivel': 'level', 'Tema / fuente': 'source', 'Categoría': 'category',
-    'Categoria': 'category', 'Descripción / función': 'description',
+    'Categoria': 'category', 'Esfera': 'category', 'Esferas': 'category',
+    'Categorías': 'tags', 'Categorias': 'tags', 'Etiquetas': 'tags',
+    'Descripción / función': 'description',
+    'Dimensión': 'source', 'Dimension': 'source',
     'Descripcion / funcion': 'description', 'Interés en el proyecto': 'interest',
     'Interes en el proyecto': 'interest', 'Poder / influencia': 'power',
     'Notas': 'notes',
@@ -40,6 +42,7 @@ REL_RENAMES = {
     'Dirección': 'direction', 'Direccion': 'direction', 'polarity': 'polarity',
     'Efecto / polaridad': 'polarity', 'theme': 'theme',
     'Tema de la relación': 'theme', 'Tema de la relacion': 'theme',
+    'Dimensión de la relación': 'theme', 'Dimension de la relacion': 'theme',
     'description': 'description', 'Descripción de la relación': 'description',
     'Descripcion de la relacion': 'description',
 }
@@ -50,6 +53,7 @@ def _load_styles_and_scales(path, warnings):
     03A/03B/03D como compatibilidad hacia atrás."""
     cat_colors, rel_styles = load_style_config(path, warnings)
     scales_cfg = load_scales(path, warnings)
+    theme_colors = {}
     uni = load_unified_config(path, warnings)
     if uni:
         for k, v in uni['cat_colors'].items():
@@ -62,7 +66,8 @@ def _load_styles_and_scales(path, warnings):
             scales_cfg['interest'] = uni['scales']['interest']
         if uni['scales']['power']:
             scales_cfg['power'] = uni['scales']['power']
-    return cat_colors, rel_styles, scales_cfg
+        theme_colors = dict(uni.get('theme_colors') or {})
+    return cat_colors, rel_styles, scales_cfg, theme_colors
 
 
 def _warn_scale_quality(st, scale, warnings):
@@ -93,7 +98,7 @@ def read_data(path):
     """Devuelve (nodes, edges, hoja_nodos, hoja_rel, warnings, cat_colors,
     rel_styles, scale). scale incluye 'net_r' (radio de la vista de red)."""
     warnings = []
-    cat_colors, rel_styles, scales_cfg = _load_styles_and_scales(path, warnings)
+    cat_colors, rel_styles, scales_cfg, theme_colors = _load_styles_and_scales(path, warnings)
 
     # Camino rápido: Excel de coordenadas ya procesado
     nodes_df, ns = sheet(path, ['nodes_for_visualizers', 'nodes_cleaned'])
@@ -109,14 +114,18 @@ def read_data(path):
         irank, prank = scale['irank'], scale['prank']
         for n in nodes:
             n.setdefault('qx', n.get('x')); n.setdefault('qy', n.get('y'))
-            n.setdefault('ex', n.get('x')); n.setdefault('ey', n.get('y'))
             n['ir'] = round(irank(n.get('interest', '')), 3)
             n['pr'] = round(prank(n.get('power', '')), 3)
             n.setdefault('themes', [{'theme': n.get('source', ''),
                                      'interest': n.get('interest', ''),
                                      'power': n.get('power', ''),
                                      'ir': n['ir'], 'pr': n['pr']}])
-            n.setdefault('multi', False); n.setdefault('tpos', {}); n.setdefault('tquad', {})
+            n.setdefault('multi', False)
+            tv = n.get('tags', [])
+            if not isinstance(tv, list):
+                tv = str(tv).strip().strip('[]')
+                tv = parse_tags(tv.replace("'", '').replace('"', ''))
+            n['tags'] = tv
             n['r'] = size_for_rank(n['pr'], scale['NP'])
         scale['net_r'] = add_network_layout(nodes, edges)
         return nodes, edges, ns, es, warnings, cat_colors, rel_styles, scale
@@ -130,10 +139,12 @@ def read_data(path):
 
     st = st.rename(columns=NODE_RENAMES)
     for col in ['id', 'label', 'parent_id', 'parent_name', 'level', 'source',
-                'category', 'description', 'interest', 'power', 'notes']:
+                'category', 'tags', 'description', 'interest', 'power', 'notes']:
         if col not in st.columns:
             st[col] = ''
         st[col] = st[col].apply(clean)
+    # Categorías (etiquetas múltiples por actor): 'A; B, C' -> ['A', 'B', 'C']
+    st['tags'] = st['tags'].apply(parse_tags)
     if 'label' not in st.columns or st['label'].eq('').all():
         raise ValueError("La hoja de stakeholders no tiene columna de nombre "
                          "('Stakeholder / entidad').")
@@ -167,6 +178,12 @@ def read_data(path):
         base['power'] = max(g['power'], key=prank)
         gi = g.assign(_sc=g['interest'].map(irank) + g['power'].map(prank))
         base['source'] = gi.sort_values('_sc', ascending=False).iloc[0]['source']
+        seen_t = []
+        for tl in g['tags']:
+            for t in tl:
+                if t not in seen_t:
+                    seen_t.append(t)
+        base['tags'] = seen_t
         for c in ['id', 'description', 'notes', 'category', 'level',
                   'parent_name', 'parent_id']:
             ne = [x for x in g[c] if str(x).strip()]
@@ -182,8 +199,8 @@ def read_data(path):
     st['id'] = ids
     themes_by_id = {st.id.iloc[k]: tlists[k] for k in range(len(tlists)) if tlists[k]}
     if themes_by_id:
-        warnings.append(f"{len(themes_by_id)} entidad(es) en varios temas se fusionaron "
-                        f"en un nodo (interés/poder = el mayor; desglose por tema en el panel).")
+        warnings.append(f"{len(themes_by_id)} entidad(es) en varias dimensiones se fusionaron "
+                        f"en un nodo (interés/poder = el mayor; desglose por dimensión en el panel).")
 
     name_id = dict(zip(st.label, st.id))
     st['parent_id'] = st.apply(
@@ -193,7 +210,7 @@ def read_data(path):
 
     # Validaciones de nodos
     idset_tmp = set(st.id)
-    for cond, msg in ((st.category == '', 'sin categoría'),
+    for cond, msg in ((st.category == '', 'sin esfera'),
                       (st.interest == '', 'sin interés'),
                       (st.power == '', 'sin poder')):
         faltan = st[cond].label.tolist()
@@ -209,7 +226,7 @@ def read_data(path):
     cats_used = set(st[st.category != ''].category)
     no_color = [c for c in cats_used if c not in cat_colors]
     if no_color:
-        warnings.append(f"Categorías sin color en la configuración (uso gris): "
+        warnings.append(f"Esferas sin color en la configuración (uso gris): "
                         f"{', '.join(sorted(no_color)[:6])}")
 
     # ---- Layout radial: semilla por categoría/interés, luego resolver solapes ----
@@ -238,28 +255,23 @@ def read_data(path):
 
     radius_of = {r.id: radius_for_rank(irank(r.interest), NI) for _, r in st.iterrows()}
     size_of = {r.id: size_for_rank(prank(r.power), NP) for _, r in st.iterrows()}
-    ent_ids = set(main.id)
-    ent_seed = {rid: dict(v) for rid, v in pos.items() if rid in ent_ids}
     pos = resolve_overlaps(pos, size_of, radius_of)
-    # Layout alterno SOLO con entidades (al ocultar subdivisiones llenan el espacio)
-    pos_ent = resolve_overlaps({k: dict(v) for k, v in ent_seed.items()},
-                               {k: size_of[k] for k in ent_ids if k in size_of},
-                               {k: radius_of[k] for k in ent_ids if k in radius_of})
 
-    # Borde por tema/fuente, dinámico para cualquier conjunto de temas
+    # Borde por tema/fuente: el color definido en 03_Config manda; los temas
+    # sin color reciben uno automático de la paleta
     src_present = sorted(s for s in dict.fromkeys(st.source) if s)
     src_colors = {s: THEME_PALETTE[i % len(THEME_PALETTE)] for i, s in enumerate(src_present)}
+    src_colors.update({k: v for k, v in theme_colors.items() if v})
 
     nodes = []
     for _, r in st.iterrows():
         p = pos.get(r.id, {'x': CX, 'y': CY})
-        pe = pos_ent.get(r.id) or p
         nodes.append({
             'id': r.id, 'label': r.label, 'parent_id': r.parent_id, 'level': r.level,
             'source': r.source, 'category': r.category, 'description': r.description,
             'interest': r.interest, 'power': r.power, 'notes': r.notes,
+            'tags': list(r.tags) if isinstance(r.tags, list) else parse_tags(r.tags),
             'x': round(p['x'], 2), 'y': round(p['y'], 2),
-            'ex': round(pe['x'], 2), 'ey': round(pe['y'], 2),
             'r': size_for_rank(prank(r.power), NP),
             'ir': round(irank(r.interest), 3), 'pr': round(prank(r.power), 3),
             'fill': cat_colors.get(r.category, '#BFBFBF'),
@@ -271,7 +283,6 @@ def read_data(path):
             'multi': r.id in themes_by_id,
         })
     add_quadrant_coords(nodes, scale)
-    add_theme_layouts(nodes, scale)
 
     idset = {n['id'] for n in nodes}
     id_label = {n['id']: n['label'] for n in nodes}

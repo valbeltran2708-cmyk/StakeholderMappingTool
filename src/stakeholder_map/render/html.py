@@ -11,7 +11,10 @@ import json
 import math
 from importlib import resources
 
-from ..config import W, H, CX, CY, THEME, APP_TITLE, RING_LABEL_PREFIX
+from ..config import (W, H, CX, CY, THEME, APP_TITLE, RING_LABEL_PREFIX,
+                      QUAD_MX, QUAD_MY, QUAD_R_MAX, QUAD_R_MIN,
+                      R_IN, R_OUT, S_MIN, S_MAX, LABEL_FONT_MIN,
+                      UI_LANG, AXIS_LABELS, NET_R_MAX, NET_R_MIN, NET_FILL)
 from ..scales import radius_for_rank
 
 
@@ -24,7 +27,7 @@ def _asset(name):
 
 
 def text_color(hexc):
-    """(color de texto, color de halo) legibles sobre el relleno del nodo."""
+    """Negro o blanco puro según la luminancia del relleno (sin halo)."""
     h = str(hexc or '#bfbfbf').lstrip('#')
     if len(h) == 3:
         h = ''.join(c * 2 for c in h)
@@ -33,7 +36,7 @@ def text_color(hexc):
     except Exception:
         r = g = b = 180
     lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255
-    return ('#15212b', '#ffffff') if lum > 0.62 else ('#ffffff', '#10202c')
+    return '#000000' if lum > 0.6 else '#FFFFFF'
 
 
 def _wrap(text, max_chars):
@@ -55,7 +58,7 @@ def _wrap(text, max_chars):
     return lines
 
 
-def fit_label(label, r, fmax=14, fmin=6):
+def fit_label(label, r, fmax=14, fmin=LABEL_FONT_MIN):
     """Mayor fuente (<= fmax) cuyas líneas caben dentro del círculo de radio r.
     Trunca con elipsis solo como último recurso."""
     label = str(label or '').strip()
@@ -106,29 +109,44 @@ def _rings_svg(scale):
     return f"<g id='rings'>{circles}</g>", f"<g id='ringLabels'>{labels}</g>"
 
 
+def _axis_title(key):
+    if UI_LANG == 'both':
+        return f"{AXIS_LABELS['es'][key]} / {AXIS_LABELS['en'][key]}"
+    return AXIS_LABELS.get(UI_LANG, AXIS_LABELS['es'])[key]
+
+
 def _qgrid_svg(scale):
-    mxq, myq = 150, 120
+    mxq, myq = QUAD_MX, QUAD_MY
     ncol = max(scale['NI'], 1); nrow = max(scale['NP'], 1)
     gwq = (W - 2 * mxq) / ncol; ghq = (H - 2 * myq) / nrow
     parts = ["<g id='qgrid' class='hidden'>"]
+    parts.append(f"<rect x='{mxq}' y='{myq}' width='{W - 2 * mxq}' height='{H - 2 * myq}' "
+                 f"fill='none' class='qline'/>")
     for i in range(1, ncol):
         x = mxq + i * gwq
         parts.append(f"<line x1='{round(x, 1)}' y1='{myq}' x2='{round(x, 1)}' y2='{H - myq}' class='qline'/>")
     for j in range(1, nrow):
         y = myq + j * ghq
         parts.append(f"<line x1='{mxq}' y1='{round(y, 1)}' x2='{W - mxq}' y2='{round(y, 1)}' class='qline'/>")
+    # marcas de nivel FUERA de la matriz: interés debajo, poder a la izquierda
     for i, v in enumerate(scale['interest_order']):
         cx = mxq + (i + 0.5) * gwq
-        parts.append(f"<text class='qtick' x='{round(cx, 1)}' y='{H - 92}' text-anchor='middle'>{esc(str(v))}</text>")
+        parts.append(f"<text class='qtick' x='{round(cx, 1)}' y='{H - myq + 30}' "
+                     f"text-anchor='middle'>{esc(str(v))}</text>")
     for p, v in enumerate(scale['power_order']):
         cy = myq + (nrow - 1 - p + 0.5) * ghq
-        parts.append(f"<text class='qtick' x='128' y='{round(cy + 4, 1)}' text-anchor='end'>{esc(str(v))}</text>")
-    parts.append(f"<text class='qlab' x='{W - 160}' y='150' text-anchor='end'>Gestionar de cerca</text>")
-    parts.append("<text class='qlab' x='160' y='150'>Mantener satisfecho</text>")
-    parts.append(f"<text class='qlab' x='{W - 160}' y='{H - 130}' text-anchor='end'>Mantener informado</text>")
-    parts.append(f"<text class='qlab' x='160' y='{H - 130}'>Monitorear</text>")
-    parts.append(f"<text class='qaxis' x='{CX}' y='{H - 70}' text-anchor='middle'>Interés →</text>")
-    parts.append(f"<text class='qaxis' transform='translate(104,{CY}) rotate(-90)' text-anchor='middle'>Poder →</text>")
+        parts.append(f"<text class='qtick' x='{mxq - 16}' y='{round(cy + 4, 1)}' "
+                     f"text-anchor='end'>{esc(str(v))}</text>")
+    # lectura Mendelow (por mitades) en las 4 esquinas, dentro de la matriz
+    parts.append(f"<text class='qlab' x='{W - mxq - 14}' y='{myq + 28}' text-anchor='end'>Gestionar de cerca</text>")
+    parts.append(f"<text class='qlab' x='{mxq + 14}' y='{myq + 28}'>Mantener satisfecho</text>")
+    parts.append(f"<text class='qlab' x='{W - mxq - 14}' y='{H - myq - 16}' text-anchor='end'>Mantener informado</text>")
+    parts.append(f"<text class='qlab' x='{mxq + 14}' y='{H - myq - 16}'>Monitorear</text>")
+    # títulos de eje, separados de las marcas para que nunca se crucen
+    parts.append(f"<text class='qaxis' x='{CX}' y='{H - myq + 74}' "
+                 f"text-anchor='middle'>{esc(_axis_title('interest'))} →</text>")
+    parts.append(f"<text class='qaxis' transform='translate({mxq - 130},{CY}) rotate(-90)' "
+                 f"text-anchor='middle'>{esc(_axis_title('power'))} →</text>")
     parts.append("</g>")
     return ''.join(parts)
 
@@ -159,11 +177,18 @@ def _nodes_svg(nodes):
     out = []
     for n in nodes:
         f, lines = fit_label(n['label'], n['r'])
+<<<<<<< Updated upstream
         tf, halo = text_color(n.get('fill'))
         lh = f * 1.18
         sy = -(len(lines) - 1) * lh / 2
         style = (f"fill:{tf};paint-order:stroke;stroke:{halo};stroke-width:2.4px;"
                  f"stroke-linejoin:round")
+=======
+        tf = text_color(n.get('fill'))
+        lh = f * 1.18
+        sy = -(len(lines) - 1) * lh / 2
+        style = f"fill:{tf}"
+>>>>>>> Stashed changes
         text = ''.join(
             f"<text text-anchor='middle' dominant-baseline='middle' y='{round(sy + j * lh, 1)}' "
             f"font-size='{f}' style='{style}'>{esc(line)}</text>"
@@ -173,8 +198,6 @@ def _nodes_svg(nodes):
         out.append(
             f"<g class='node' data-id='{esc(n['id'])}' data-category='{esc(n.get('category', ''))}' "
             f"data-source='{esc(n.get('source', ''))}' data-level='{esc(n.get('level', ''))}' "
-            f"data-x='{n['x']}' data-y='{n['y']}' data-ex='{n['ex']}' data-ey='{n['ey']}' "
-            f"data-qx='{n.get('qx', n['x'])}' data-qy='{n.get('qy', n['y'])}' "
             f"transform='translate({n['x']},{n['y']})'>"
             f"<circle r='{n['r']}' fill='{esc(n['fill'])}' stroke='{esc(n['stroke'])}' stroke-width='3'/>{marker2}"
             f"<g class='lbl'>{text}</g></g>")
@@ -222,6 +245,14 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
     pw_mid = po[len(po) // 2] if len(po) >= 3 else ''
     interest_levels = ', '.join(str(v) for v in reversed(scale['interest_order'])) or 'n/d'
 
+    tags_all = sorted({t for n in nodes for t in (n.get('tags') or [])})
+    if tags_all:
+        topts = ''.join(f"<option value='{esc(t)}'>{esc(t)}</option>" for t in tags_all)
+        tag_filter = ("<label>Categoría</label><select id='tagF' onchange='filters()'>"
+                      f"<option value=''>Todas</option>{topts}</select>")
+    else:
+        tag_filter = ''
+
     warn_html = ('<p class="small ok">Sin advertencias de validación.</p>' if not warnings
                  else ''.join(f"<div class='warn'>{esc(w)}</div>" for w in warnings[:14]))
 
@@ -229,11 +260,18 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
     # texto crudo y no se decodifican entidades, así que &quot; rompería
     # JSON.parse. Solo se neutralizan <, > y & con escapes unicode (JSON
     # válido) para que el payload no pueda cerrar la etiqueta <script>.
-    data_json = (json.dumps({'nodes': nodes, 'edges': edges,
+    slim = [{k: v for k, v in n.items() if k not in ('qx', 'qy')} for n in nodes]
+    data_json = (json.dumps({'nodes': slim, 'edges': edges,
                              'NI': scale['NI'], 'NP': scale['NP'],
                              'interest_order': scale['interest_order'],
                              'power_order': scale['power_order'],
-                             'net_r': scale.get('net_r', 34)},
+                             'net_r': scale.get('net_r', 34),
+                             'geo': {'R_IN': R_IN, 'R_OUT': R_OUT,
+                                     'S_MIN': S_MIN, 'S_MAX': S_MAX,
+                                     'QMX': QUAD_MX, 'QMY': QUAD_MY,
+                                     'QRMAX': QUAD_R_MAX, 'QRMIN': QUAD_R_MIN,
+                                     'NRMAX': NET_R_MAX, 'NRMIN': NET_R_MIN,
+                                     'NFILL': NET_FILL}},
                             ensure_ascii=False)
                  .replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026'))
 
@@ -251,6 +289,7 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
             ('%%NODE_COUNT%%', str(len(nodes))),
             ('%%EDGE_COUNT%%', str(len(edges))),
             ('%%OPTIONS_CAT%%', options_cat),
+            ('%%TAG_FILTER%%', tag_filter),
             ('%%OPTIONS_SRC%%', options_src),
             ('%%TYPES_OPTS%%', types_opts),
             ('%%LEGEND_CAT%%', legend_cat),

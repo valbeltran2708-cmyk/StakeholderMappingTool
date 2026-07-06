@@ -22,6 +22,15 @@ import pandas as pd
 
 T1 = 'Electrificación de flota'
 T2 = 'Resiliencia climática'
+THEME_COLORS = {T1: '#0B5394', T2: '#38761D'}
+TAGS = {
+    'IDIGER': 'Risk Reduction; Disaster Management',
+    'IDEAM': 'Knowledge & Prevention; Risk Reduction',
+    'Banca multilateral': 'Climate Finance',
+    'Findeter': 'Climate Finance; Risk Reduction',
+    'Universidad de los Andes': 'Knowledge & Prevention',
+    'TransMilenio S.A.': 'Disaster Management',
+}
 
 CATS = {
     'Gobierno nacional': '#1F4E79',
@@ -144,14 +153,18 @@ REL = [
 
 def build(path):
     st = pd.DataFrame(STK, columns=[
-        'Stakeholder / entidad', 'Entidad padre / grupo', 'Nivel', 'Tema / fuente',
-        'Categoría', 'Descripción / función', 'Interés en el proyecto',
+        'Stakeholder / entidad', 'Entidad padre / grupo', 'Nivel', 'Dimensión',
+        'Esfera', 'Descripción / función', 'Interés en el proyecto',
         'Poder / influencia'])
     st['Notas'] = ''
+    st['Categorías'] = st['Stakeholder / entidad'].map(TAGS).fillna('')
+    st = st[['Stakeholder / entidad', 'Entidad padre / grupo', 'Nivel', 'Dimensión',
+             'Esfera', 'Categorías', 'Descripción / función',
+             'Interés en el proyecto', 'Poder / influencia', 'Notas']]
     rel = pd.DataFrame(REL, columns=[
         'Desde / entidad origen', 'Hacia / entidad destino', 'Tipo de relación',
         'Fuerza de la relación (1-5)', 'Dirección', 'Efecto / polaridad',
-        'Tema de la relación', 'Descripción de la relación'])
+        'Dimensión de la relación', 'Descripción de la relación'])
 
     cats = list(CATS.items())
     n = max(len(cats), len(RELS), 5, 2)
@@ -160,7 +173,7 @@ def build(path):
         return list(seq) + [fill] * (n - len(seq))
 
     cfg = pd.DataFrame({
-        'Categoría': pad([c for c, _ in cats]),
+        'Esfera': pad([c for c, _ in cats]),
         'Color HEX': pad([h for _, h in cats]),
         ' ': pad([]),
         'Tipo de relación': pad([t for t, _, _ in RELS]),
@@ -170,7 +183,8 @@ def build(path):
         'Escala de interés': pad(['1', '2', '3', '4', '5']),
         'Escala de poder': pad(['1', '2', '3', '4', '5']),
         '   ': pad([]),
-        'Temas / fuentes': pad([T1, T2]),
+        'Dimensiones': pad([T1, T2]),
+        'Color HEX  ': pad([THEME_COLORS[T1], THEME_COLORS[T2]]),
     })
 
     path = Path(path)

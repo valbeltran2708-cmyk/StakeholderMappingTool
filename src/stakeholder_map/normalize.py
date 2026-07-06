@@ -47,3 +47,16 @@ def slug(x):
 
 def is_hex(c):
     return bool(re.fullmatch(r'#[0-9A-Fa-f]{6}', clean(c)))
+
+
+def parse_tags(x):
+    """'A; B, C' -> ['A', 'B', 'C'] (separadores ; o ,), sin vacíos ni duplicados."""
+    if isinstance(x, list):
+        vals = [clean(v) for v in x]
+    else:
+        vals = [clean(v) for v in re.split(r'[;,]', str(x or ''))]
+    out = []
+    for v in vals:
+        if v and v not in out:
+            out.append(v)
+    return out

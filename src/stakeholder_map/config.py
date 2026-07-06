@@ -34,6 +34,15 @@ THEME = {
 
 APP_TITLE = 'Mapa de Stakeholders · Poder–Interés y Relaciones'
 
+# Idioma de los títulos de eje del cuadrante: 'es', 'en' o 'both' (bilingüe).
+UI_LANG = 'both'
+AXIS_LABELS = {
+    'es': {'interest': 'Interés en el proyecto',
+           'power': 'Poder e influencia sobre el proyecto'},
+    'en': {'interest': 'Project interest',
+           'power': 'Power / influence on the project'},
+}
+
 # Prefijo de las etiquetas de los anillos de interés. Vacío por defecto para
 # que funcione igual con escalas en español, inglés o numéricas
 # ('ALTO', 'HIGH', '5'). Si prefieres el prefijo antiguo usa 'INTERÉS '.
@@ -48,8 +57,27 @@ CX, CY = W / 2, H / 2
 # ---------------------------------------------------------------------------
 # Escala visual de la vista radial (poder–interés)
 # ---------------------------------------------------------------------------
-R_IN, R_OUT = 150, 470      # radio de la banda más interna / más externa
+R_IN, R_OUT = 70, 470       # radio de la banda más interna / más externa
+                            # (70 acerca el interés máximo al centro real;
+                            # sube el valor si prefieres un anillo interior amplio)
 S_MIN, S_MAX = 26, 56       # radio del círculo para el menor / mayor poder
+BAND_SPRING = 0.35          # fuerza con la que un nodo vuelve a su banda de
+                            # interés cuando las colisiones lo empujan; mayor
+                            # valor = posiciones más fieles al eje, deslizando
+                            # los solapes de forma tangencial
+
+# Tamaño mínimo de fuente de las etiquetas dentro de los círculos. Por debajo
+# de esto el texto se trunca con '…' en lugar de volverse ilegible.
+LABEL_FONT_MIN = 8
+
+# ---------------------------------------------------------------------------
+# Vista cuadrante (matriz de Mendelow)
+# ---------------------------------------------------------------------------
+# En el cuadrante la POSICIÓN ya codifica interés y poder, así que los
+# círculos son de tamaño uniforme (se adapta a la celda más llena, entre
+# estos límites) y se empaquetan en rejilla dentro de cada celda.
+QUAD_MX, QUAD_MY = 190, 130   # márgenes del área de la matriz en el lienzo
+QUAD_R_MAX, QUAD_R_MIN = 40, 14
 
 # ---------------------------------------------------------------------------
 # Vista de conexiones (red force-directed)

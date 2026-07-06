@@ -1,5 +1,92 @@
 # Changelog
 
+## 1.3.0 (2026-07-06)
+
+### Nuevo
+- Vista radial dividida en sectores por esfera, con arco PROPORCIONAL al
+  número de actores visibles de cada una (con un piso mínimo para esferas
+  pequeñas). Líneas divisorias y rótulo de cada sector; casilla "Sectores
+  por esfera" para ocultarlos. Con filtros activos los sectores se
+  recalculan sobre lo visible.
+- El interés máximo llega ahora casi al centro (R_IN pasa de 150 a 70 en
+  config.py): desaparece el disco vacío central.
+- Leyenda flotante sobre el mapa: botón "Leyenda" en la barra inferior
+  abre un panel con esferas, dimensiones, relaciones y efecto; sus
+  elementos también filtran al hacer click.
+- Terminología: "Categoría" pasa a llamarse "Esfera" en toda la interfaz,
+  plantilla y CSV de estrategia. Los Excel con la columna antigua siguen
+  funcionando.
+- Nueva columna "Categorías" en 01_Stakeholders: etiquetas temáticas
+  múltiples por actor (separadas por ";" o ","), por ejemplo Knowledge &
+  Prevention, Risk Reduction, Disaster Management, Climate Finance. Se
+  muestran como etiquetas en el panel de detalle, habilitan un filtro
+  propio (solo aparece si hay etiquetas en los datos) y se exportan en el
+  CSV de estrategia. En la fusión multi-dimensión se unen las etiquetas
+  de todas las filas del actor.
+
+
+## 1.2.0 (2026-07-06)
+
+### Nuevo
+- Panel izquierdo reorganizado en tarjetas plegables: abiertas por defecto
+  solo Vista, Filtros y Actores clave; Cómo leer, Leyendas, Exportar y
+  Validación quedan plegadas para navegar menos.
+- Tarjeta "Actores clave": shortlist Top 5 / Top 10 por interés + poder
+  (normalizados y sumados) o por número de conexiones, con la opción
+  "Mostrar solo estos en el mapa" que aísla la shortlist en la vista
+  activa (se compone con los demás filtros y respeta la dimensión
+  seleccionada). Reemplaza la tarjeta "Más conectados".
+- Terminología: "Fuente / tema" pasa a llamarse "Dimensión" en toda la
+  interfaz, la plantilla y el CSV de estrategia. Los Excel existentes con
+  las columnas antiguas ("Tema / fuente", "Tema de la relación",
+  "Temas / fuentes") siguen funcionando sin cambios.
+
+
+## 1.1.1 (2026-07-03)
+
+### Corregido
+- Vista de conexiones: eliminada una ruta en la que el recorte al lienzo
+  podía reintroducir un solape tras el último ciclo de separación, y la
+  falta de verificación final en grafos densos. Ahora (en Python y en el
+  JS) el radio uniforme se adapta al número de nodos VISIBLES, se verifica
+  el resultado y, si queda algún roce, se reduce el radio y se repite
+  hasta garantizar cero solapes dentro del lienzo. Con pocos nodos
+  filtrados el radio crece para mejorar la lectura.
+- Etiquetas de nodo sin halo: texto negro o blanco puro según la
+  luminancia del relleno.
+- Etiquetas de los anillos de interés (leyenda del eje radial) dibujadas
+  por encima de los nodos, con halo blanco propio, para que los círculos
+  que caen sobre el anillo no las tapen.
+
+
+## 1.1.0 (2026-07-03)
+
+### Nuevo
+- Motor de layout dinámico en el navegador: las tres vistas recalculan
+  posiciones con el subconjunto visible al cambiar cualquier filtro
+  (categoría, tema, subdivisiones), sin huecos y sin solapes.
+- Cuadrante: círculos de tamaño uniforme empaquetados en rejilla dentro
+  de cada celda (la posición ya codifica interés y poder); títulos de eje
+  "Interés en el proyecto" y "Poder e influencia sobre el proyecto" en
+  español, inglés o bilingüe (`UI_LANG` en config.py), colocados fuera de
+  las marcas para que nunca se crucen.
+- Colores de tema definidos en el Excel: nueva columna "Color HEX" junto a
+  "Temas / fuentes" en 03_Config; define el borde de los nodos y la
+  leyenda de temas (con color automático si se deja vacía).
+
+### Corregido
+- Radial: los nodos ya no se salen de su banda de interés al resolver
+  colisiones (separación tangencial + resorte fuerte); un actor con
+  interés máximo queda pegado al centro.
+- Cuadrante: eliminados los solapes entre círculos en todos los casos.
+- Etiquetas de nodo: fuente mínima de 8px con truncado "…" en lugar de
+  texto ilegible.
+
+### Interno
+- Eliminados los precálculos por tema y por subdivisión en Python
+  (themes.py, ex/ey, tpos/tquad): el JS los reemplaza con layout en vivo.
+
+
 ## 1.0.0 (2026-07-03)
 
 Primera versión modular (antes: script único `stakeholder_map_v8.py`).

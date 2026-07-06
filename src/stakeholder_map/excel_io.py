@@ -103,9 +103,11 @@ def load_unified_config(path, warnings):
         return j if 0 <= j <= i + 2 else -1
 
     out = {'cat_colors': {}, 'rel_styles': {}, 'scales': {'interest': [], 'power': []},
-           'themes': [], 'sheet': name}
+           'themes': [], 'theme_colors': {}, 'sheet': name}
 
-    ci = find(lambda c: 'categor' in c)
+    ci = find(lambda c: 'esfera' in c)
+    if ci < 0:
+        ci = find(lambda c: 'categor' in c)
     if ci >= 0:
         hexi = next_color(ci)
         for k, r in enumerate(df.iloc[:, ci].tolist()):
@@ -147,9 +149,20 @@ def load_unified_config(path, warnings):
     if pi >= 0:
         out['scales']['power'] = [cell_val(v) for v in df.iloc[:, pi].tolist() if cell_val(v)]
 
-    tj = find(lambda c: 'tema' in c or 'fuente' in c or 'theme' in c)
+    tj = find(lambda c: 'tema' in c or 'fuente' in c or 'theme' in c or 'dimensi' in c)
     if tj >= 0:
-        out['themes'] = col_values(tj)
+        hexi = next_color(tj)
+        for k, r in enumerate(df.iloc[:, tj].tolist()):
+            key = clean(r)
+            if not key:
+                continue
+            out['themes'].append(key)
+            v = clean(df.iloc[k, hexi]) if hexi >= 0 else ''
+            if is_hex(v):
+                out['theme_colors'][key] = v.upper()
+            elif v:
+                warnings.append(f"Tema '{key}' sin color HEX válido en {name}; "
+                                f"uso color automático.")
     return out
 
 

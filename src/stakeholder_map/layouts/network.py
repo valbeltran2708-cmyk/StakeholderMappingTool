@@ -110,28 +110,43 @@ def add_network_layout(nodes, edges):
         P[nid][0] = CX + (P[nid][0] - cxr) * sc
         P[nid][1] = CY + (P[nid][1] - cyr) * sc
 
-    # Separación de colisiones SOBRE LAS COORDENADAS FINALES,
-    # con sujeción a un marco más holgado que el de ajuste
-    mind = urad * 2 + 6
-    for _ in range(400):
-        moved = False
+    # Separación de colisiones SOBRE LAS COORDENADAS FINALES, con sujeción a
+    # un marco más holgado que el de ajuste. Al terminar se VERIFICA el
+    # resultado: el clamp del último ciclo puede reintroducir un roce y la
+    # convergencia no está garantizada en grafos densos. Si queda algún
+    # solape, se reduce el radio y se repite (hasta 5 pasadas).
+    def _separate(rad):
+        mind = rad * 2 + 6
+        for _ in range(400):
+            moved = False
+            for i in range(n):
+                a = ids[i]
+                for j in range(i + 1, n):
+                    b = ids[j]
+                    dx = P[a][0] - P[b][0]; dy = P[a][1] - P[b][1]
+                    d = math.hypot(dx, dy) or 0.01
+                    if d < mind:
+                        push = (mind - d) / 2
+                        ux, uy = dx / d, dy / d
+                        P[a][0] += ux * push; P[a][1] += uy * push
+                        P[b][0] -= ux * push; P[b][1] -= uy * push
+                        moved = True
+            for nid in ids:
+                P[nid][0] = min(W - margin_clamp, max(margin_clamp, P[nid][0]))
+                P[nid][1] = min(H - margin_clamp, max(margin_clamp, P[nid][1]))
+            if not moved:
+                break
         for i in range(n):
-            a = ids[i]
             for j in range(i + 1, n):
-                b = ids[j]
-                dx = P[a][0] - P[b][0]; dy = P[a][1] - P[b][1]
-                d = math.hypot(dx, dy) or 0.01
-                if d < mind:
-                    push = (mind - d) / 2
-                    ux, uy = dx / d, dy / d
-                    P[a][0] += ux * push; P[a][1] += uy * push
-                    P[b][0] -= ux * push; P[b][1] -= uy * push
-                    moved = True
-        for nid in ids:
-            P[nid][0] = min(W - margin_clamp, max(margin_clamp, P[nid][0]))
-            P[nid][1] = min(H - margin_clamp, max(margin_clamp, P[nid][1]))
-        if not moved:
-            break
+                if math.hypot(P[ids[i]][0] - P[ids[j]][0],
+                              P[ids[i]][1] - P[ids[j]][1]) < rad * 2 + 1:
+                    return False
+        return True
+
+    tries = 0
+    while not _separate(urad) and tries < 5:
+        urad = max(9, int(round(urad * 0.9)))
+        tries += 1
 
     for nd in nodes:
         p = P[nd['id']]

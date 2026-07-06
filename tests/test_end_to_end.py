@@ -40,6 +40,7 @@ def _demo_xlsx(path):
         'Escala de interés': ['1', '2', '3', '4', '5'],
         'Escala de poder': ['1', '2', '3', '4', '5'],
         'Temas / fuentes': ['Tema A', 'Tema B', '', '', ''],
+        'Color HEX  ': ['#0B5394', '#38761D', '', '', ''],
     })
     with pd.ExcelWriter(path, engine='openpyxl') as w:
         st.to_excel(w, sheet_name='01_Stakeholders', index=False)
@@ -79,6 +80,14 @@ def test_generate_end_to_end(tmp_path):
     # Relación automática padre -> subdivisión
     assert res['n_edges'] == 3
 
+    # Color de tema definido en 03_Config aplicado al borde del nodo
+    assert by_label['Ministerio']['stroke'] == '#0B5394'
+    assert by_label['ONG aislada']['stroke'] == '#38761D'
+
+    # Títulos de eje del cuadrante bilingües y separados de las marcas
+    assert 'Project interest' in html
+    assert 'Interés en el proyecto' in html
+
 
 def test_read_data_warns_on_mixed_scale(tmp_path):
     src = tmp_path / 'mix.xlsx'
@@ -95,3 +104,35 @@ def test_read_data_warns_on_mixed_scale(tmp_path):
     *_, warnings, _cc, _rs, scale = read_data(src)
     assert any('mezcla números y etiquetas' in w for w in warnings)
     assert scale['p_mode'] == 'num'
+
+
+def test_new_dimension_headers(tmp_path):
+    """Las cabeceras 'Dimensión' / 'Dimensiones' funcionan igual que las antiguas."""
+    src = tmp_path / 'dim.xlsx'
+    st = pd.DataFrame({
+        'Stakeholder / entidad': ['A', 'B'],
+        'Nivel': ['Entidad', 'Entidad'],
+        'Dimensión': ['D1', 'D2'],
+        'Esfera': ['C1', 'C1'],
+        'Categorías': ['Risk Reduction; Climate Finance', ''],
+        'Interés en el proyecto': [2, 4],
+        'Poder / influencia': [3, 5],
+    })
+    cfg = pd.DataFrame({
+        'Esfera': ['C1', ''],
+        'Color HEX': ['#1F4E79', ''],
+        'Escala de interés': ['1', '5'],
+        'Escala de poder': ['1', '5'],
+        'Dimensiones': ['D1', 'D2'],
+        'Color HEX  ': ['#0B5394', '#38761D'],
+    })
+    with pd.ExcelWriter(src, engine='openpyxl') as w:
+        st.to_excel(w, sheet_name='01_Stakeholders', index=False)
+        cfg.to_excel(w, sheet_name='03_Config', index=False)
+    nodes, *_ = read_data(src)
+    by = {n['label']: n for n in nodes}
+    assert by['A']['source'] == 'D1' and by['A']['stroke'] == '#0B5394'
+    assert by['A']['category'] == 'C1'
+    assert by['A']['tags'] == ['Risk Reduction', 'Climate Finance']
+    assert by['B']['tags'] == []
+    assert by['B']['source'] == 'D2' and by['B']['stroke'] == '#38761D'

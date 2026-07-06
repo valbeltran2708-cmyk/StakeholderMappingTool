@@ -6,7 +6,7 @@ se asigna a la celda de la marca entera más cercana.
 """
 import math
 
-from ..config import W, H
+from ..config import W, H, QUAD_MX, QUAD_MY
 
 
 def _cell(rank, n):
@@ -19,7 +19,7 @@ def quadrant_coords(items, NI, NP):
     """items: [{id, ir, pr}] -> {id:{qx,qy}} en una rejilla NI x NP
     (interés = columnas, poder = filas)."""
     ncol = max(NI, 1); nrow = max(NP, 1)
-    mx, my = 150, 120
+    mx, my = QUAD_MX, QUAD_MY
     gw, gh = (W - 2 * mx) / ncol, (H - 2 * my) / nrow
     cells = {}
     for it in items:

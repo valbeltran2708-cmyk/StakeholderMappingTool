@@ -18,6 +18,7 @@ def _write(path):
         'Escala de poder': ['Bajo', 'Medio', 'Alto'],
         '   ': ['', '', ''],
         'Temas / fuentes': ['Tema A', 'Tema B', ''],
+        'Color HEX  ': ['#0B5394', 'malo', ''],
     })
     st = pd.DataFrame({'Stakeholder / entidad': ['X'],
                        'Interés en el proyecto': ['3'],
@@ -41,3 +42,5 @@ def test_unified_config_parsed(tmp_path):
     assert uni['scales']['interest'] == ['1', '3', '5']
     assert uni['scales']['power'] == ['Bajo', 'Medio', 'Alto']
     assert uni['themes'] == ['Tema A', 'Tema B']
+    assert uni['theme_colors'] == {'Tema A': '#0B5394'}
+    assert any("Tema 'Tema B'" in w for w in warnings)

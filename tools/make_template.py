@@ -73,12 +73,12 @@ def build(path):
     cfg = wb.active
     cfg.title = '03_Config'
     _head(cfg,
-          ['Categoría', 'Color HEX', '', 'Tipo de relación', 'Color HEX',
+          ['Esfera', 'Color HEX', '', 'Tipo de relación', 'Color HEX',
            'Estilo de línea', '', 'Escala de interés', 'Escala de poder', '',
-           'Temas / fuentes'],
-          [26, 12, 3, 30, 12, 16, 3, 18, 18, 3, 28],
+           'Dimensiones', 'Color HEX'],
+          [26, 12, 3, 30, 12, 16, 3, 18, 18, 3, 28, 12],
           comments={
-              'Categoría': 'Una categoría por fila (columna A) con su color en la '
+              'Esfera': 'Una esfera por fila (columna A) con su color en la '
                            'columna B (#RRGGBB). Añade o cambia libremente: las '
                            'listas desplegables de 01_Stakeholders se actualizan solas.',
               'Tipo de relación': 'Tipos de relación disponibles en 02_Relaciones, '
@@ -93,9 +93,12 @@ def build(path):
                                    'No mezcles etiquetas y números.',
               'Escala de poder': 'Igual que la escala de interés: etiquetas O números, '
                                  'de menor a mayor.',
-              'Temas / fuentes': 'Temas o fuentes de análisis (ej. Electrificación de '
+              'Dimensiones': 'Dimensiones de análisis (ej. Electrificación de '
                                  'flota, Resiliencia climática). Alimenta el desplegable '
-                                 'de "Tema / fuente" en las dos hojas de datos.',
+                                 'de "Tema / fuente" en las dos hojas de datos. El color '
+                                 'de la columna L define el BORDE de los nodos y la '
+                                 'leyenda de temas; si se deja vacío se asigna uno '
+                                 'automático.',
           })
 
     for i, (cat, col) in enumerate(DEFAULT_CATEGORY_COLORS.items(), start=2):
@@ -117,25 +120,37 @@ def build(path):
         cfg.cell(row=i, column=8, value=v)
         cfg.cell(row=i, column=9, value=v)
     cfg.cell(row=6, column=8, value='(o números: 1,2,3,4,5)').font = NOTE_FONT
-    for i, t in enumerate(['Tema A', 'Tema B'], start=2):
+    for i, (t, col) in enumerate([('Dimensión A', '#0B5394'), ('Dimensión B', '#38761D')],
+                                 start=2):
         cfg.cell(row=i, column=11, value=t)
+        c = cfg.cell(row=i, column=12, value=col)
+        c.fill = PatternFill('solid', fgColor=col.lstrip('#'))
+        c.font = Font(color='FFFFFF', bold=True, size=9)
     _dv(cfg, f'F2:F{MAXR}', '"Sólida,Punteada"', strict=True)
 
     # ---------- 01_Stakeholders ----------
     st = wb.create_sheet('01_Stakeholders')
     st_headers = ['Stakeholder / entidad', 'Entidad padre / grupo', 'Nivel',
-                  'Tema / fuente', 'Categoría', 'Descripción / función',
+                  'Dimensión', 'Esfera', 'Categorías', 'Descripción / función',
                   'Interés en el proyecto', 'Poder / influencia', 'Notas']
-    _head(st, st_headers, [34, 26, 14, 22, 26, 44, 20, 20, 34], comments={
+    _head(st, st_headers, [34, 26, 14, 22, 24, 30, 40, 20, 20, 30], comments={
         'Stakeholder / entidad': 'Nombre visible del actor. Obligatorio.\n\n'
                                  'Multi-tema: repite el MISMO nombre en otra fila con '
-                                 'otro "Tema / fuente" y sus propios interés/poder; la '
+                                 'otra "Dimensión" y sus propios interés/poder; la '
                                  'herramienta los fusiona en un nodo con desglose por tema.',
         'Entidad padre / grupo': 'Solo para subdivisiones: nombre EXACTO de la entidad '
                                  'a la que pertenece (debe existir en esta hoja).',
         'Nivel': 'Entidad (por defecto) o Subdivisión (área interna de una entidad).',
-        'Tema / fuente': 'Tema o fuente de esta evaluación. La lista sale de 03_Config.',
-        'Categoría': 'Categoría del actor. La lista y su color salen de 03_Config.',
+        'Dimensión': 'Dimensión de esta evaluación (antes "Tema / fuente"; los archivos '
+                     'con el nombre antiguo siguen funcionando). La lista sale de 03_Config.',
+        'Esfera': 'Esfera del actor (antes "Categoría": academia, gobierno, ONG...). '
+                  'Define el COLOR del círculo y el sector del mapa radial. La lista '
+                  'y su color salen de 03_Config.',
+        'Categorías': 'Etiquetas temáticas del actor, OPCIONALES y MÚLTIPLES, '
+                      'separadas por ";" o ",". Ejemplo: Knowledge & Prevention; '
+                      'Risk Reduction; Climate Finance. Aparecen en el panel de '
+                      'detalle y habilitan un filtro propio. No hay desplegable '
+                      'porque Excel no permite selección múltiple en una celda.',
         'Interés en el proyecto': 'Dos modos (definidos por la escala en 03_Config):\n'
                                   '1) Etiqueta: Bajo / Medio / Alto...\n'
                                   '2) Número con decimales (1.1, 3.5, 4.8) para '
@@ -149,11 +164,11 @@ def build(path):
     })
     _dv(st, f'C2:C{MAXR}', '"Entidad,Subdivisión"', strict=True)
     _dv(st, f'D2:D{MAXR}', f"'03_Config'!$K$2:$K${MAXR}",
-        prompt='Tema/fuente definido en 03_Config (puedes escribir uno nuevo).')
+        prompt='Dimensión definida en 03_Config (puedes escribir una nueva).')
     _dv(st, f'E2:E{MAXR}', f"'03_Config'!$A$2:$A${MAXR}",
-        prompt='Categoría definida en 03_Config (puedes escribir una nueva).')
-    for col in ('G', 'H'):
-        ref = '$H' if col == 'G' else '$I'
+        prompt='Esfera definida en 03_Config (puedes escribir una nueva).')
+    for col in ('H', 'I'):
+        ref = '$H' if col == 'H' else '$I'
         _dv(st, f'{col}2:{col}{MAXR}', f"'03_Config'!{ref}$2:{ref}${MAXR}",
             title='Etiqueta o número',
             prompt='Elige un nivel de la escala O escribe un número con decimales '
@@ -161,8 +176,9 @@ def build(path):
                    'de la lista.')
     _dv(st, f'B2:B{MAXR}', f"'01_Stakeholders'!$A$2:$A${MAXR}",
         prompt='Nombre exacto de la entidad padre (de la columna A).')
-    ejemplo = ['(Ejemplo) Ministerio de Transporte', '', 'Entidad', 'Tema A',
-               list(DEFAULT_CATEGORY_COLORS)[0], 'Rectoría de la política sectorial',
+    ejemplo = ['(Ejemplo) Ministerio de Transporte', '', 'Entidad', 'Dimensión A',
+               list(DEFAULT_CATEGORY_COLORS)[0], 'Risk Reduction; Climate Finance',
+               'Rectoría de la política sectorial',
                'Alto', 'Alto', 'Borra esta fila al llenar la plantilla']
     for j, v in enumerate(ejemplo, start=1):
         st.cell(row=2, column=j, value=v).font = NOTE_FONT
@@ -171,7 +187,7 @@ def build(path):
     rel = wb.create_sheet('02_Relaciones')
     rel_headers = ['Desde / entidad origen', 'Hacia / entidad destino',
                    'Tipo de relación', 'Fuerza de la relación (1-5)', 'Dirección',
-                   'Efecto / polaridad', 'Tema de la relación',
+                   'Efecto / polaridad', 'Dimensión de la relación',
                    'Descripción de la relación']
     _head(rel, rel_headers, [32, 32, 30, 22, 24, 20, 24, 46], comments={
         'Desde / entidad origen': 'Nombre EXACTO del actor origen (columna A de '
@@ -183,7 +199,7 @@ def build(path):
         'Dirección': 'De origen a destino, o Bidireccional (sin flecha).',
         'Efecto / polaridad': 'Positiva (apoya), Negativa (se opone) o Neutral. '
                               'Se usa en la capa "Color por efecto".',
-        'Tema de la relación': 'Tema al que pertenece la relación (opcional).',
+        'Dimensión de la relación': 'Dimensión a la que pertenece la relación (opcional).',
     })
     _dv(rel, f'A2:A{MAXR}', f"'01_Stakeholders'!$A$2:$A${MAXR}",
         prompt='Debe existir en 01_Stakeholders; si no, la relación se ignora con aviso.')
@@ -200,7 +216,7 @@ def build(path):
     _dv(rel, f'E2:E{MAXR}', '"De origen a destino,Bidireccional"', strict=True)
     _dv(rel, f'F2:F{MAXR}', '"Positiva,Negativa,Neutral"', strict=True)
     _dv(rel, f'G2:G{MAXR}', f"'03_Config'!$K$2:$K${MAXR}",
-        prompt='Tema definido en 03_Config (puedes escribir uno nuevo).')
+        prompt='Dimensión definida en 03_Config (puedes escribir una nueva).')
 
     top = PatternFill('solid', fgColor=ARUP_RED.lstrip('#'))
     for ws in (st, rel, cfg):
