@@ -1,5 +1,47 @@
 # Changelog
 
+## 1.8.0 (2026-07-07)
+
+### Nuevo
+- Bandas de fondo grises por nivel de interés en la vista radial: un disco
+  por nivel, del interior oscuro (interés mayor) al exterior claro (interés
+  menor), para identificar de un vistazo a qué anillo pertenece cada actor.
+  El color del nodo sigue siendo su esfera; el gris va solo en el fondo. Se
+  ocultan con la casilla de anillos y en cuadrante/red, escalan con la
+  separación de anillos, van detrás de los nodos y se exportan sin cortarse
+  (los discos que no caben se eliminan, no se amputan). Efecto útil con
+  escalas de pocos niveles; con muchos, los tonos quedan muy juntos.
+- Índice de "Convenciones" (numeración de nombres largos) a dos columnas
+  cuando la leyenda va abajo, hay al menos 6 entradas y el ancho de columna
+  alcanza para el nombre completo; en otro caso, una columna. Los nombres
+  se muestran íntegros, nunca truncados.
+
+### Nota
+- No hay recoloreo manual por actor: el color del círculo representa la
+  esfera (dato del Excel). La exportación permite Color o Escala de grises
+  de toda la figura, pero no repintar actores individuales.
+
+
+## 1.7.0 (2026-07-07)
+
+### Exportación de imagen
+- Nada se corta: en radial el marco se centra en el origen y cubre todos
+  los nodos; los anillos de interés que no caben completos se eliminan
+  del archivo en lugar de quedar amputados en el borde. Margen ampliado
+  para que las curvas de las relaciones tampoco se recorten.
+- Posición de la leyenda: abajo (como antes) o a la derecha en columna.
+- Leyenda de tamaño = poder como círculos concéntricos con degradado de
+  grises (interior oscuro = menor poder, exterior claro = mayor); también
+  en la tarjeta "Cómo leer" del panel.
+- Fondo del PNG y del SVG: blanco o transparente.
+- Numeración de nombres largos: si la etiqueta elegida supera N
+  caracteres (configurable), el círculo muestra un número y se añade un
+  bloque "Convenciones" con el índice "N. Nombre completo (Alias)",
+  ordenado alfabéticamente. Los nombres cortos conservan su etiqueta.
+- Tipografía Times New Roman añadida a las opciones.
+- Pie de figura con interruptor para incluirlo u omitirlo.
+
+
 ## 1.6.0 (2026-07-06)
 
 ### Nuevo

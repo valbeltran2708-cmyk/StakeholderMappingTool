@@ -103,12 +103,30 @@ def _rings_svg(scale):
     if radii:
         outer = radii[-1] + ((radii[-1] - radii[-2]) / 2 if len(radii) > 1 else 70)
         bounds.append(round(outer, 1))
+
+    # Bandas de fondo grises: un disco por nivel, del más externo (claro) al
+    # más interno (oscuro), apilados. Ayudan a leer a qué nivel de interés
+    # pertenece cada actor sin recolorear los nodos (el color del nodo sigue
+    # siendo su esfera). Se dibujan detrás de todo. Solo tienen sentido con
+    # pocos niveles; con muchos, los tonos quedan demasiado juntos.
+    bands = ''
+    n = len(bounds)
+    if 1 < n <= 8:
+        outer_r = bounds[-1]
+        for k in range(n - 1, -1, -1):     # de fuera hacia dentro
+            r = bounds[k]
+            t = k / (n - 1)                 # 0 interior, 1 exterior
+            g = round(228 - 56 * (1 - t))   # 172 (interior) .. 228 (exterior)
+            fill = '#%02x%02x%02x' % (g, g, g)
+            bands += (f"<circle class='band' cx='{CX}' cy='{CY}' r='{r}' "
+                      f"data-r='{r}' fill='{fill}'/>")
     circles = ''.join(f"<circle class='ring' cx='{CX}' cy='{CY}' r='{r}' data-r='{r}'/>" for r in bounds)
     labels = ''.join(
         f"<text class='ringlab' x='{CX}' y='{round(CY - rad, 1)}' data-r='{round(rad, 1)}' "
         f"text-anchor='middle'>{esc((RING_LABEL_PREFIX + str(v)).strip().upper())}</text>"
         for v, rad in centers)
-    return f"<g id='rings'>{circles}</g>", f"<g id='ringLabels'>{labels}</g>"
+    return (f"<g id='ringBands'>{bands}</g><g id='rings'>{circles}</g>",
+            f"<g id='ringLabels'>{labels}</g>")
 
 
 def _axis_title(key):
