@@ -1,95 +1,97 @@
 <!DOCTYPE html><html lang='es'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width, initial-scale=1'><title>%%TITLE%%</title><style>%%STYLES%%</style></head><body>
-<div class='top'><b>%%TITLE%%</b>
-<button id='qbtn' onclick='toggleQuadrant()'>Vista cuadrante</button></div>
+<div class='top'><b data-i18n='app_title'>%%TITLE%%</b>
+<div class='topbtns'><button id='langBtn' class='langbtn' onclick='toggleLang()'>EN</button>
+<button id='qbtn' onclick='toggleQuadrant()'>Vista cuadrante</button></div></div>
 <div id='app' class='app hideRight'>
 <aside>
   <div class='card summary'>
-    <div class='count'><div><b>%%NODE_COUNT%%</b><br><span class='small'>nodos</span></div><div><b>%%EDGE_COUNT%%</b><br><span class='small'>relaciones</span></div></div>
+    <div class='count'><div><b>%%NODE_COUNT%%</b><br><span class='small' data-i18n='nodes'>nodos</span></div><div><b>%%EDGE_COUNT%%</b><br><span class='small' data-i18n='edges_lbl'>relaciones</span></div></div>
   </div>
   <details class='card' open>
-    <summary>Vista</summary>
+    <summary data-i18n='view'>Vista</summary>
     <div class='viewsel'>
-      <button class='viewbtn active' data-mode='radial' onclick='setMode("radial")'>Poder–interés</button>
-      <button class='viewbtn' data-mode='network' onclick='setMode("network")'>Conexiones</button>
-      <button class='viewbtn' data-mode='quadrant' onclick='setMode("quadrant")'>Cuadrante</button>
+      <button class='viewbtn active' data-mode='radial' onclick='setMode("radial")' data-i18n='v_pi'>Poder–interés</button>
+      <button class='viewbtn' data-mode='network' onclick='setMode("network")' data-i18n='v_net'>Conexiones</button>
+      <button class='viewbtn' data-mode='quadrant' onclick='setMode("quadrant")' data-i18n='v_quad'>Cuadrante</button>
     </div>
-    <label class='chk'><input id='showEdges' type='checkbox' checked onchange='filters()'> Relaciones</label>
-    <label class='chk'><input id='showSub' type='checkbox' checked onchange='filters()'> Subdivisiones</label>
-    <label class='chk'><input id='showRings' type='checkbox' checked onchange='filters()'> Anillos de interés</label>
-    <label class='chk'><input id='polColor' type='checkbox' onchange='togglePolColor()'> Color por efecto (polaridad)</label>
-    <label class='formlabel'>Separación de anillos <span id='spreadVal' class='small'>1.00×</span></label>
+    <label class='chk'><input id='showEdges' type='checkbox' checked onchange='filters()'> <span data-i18n='c_edges'>Relaciones</span></label>
+    <label class='chk'><input id='showSub' type='checkbox' checked onchange='filters()'> <span data-i18n='c_subs'>Subdivisiones</span></label>
+    <label class='chk'><input id='showRings' type='checkbox' checked onchange='filters()'> <span data-i18n='c_rings'>Anillos de interés</span></label>
+    <label class='chk'><input id='polColor' type='checkbox' onchange='togglePolColor()'> <span data-i18n='c_pol'>Color por efecto (polaridad)</span></label>
+    <label class='formlabel'><span data-i18n='spread'>Separación de anillos</span> <span id='spreadVal' class='small'>1.00×</span></label>
     <input id='spread' type='range' min='0.45' max='1.6' step='0.05' value='1' oninput='setSpread(this.value)'>
+    %%COLOR_CONTROLS%%
   </details>
   <details class='card' open>
-    <summary>Filtros</summary>
-    <label>Esfera</label><select id='catF' onchange='filters()'><option value=''>Todas</option>%%OPTIONS_CAT%%</select>
-    <label>Dimensión</label><select id='srcF' onchange='filters()'><option value=''>Todas (consolidado)</option>%%OPTIONS_SRC%%</select>
-    <div class='small' style='margin-top:3px;color:#6b7480'>Elegir una dimensión reposiciona y redimensiona cada actor según su puntaje en ella.</div>
+    <summary data-i18n='filters'>Filtros</summary>
+    <label data-i18n='f_sphere'>Esfera</label><select id='catF' onchange='filters()'><option value='' data-i18n='all_f'>Todas</option>%%OPTIONS_CAT%%</select>
+    <label data-i18n='f_dim'>Dimensión</label><select id='srcF' onchange='filters()'><option value='' data-i18n='all_consol'>Todas (consolidado)</option>%%OPTIONS_SRC%%</select>
+    <div class='small' style='margin-top:3px;color:#6b7480' data-i18n='dim_hint'>Elegir una dimensión reposiciona y redimensiona cada actor según su puntaje en ella.</div>
     %%IMP_FILTER%%
     %%TAG_FILTER%%
-    <label>Tipo de relación</label><select id='typF' onchange='filters()'><option value=''>Todas</option>%%TYPES_OPTS%%</select>
+    <label data-i18n='f_reltype'>Tipo de relación</label><select id='typF' onchange='filters()'><option value='' data-i18n='all_f'>Todas</option>%%TYPES_OPTS%%</select>
   </details>
   <details class='card' open>
-    <summary>Actores clave</summary>
+    <summary data-i18n='key_actors'>Actores clave</summary>
     <div class='seg'>
-      <button class='segbtn kmode active' data-k='score' onclick='setKeyMode("score")'>Interés + poder</button>
-      <button class='segbtn kmode' data-k='deg' onclick='setKeyMode("deg")'>Conexiones</button>
+      <button class='segbtn kmode active' data-k='score' onclick='setKeyMode("score")' data-i18n='k_score'>Interés + poder</button>
+      <button class='segbtn kmode' data-k='deg' onclick='setKeyMode("deg")' data-i18n='k_deg'>Conexiones</button>
     </div>
     <div class='seg'>
       <button class='segbtn kn active' data-n='5' onclick='setKeyN(5)'>Top 5</button>
       <button class='segbtn kn' data-n='10' onclick='setKeyN(10)'>Top 10</button>
     </div>
     <ul id='keyList' class='toplist'></ul>
-    <label class='chk'><input id='keyIsolate' type='checkbox' onchange='filters()'> Mostrar solo estos en el mapa</label>
+    <label class='chk'><input id='keyIsolate' type='checkbox' onchange='filters()'> <span data-i18n='k_isolate'>Mostrar solo estos en el mapa</span></label>
   </details>
   <details class='card'>
-    <summary>Cómo leer</summary>
+    <summary data-i18n='how_read'>Cómo leer</summary>
     <div class='howto'>
-      <div class='hkey'>Tamaño del círculo = poder</div>
+      <div class='hkey' data-i18n='h_size'>Tamaño del círculo = poder</div>
       <svg width='256' height='48' viewBox='0 0 256 48'>
         <circle cx='26' cy='24' r='18' fill='#c7ccd3'/>
         <circle cx='26' cy='24' r='13' fill='#8a94a0'/>
         <circle cx='26' cy='24' r='8' fill='#4b5563'/>
-        <text x='54' y='28' font-size='10.5' fill='#6b7480'>de %%PW_LO%% (interior) a %%PW_HI%% (exterior)</text>
+        <text id='hSizeTxt' x='54' y='28' font-size='10.5' fill='#6b7480'>de %%PW_LO%% (interior) a %%PW_HI%% (exterior)</text>
       </svg>
-      <div class='hkey'>Distancia al centro = interés</div>
-      <p class='small' style='margin:1px 0 4px'>Más cerca del centro, mayor interés. Niveles: %%INTEREST_LEVELS%%.</p>
-      <div class='hkey'>Borde = dimensión</div>
-      <p class='small' style='margin:1px 0 4px'>Línea punteada = subdivisión. Click en una entidad abre su mapa local.</p>
-      <div class='hkey'>Vistas</div>
-      <p class='small' style='margin:1px 0'>Poder–interés: posición por interés y tamaño por poder. Conexiones: distribuye por relaciones, círculos iguales. Cuadrante: matriz de Mendelow, círculos de igual tamaño (la posición ya codifica interés y poder).</p>
+      <div class='hkey' data-i18n='h_dist'>Distancia al centro = interés</div>
+      <p class='small' id='hDistTxt' style='margin:1px 0 4px'>Más cerca del centro, mayor interés. Niveles: %%INTEREST_LEVELS%%.</p>
+      <div class='hkey' data-i18n='h_border'>Borde = dimensión</div>
+      <p class='small' style='margin:1px 0 4px' data-i18n='h_border_txt'>Línea punteada = subdivisión. Click en una entidad abre su mapa local.</p>
+      <div class='hkey' data-i18n='h_views'>Vistas</div>
+      <p class='small' style='margin:1px 0' data-i18n='h_views_txt'>Poder–interés: posición por interés y tamaño por poder. Conexiones: distribuye por relaciones, círculos iguales. Cuadrante: matriz de Mendelow, círculos de igual tamaño (la posición ya codifica interés y poder).</p>
     </div>
   </details>
   <details class='card' id='legendCard'>
-    <summary>Leyendas</summary>
-    <div class='hkey'>Esferas</div>%%LEGEND_CAT%%
-    <div class='hkey' style='margin-top:11px'>Dimensiones (borde)</div>%%LEGEND_SRC%%
-    <div class='hkey' style='margin-top:11px'>Relaciones</div>%%LEGEND_REL%%
-    <div class='hkey' style='margin-top:11px'>Efecto (color por polaridad)</div>
-    <div class='legend'><span class='line' style='border-top:3px solid #2e9e5b'></span>Apoya / positiva</div>
-    <div class='legend'><span class='line' style='border-top:3px solid #d64545'></span>Se opone / negativa</div>
-    <div class='legend'><span class='line' style='border-top:3px solid #9aa3af'></span>Neutral</div>
+    <summary data-i18n='legends'>Leyendas</summary>
+    <div class='hkey' data-i18n='l_spheres'>Esferas</div>%%LEGEND_CAT%%
+    <div class='hkey' style='margin-top:11px' data-i18n='l_dims'>Dimensiones (borde)</div>%%LEGEND_SRC%%
+    <div class='hkey' style='margin-top:11px' data-i18n='l_rels'>Relaciones</div>%%LEGEND_REL%%
+    <div class='hkey' style='margin-top:11px' data-i18n='l_effect'>Efecto (color por polaridad)</div>
+    <div class='legend'><span class='line' style='border-top:3px solid #2e9e5b'></span><span data-i18n='l_pos'>Apoya / positiva</span></div>
+    <div class='legend'><span class='line' style='border-top:3px solid #d64545'></span><span data-i18n='l_neg'>Se opone / negativa</span></div>
+    <div class='legend'><span class='line' style='border-top:3px solid #9aa3af'></span><span data-i18n='l_neu'>Neutral</span></div>
   </details>
   <details class='card'>
-    <summary>Exportar</summary>
+    <summary data-i18n='export'>Exportar</summary>
     <div class='btns'>
-      <button class='primary' onclick='openExport()' style='background:#1f4e79;border-color:#1f4e79;color:#fff'>Imagen para reporte…</button>
-      <button onclick='downloadStrategy()'>CSV estrategia</button>
-      <button onclick='downloadNodes()'>CSV nodos</button><button onclick='downloadEdges()'>CSV relaciones</button>
+      <button class='primary' onclick='openExport()' style='background:#1f4e79;border-color:#1f4e79;color:#fff' data-i18n='btn_report_img'>Imagen para reporte…</button>
+      <button onclick='downloadStrategy()' data-i18n='csv_strategy'>CSV estrategia</button>
+      <button onclick='downloadNodes()' data-i18n='csv_nodes'>CSV nodos</button><button onclick='downloadEdges()' data-i18n='csv_edges'>CSV relaciones</button>
     </div>
-    <p class='small' style='margin-top:9px'>La imagen exporta lo que está visible en el mapa (filtros incluidos); el diálogo controla formato, etiquetas, color, leyenda y pie de figura.</p>
+    <p class='small' style='margin-top:9px' data-i18n='export_hint'>La imagen exporta lo que está visible en el mapa (filtros incluidos); el diálogo controla formato, etiquetas, color, leyenda y pie de figura.</p>
   </details>
   <details class='card'>
-    <summary>Validación (%%WARN_COUNT%%)</summary>
+    <summary><span data-i18n='validation'>Validación</span> (%%WARN_COUNT%%)</summary>
     <div style='margin-top:6px'>%%WARN_HTML%%</div>
-    <p class='small'>Hoja nodos: %%SHEET_NODES%% · Hoja relaciones: %%SHEET_EDGES%%</p>
+    <p class='small'><span data-i18n='sheet_nodes'>Hoja nodos</span>: %%SHEET_NODES%% · <span data-i18n='sheet_edges'>Hoja relaciones</span>: %%SHEET_EDGES%%</p>
   </details>
 </aside>
 <main>
-  <div class='search'><input id='search' placeholder='Buscar stakeholder…' oninput='searchInput()' onkeydown='searchKey(event)' autocomplete='off'><button class='sclr' onclick='searchClear()' title='Limpiar'>×</button><ul id='searchResults' class='sres hidden'></ul></div>
+  <div class='search'><input id='search' placeholder='Buscar stakeholder…' data-i18n-ph='search_ph' oninput='searchInput()' onkeydown='searchKey(event)' autocomplete='off'><button class='sclr' onclick='searchClear()' data-i18n-title='clear' title='Limpiar'>×</button><ul id='searchResults' class='sres hidden'></ul></div>
   <div class='zoom'><button onclick='zoomBy(1.2)'>+</button><button onclick='zoomBy(.83)'>−</button><button onclick='resetView()'>⌂</button></div>
-  <div class='bar'><button onclick='toggleRight()'>Panel detalle</button><button onclick='toggleFloatLegend()'>Leyenda</button><button onclick='openExport()'>Exportar…</button></div>
-  <div id='floatLegend' class='floatLegend hidden'><button class='xbtn' onclick='toggleFloatLegend()' title='Cerrar'>×</button><div id='floatLegendBody'></div></div>
+  <div class='bar'><button onclick='toggleRight()' data-i18n='btn_detail'>Panel detalle</button><button onclick='toggleFloatLegend()' data-i18n='btn_legend'>Leyenda</button><button onclick='openExport()' data-i18n='btn_export'>Exportar…</button></div>
+  <div id='floatLegend' class='floatLegend hidden'><button class='xbtn' onclick='toggleFloatLegend()' data-i18n-title='close' title='Cerrar'>×</button><div id='floatLegendBody'></div></div>
   <div id='focusHint' class='focusHint hidden'></div>
   <div id='tip' class='tip hidden'></div>
   <svg id='svg' viewBox='0 0 %%W%% %%H%%'>
@@ -97,29 +99,29 @@
     %%QGRID%%%%RINGS%%<g id='focusSpokes'></g>%%EDGES%%%%NODES%%%%RING_LABELS%%
   </svg>
 </main>
-<aside id='right' class='right rightHidden'><div class='card'><button class='xbtn' onclick='closeRight()' title='Cerrar'>×</button><div id='details'><div class='dtitle'>Selecciona un stakeholder</div><p class='small'>Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local.</p></div></div></aside>
+<aside id='right' class='right rightHidden'><div class='card'><button class='xbtn' onclick='closeRight()' data-i18n-title='close' title='Cerrar'>×</button><div id='details'><div class='dtitle' data-i18n='d_select'>Selecciona un stakeholder</div><p class='small' data-i18n='d_select_txt'>Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local.</p></div></div></aside>
 </div>
 <div id='expBack' class='modalBack hidden' onclick='if(event.target===this){closeExport();}'>
   <div class='modal'>
-    <button class='xbtn' onclick='closeExport()' title='Cerrar'>×</button>
-    <h2>Imagen para reporte</h2>
-    <p class='msub'>Exporta lo visible en el mapa. Los filtros de actores se controlan en el panel izquierdo.</p>
+    <button class='xbtn' onclick='closeExport()' data-i18n-title='close' title='Cerrar'>×</button>
+    <h2 data-i18n='m_title'>Imagen para reporte</h2>
+    <p class='msub' data-i18n='m_sub'>Exporta lo visible en el mapa. Los filtros de actores se controlan en el panel izquierdo.</p>
     <div class='mgrid'>
       <div class='mrow'>
-        <label class='formlabel'>Título</label>
+        <label class='formlabel' data-i18n='m_titlelbl'>Título</label>
         <input id='expTitle' type='text' placeholder='Mapa de Stakeholders'>
-        <label class='formlabel'>Subtítulo</label>
+        <label class='formlabel' data-i18n='m_subtitle'>Subtítulo</label>
         <input id='expSubtitle' type='text' placeholder='Vista poder–interés · consolidado'>
       </div>
       <div>
-        <label class='formlabel'>Etiquetas de los círculos</label>
-        <label class='chk'><input type='radio' name='expLbl' value='alias' checked> Alias</label>
-        <label class='chk'><input type='radio' name='expLbl' value='full'> Nombre completo</label>
-        <label class='chk'><input type='checkbox' id='expNum'> Numerar si supera <input id='expNumLen' type='number' value='14' min='4' style='width:54px;display:inline-block;padding:3px;margin:0'> caracteres</label>
-        <label class='formlabel'>Color</label>
-        <label class='chk'><input type='radio' name='expColor' value='color' checked> Color</label>
-        <label class='chk'><input type='radio' name='expColor' value='gray'> Escala de grises</label>
-        <label class='formlabel'>Tipografía</label>
+        <label class='formlabel' data-i18n='m_labels'>Etiquetas de los círculos</label>
+        <label class='chk'><input type='radio' name='expLbl' value='alias' checked> <span data-i18n='m_alias'>Alias</span></label>
+        <label class='chk'><input type='radio' name='expLbl' value='full'> <span data-i18n='m_fullname'>Nombre completo</span></label>
+        <label class='chk'><input type='checkbox' id='expNum'> <span data-i18n='m_num_pre'>Numerar si supera</span> <input id='expNumLen' type='number' value='14' min='4' style='width:54px;display:inline-block;padding:3px;margin:0'> <span data-i18n='m_num_post'>caracteres</span></label>
+        <label class='formlabel' data-i18n='m_color'>Color</label>
+        <label class='chk'><input type='radio' name='expColor' value='color' checked> <span data-i18n='m_color_on'>Color</span></label>
+        <label class='chk'><input type='radio' name='expColor' value='gray'> <span data-i18n='m_gray'>Escala de grises</span></label>
+        <label class='formlabel' data-i18n='m_font'>Tipografía</label>
         <select id='expFont'>
           <option value='arial'>Arial (sans serif)</option>
           <option value='georgia'>Georgia (serif)</option>
@@ -128,38 +130,38 @@
         </select>
       </div>
       <div>
-        <label class='formlabel'>Leyenda</label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='esf' checked> Esferas</label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='dim' checked> Dimensiones</label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='rel' checked> Relaciones</label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='size' checked id='expLegSize'> Tamaño = poder</label>
-        <label class='formlabel'>Posición de la leyenda</label>
-        <label class='chk'><input type='radio' name='expLegPos' value='bottom' checked> Abajo</label>
-        <label class='chk'><input type='radio' name='expLegPos' value='right'> Derecha</label>
-        <label class='formlabel'>Resolución PNG</label>
-        <label class='chk'><input type='radio' name='expScale' value='2' checked> 2x (pantalla)</label>
-        <label class='chk'><input type='radio' name='expScale' value='3'> 3x (impresión)</label>
-        <label class='formlabel'>Fondo</label>
-        <label class='chk'><input type='radio' name='expBg' value='white' checked> Blanco</label>
-        <label class='chk'><input type='radio' name='expBg' value='transparent'> Transparente</label>
+        <label class='formlabel' data-i18n='m_legend'>Leyenda</label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='esf' checked> <span data-i18n='m_le_esf'>Esferas</span></label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='dim' checked> <span data-i18n='m_le_dim'>Dimensiones</span></label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='rel' checked> <span data-i18n='m_le_rel'>Relaciones</span></label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='size' checked id='expLegSize'> <span data-i18n='m_le_size'>Tamaño = poder</span></label>
+        <label class='formlabel' data-i18n='m_legpos'>Posición de la leyenda</label>
+        <label class='chk'><input type='radio' name='expLegPos' value='bottom' checked> <span data-i18n='m_bottom'>Abajo</span></label>
+        <label class='chk'><input type='radio' name='expLegPos' value='right'> <span data-i18n='m_right'>Derecha</span></label>
+        <label class='formlabel' data-i18n='m_res'>Resolución PNG</label>
+        <label class='chk'><input type='radio' name='expScale' value='2' checked> <span data-i18n='m_2x'>2x (pantalla)</span></label>
+        <label class='chk'><input type='radio' name='expScale' value='3'> <span data-i18n='m_3x'>3x (impresión)</span></label>
+        <label class='formlabel' data-i18n='m_bg'>Fondo</label>
+        <label class='chk'><input type='radio' name='expBg' value='white' checked> <span data-i18n='m_white'>Blanco</span></label>
+        <label class='chk'><input type='radio' name='expBg' value='transparent'> <span data-i18n='m_transp'>Transparente</span></label>
       </div>
       <div class='mrow' id='expRelBlock'>
-        <label class='formlabel'>Tipos de relación a incluir en la imagen</label>
+        <label class='formlabel' data-i18n='m_reltypes'>Tipos de relación a incluir en la imagen</label>
         <div id='expRelTypes'></div>
       </div>
       <div class='mrow'>
-        <label class='chk' style='margin:0 0 4px'><input type='checkbox' id='expFootOn' checked> Incluir pie de figura</label>
+        <label class='chk' style='margin:0 0 4px'><input type='checkbox' id='expFootOn' checked> <span data-i18n='m_foot'>Incluir pie de figura</span></label>
         <div style='display:flex;gap:8px'>
           <input id='expFigura' type='text' placeholder='Figura 1' style='flex:0 0 130px'>
-          <input id='expFuente' type='text' placeholder='Elaboración propia' style='flex:1'>
+          <input id='expFuente' type='text' placeholder='Elaboración propia' data-i18n-ph='m_source_ph' style='flex:1'>
         </div>
-        <label class='chk' style='margin-top:6px'><input type='checkbox' id='expFecha' checked> Incluir fecha</label>
+        <label class='chk' style='margin-top:6px'><input type='checkbox' id='expFecha' checked> <span data-i18n='m_date'>Incluir fecha</span></label>
       </div>
     </div>
     <div class='mactions'>
-      <button onclick='doExport("copy")'>Copiar imagen</button>
-      <button onclick='doExport("svg")'>Descargar SVG</button>
-      <button class='primary' onclick='doExport("png")'>Descargar PNG</button>
+      <button onclick='doExport("copy")' data-i18n='m_copy'>Copiar imagen</button>
+      <button onclick='doExport("svg")' data-i18n='m_dlsvg'>Descargar SVG</button>
+      <button class='primary' onclick='doExport("png")' data-i18n='m_dlpng'>Descargar PNG</button>
     </div>
   </div>
 </div>

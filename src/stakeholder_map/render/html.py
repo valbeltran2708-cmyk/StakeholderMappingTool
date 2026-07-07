@@ -16,7 +16,8 @@ from ..config import (W, H, CX, CY, THEME, APP_TITLE, RING_LABEL_PREFIX,
                       QUAD_MX, QUAD_MY, QUAD_R_MAX, QUAD_R_MIN,
                       R_IN, R_OUT, S_MIN, S_MAX, LABEL_FONT_MIN,
                       UI_LANG, AXIS_LABELS, NET_R_MAX, NET_R_MIN, NET_FILL,
-                      MULTI_STROKE)
+                      MULTI_STROKE, QUAD_ZONE_COLORS, BAND_GRAY_INNER,
+                      BAND_GRAY_OUTER)
 from ..scales import radius_for_rank
 
 
@@ -119,7 +120,7 @@ def _rings_svg(scale):
             g = round(228 - 56 * (1 - t))   # 172 (interior) .. 228 (exterior)
             fill = '#%02x%02x%02x' % (g, g, g)
             bands += (f"<circle class='band' cx='{CX}' cy='{CY}' r='{r}' "
-                      f"data-r='{r}' fill='{fill}'/>")
+                      f"data-r='{r}' data-lvl='{k}' fill='{fill}'/>")
     circles = ''.join(f"<circle class='ring' cx='{CX}' cy='{CY}' r='{r}' data-r='{r}'/>" for r in bounds)
     labels = ''.join(
         f"<text class='ringlab' x='{CX}' y='{round(CY - rad, 1)}' data-r='{round(rad, 1)}' "
@@ -140,6 +141,17 @@ def _qgrid_svg(scale):
     ncol = max(scale['NI'], 1); nrow = max(scale['NP'], 1)
     gwq = (W - 2 * mxq) / ncol; ghq = (H - 2 * myq) / nrow
     parts = ["<g id='qgrid' class='hidden'>"]
+    # Fondo de zonas de Mendelow (detrás de la rejilla): cuatro rectángulos
+    # divididos en el centro. data-zone permite recolorearlos en vivo.
+    zc = QUAD_ZONE_COLORS
+    zones = [('ks', mxq, myq, CX - mxq, CY - myq),
+             ('cm', CX, myq, (W - mxq) - CX, CY - myq),
+             ('mo', mxq, CY, CX - mxq, (H - myq) - CY),
+             ('ki', CX, CY, (W - mxq) - CX, (H - myq) - CY)]
+    for z, x, y, w, h in zones:
+        parts.append(f"<rect class='qzone' data-zone='{z}' x='{round(x,1)}' "
+                     f"y='{round(y,1)}' width='{round(w,1)}' height='{round(h,1)}' "
+                     f"fill='{zc[z]}'/>")
     parts.append(f"<rect x='{mxq}' y='{myq}' width='{W - 2 * mxq}' height='{H - 2 * myq}' "
                  f"fill='none' class='qline'/>")
     for i in range(1, ncol):
@@ -148,7 +160,6 @@ def _qgrid_svg(scale):
     for j in range(1, nrow):
         y = myq + j * ghq
         parts.append(f"<line x1='{mxq}' y1='{round(y, 1)}' x2='{W - mxq}' y2='{round(y, 1)}' class='qline'/>")
-    # marcas de nivel FUERA de la matriz: interés debajo, poder a la izquierda
     for i, v in enumerate(scale['interest_order']):
         cx = mxq + (i + 0.5) * gwq
         parts.append(f"<text class='qtick' x='{round(cx, 1)}' y='{H - myq + 30}' "
@@ -157,16 +168,15 @@ def _qgrid_svg(scale):
         cy = myq + (nrow - 1 - p + 0.5) * ghq
         parts.append(f"<text class='qtick' x='{mxq - 16}' y='{round(cy + 4, 1)}' "
                      f"text-anchor='end'>{esc(str(v))}</text>")
-    # lectura Mendelow (por mitades) en las 4 esquinas, dentro de la matriz
-    parts.append(f"<text class='qlab' x='{W - mxq - 14}' y='{myq + 28}' text-anchor='end'>Gestionar de cerca</text>")
-    parts.append(f"<text class='qlab' x='{mxq + 14}' y='{myq + 28}'>Mantener satisfecho</text>")
-    parts.append(f"<text class='qlab' x='{W - mxq - 14}' y='{H - myq - 16}' text-anchor='end'>Mantener informado</text>")
-    parts.append(f"<text class='qlab' x='{mxq + 14}' y='{H - myq - 16}'>Monitorear</text>")
-    # títulos de eje, separados de las marcas para que nunca se crucen
-    parts.append(f"<text class='qaxis' x='{CX}' y='{H - myq + 74}' "
-                 f"text-anchor='middle'>{esc(_axis_title('interest'))} →</text>")
-    parts.append(f"<text class='qaxis' transform='translate({mxq - 130},{CY}) rotate(-90)' "
-                 f"text-anchor='middle'>{esc(_axis_title('power'))} →</text>")
+    # etiquetas Mendelow y de eje: data-i18n para el botón de idioma
+    parts.append(f"<text class='qlab' data-i18n='q_cm' x='{W - mxq - 14}' y='{myq + 28}' text-anchor='end'>Gestionar de cerca</text>")
+    parts.append(f"<text class='qlab' data-i18n='q_ks' x='{mxq + 14}' y='{myq + 28}'>Mantener satisfecho</text>")
+    parts.append(f"<text class='qlab' data-i18n='q_ki' x='{W - mxq - 14}' y='{H - myq - 16}' text-anchor='end'>Mantener informado</text>")
+    parts.append(f"<text class='qlab' data-i18n='q_mo' x='{mxq + 14}' y='{H - myq - 16}'>Monitorear</text>")
+    parts.append(f"<text class='qaxis' data-i18n='axis_interest' data-suffix=' \u2192' x='{CX}' y='{H - myq + 74}' "
+                 f"text-anchor='middle'>{esc(AXIS_LABELS['es']['interest'])} \u2192</text>")
+    parts.append(f"<text class='qaxis' data-i18n='axis_power' data-suffix=' \u2192' transform='translate({mxq - 130},{CY}) rotate(-90)' "
+                 f"text-anchor='middle'>{esc(AXIS_LABELS['es']['power'])} \u2192</text>")
     parts.append("</g>")
     return ''.join(parts)
 
@@ -230,7 +240,8 @@ def _legends(nodes, edges, rel_styles):
     cats = {n.get('category', ''): n.get('fill', '#aaa') for n in nodes if n.get('category', '')}
     legend_cat = ''.join(
         f"<div class='legend clk' data-cat=\"{esc(k)}\" onclick='filterCat(this.dataset.cat)'>"
-        f"<span class='sw' style='background:{esc(v)}'></span>{esc(k)}</div>"
+        f"<span class='sw' style='background:{esc(v)}'></span>"
+        f"<span class='ltxt' data-term=\"{esc(k)}\">{esc(k)}</span></div>"
         for k, v in sorted(cats.items()))
     srcs = {}
     for n in nodes:
@@ -239,28 +250,64 @@ def _legends(nodes, edges, rel_styles):
             srcs[s] = n.get('stroke', '#667085')
     legend_src = ''.join(
         f"<div class='legend clk' data-src=\"{esc(s)}\" onclick='filterSrc(this.dataset.src)'>"
-        f"<span class='sw' style='border:3px solid {esc(c)};background:#fff'></span>{esc(s)}</div>"
+        f"<span class='sw' style='border:3px solid {esc(c)};background:#fff'></span>"
+        f"<span class='ltxt' data-term=\"{esc(s)}\">{esc(s)}</span></div>"
         for s, c in sorted(srcs.items()))
     multi_label = ('En ambas dimensiones' if len(srcs) == 2 else 'En varias dimensiones')
     if any(n.get('multi') for n in nodes):
         legend_src += (f"<div class='legend clk' data-src='__multi__' "
                        f"onclick='filterSrc(this.dataset.src)'>"
                        f"<span class='sw' style='border:3px solid {MULTI_STROKE};"
-                       f"background:#fff'></span>{esc(multi_label)}</div>")
+                       f"background:#fff'></span>"
+                       f"<span class='ltxt' data-i18n='multi_dims'>{esc(multi_label)}</span></div>")
     types_used = sorted({e['type'] for e in edges})
     legend_rel = ''.join(
         f"<div class='legend clk' data-type=\"{esc(t)}\" onclick='filterType(this.dataset.type)'>"
         f"<span class='line' style='border-top:3px "
         f"{('dashed' if rel_styles.get(t, {}).get('dash') else 'solid')} "
-        f"{esc(rel_styles.get(t, {}).get('color', '#999'))}'></span>{esc(t)}</div>"
+        f"{esc(rel_styles.get(t, {}).get('color', '#999'))}'></span>"
+        f"<span class='ltxt' data-term=\"{esc(t)}\">{esc(t)}</span></div>"
         for t in types_used)
-    options_cat = ''.join(f"<option value='{esc(k)}'>{esc(k)}</option>" for k in sorted(cats))
+    options_cat = ''.join(f"<option value='{esc(k)}' data-term=\"{esc(k)}\">{esc(k)}</option>" for k in sorted(cats))
     sources = sorted({n.get('source', '') for n in nodes if n.get('source', '')})
-    options_src = ''.join(f"<option value='{esc(s)}'>{esc(s)}</option>" for s in sources)
+    options_src = ''.join(f"<option value='{esc(s)}' data-term=\"{esc(s)}\">{esc(s)}</option>" for s in sources)
     if any(n.get('multi') for n in nodes):
-        options_src += f"<option value='__multi__'>{esc(multi_label)}</option>"
-    types_opts = ''.join(f"<option value='{esc(t)}'>{esc(t)}</option>" for t in types_used)
+        options_src += f"<option value='__multi__' data-i18n='multi_dims'>{esc(multi_label)}</option>"
+    types_opts = ''.join(f"<option value='{esc(t)}' data-term=\"{esc(t)}\">{esc(t)}</option>" for t in types_used)
     return legend_cat, legend_src, legend_rel, options_cat, options_src, types_opts
+
+
+
+def _band_gray(k, n):
+    if n <= 1:
+        return '#%02x%02x%02x' % ((BAND_GRAY_INNER,) * 3)
+    t = k / (n - 1)
+    g = round(BAND_GRAY_OUTER - (BAND_GRAY_OUTER - BAND_GRAY_INNER) * (1 - t))
+    return '#%02x%02x%02x' % (g, g, g)
+
+
+def _color_controls(scale):
+    io = scale['interest_order']; n = len(io)
+    parts = []
+    if 1 < n <= 8:
+        parts.append("<div class='formlabel' data-i18n='band_colors'>Colores de anillos (radial)</div>")
+        parts.append("<div class='swrow'>")
+        for i in range(n):
+            level = io[n - 1 - i]      # de mayor interés (interior) a menor
+            color = _band_gray(i, n)
+            parts.append(f"<label class='swpick'><input type='color' class='bandC' "
+                         f"data-lvl='{i}' value='{color}' oninput='setBandColor(this.dataset.lvl,this.value)'>"
+                         f"<span>{esc(str(level))}</span></label>")
+        parts.append("</div>")
+    zc = QUAD_ZONE_COLORS
+    parts.append("<div class='formlabel' data-i18n='zone_colors'>Colores de cuadrantes</div>")
+    parts.append("<div class='swcol'>")
+    for z, key in (('cm', 'q_cm'), ('ks', 'q_ks'), ('ki', 'q_ki'), ('mo', 'q_mo')):
+        parts.append(f"<label class='swpick'><input type='color' class='zoneC' "
+                     f"data-zone='{z}' value='{zc[z]}' oninput='setZoneColor(this.dataset.zone,this.value)'>"
+                     f"<span data-i18n='{key}'></span></label>")
+    parts.append("</div>")
+    return ''.join(parts)
 
 
 def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
@@ -310,6 +357,7 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
                              'NI': scale['NI'], 'NP': scale['NP'],
                              'interest_order': scale['interest_order'],
                              'power_order': scale['power_order'],
+                             'terms': scale.get('terms', {}),
                              'net_r': scale.get('net_r', 34),
                              'geo': {'R_IN': R_IN, 'R_OUT': R_OUT,
                                      'S_MIN': S_MIN, 'S_MAX': S_MAX,
@@ -338,6 +386,7 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
             ('%%IMP_FILTER%%', imp_filter),
             ('%%OPTIONS_SRC%%', options_src),
             ('%%TYPES_OPTS%%', types_opts),
+            ('%%COLOR_CONTROLS%%', _color_controls(scale)),
             ('%%LEGEND_CAT%%', legend_cat),
             ('%%LEGEND_SRC%%', legend_src),
             ('%%LEGEND_REL%%', legend_rel),

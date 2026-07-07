@@ -15,7 +15,8 @@ from .config import (CX, CY, THEME_PALETTE, CATEGORY_PALETTE, REL_PALETTE,
 from .normalize import clean, cell_val, norm_pol, slug, parse_tags
 from .scales import (build_scale, radius_for_rank, size_for_rank, to_num,
                      order_scale)
-from .excel_io import sheet, load_scales, load_style_config, load_unified_config
+from .excel_io import (sheet, load_scales, load_style_config,
+                       load_unified_config, load_term_dict)
 from .layouts import resolve_overlaps, add_network_layout, add_quadrant_coords
 
 NODE_RENAMES = {
@@ -30,6 +31,11 @@ NODE_RENAMES = {
     'Descripción / función': 'description',
     'Dimensión': 'source', 'Dimension': 'source',
     'Alias / acrónimo': 'alias', 'Alias / acronimo': 'alias', 'Alias': 'alias',
+    'Stakeholder / entidad (EN)': 'label_en', 'Nombre (EN)': 'label_en',
+    'Name (EN)': 'label_en', 'Entity name (EN)': 'label_en',
+    'Alias (EN)': 'alias_en', 'Alias / acrónimo (EN)': 'alias_en',
+    'Descripción / función (EN)': 'desc_en', 'Descripción (EN)': 'desc_en',
+    'Descripcion (EN)': 'desc_en', 'Description (EN)': 'desc_en',
     'Acrónimo': 'alias', 'Acronimo': 'alias', 'Short name': 'alias',
     'Importancia en el proyecto': 'importance', 'Importancia': 'importance',
     'Importance': 'importance', 'Project importance': 'importance',
@@ -52,6 +58,13 @@ REL_RENAMES = {
     'description': 'description', 'Descripción de la relación': 'description',
     'Descripcion de la relacion': 'description',
 }
+
+
+def _load_terms(path, warnings):
+    try:
+        return load_term_dict(path, warnings)
+    except Exception:
+        return {}
 
 
 def _load_styles_and_scales(path, warnings):
@@ -131,12 +144,15 @@ def read_data(path):
             n.setdefault('multi', False)
             n['importance'] = cell_val(n.get('importance', ''))
             n.setdefault('alias', '')
+            n.setdefault('label_en', ''); n.setdefault('alias_en', '')
+            n.setdefault('desc_en', '')
             tv = n.get('tags', [])
             if not isinstance(tv, list):
                 tv = str(tv).strip().strip('[]')
                 tv = parse_tags(tv.replace("'", '').replace('"', ''))
             n['tags'] = tv
             n['r'] = size_for_rank(n['pr'], scale['NP'])
+        scale['terms'] = _load_terms(path, warnings)
         scale['net_r'] = add_network_layout(nodes, edges)
         return nodes, edges, ns, es, warnings, cat_colors, rel_styles, scale
 
@@ -148,7 +164,8 @@ def read_data(path):
                          'o el Excel de coordenadas.')
 
     st = st.rename(columns=NODE_RENAMES)
-    for col in ['id', 'label', 'alias', 'parent_id', 'parent_name', 'level', 'source',
+    for col in ['id', 'label', 'alias', 'label_en', 'alias_en', 'desc_en',
+                'parent_id', 'parent_name', 'level', 'source',
                 'category', 'tags', 'description', 'interest', 'power',
                 'importance', 'notes']:
         if col not in st.columns:
@@ -171,6 +188,7 @@ def read_data(path):
     scale = build_scale(list(st.interest), list(st.power), scales_cfg)
     imp_order = order_scale(list(st.importance), scales_cfg.get('importance'))
     scale['importance_order'] = imp_order
+    scale['terms'] = _load_terms(path, warnings)
     _imp_rank = {v: i for i, v in enumerate(imp_order)}
 
     def imprank(v):
@@ -201,7 +219,8 @@ def read_data(path):
                 if t not in seen_t:
                     seen_t.append(t)
         base['tags'] = seen_t
-        for c in ['id', 'alias', 'description', 'notes', 'category', 'level',
+        for c in ['id', 'alias', 'label_en', 'alias_en', 'desc_en',
+                  'description', 'notes', 'category', 'level',
                   'parent_name', 'parent_id']:
             ne = [x for x in g[c] if str(x).strip()]
             base[c] = ne[0] if ne else base.get(c, '')
@@ -292,6 +311,7 @@ def read_data(path):
         p = pos.get(r.id, {'x': CX, 'y': CY})
         nodes.append({
             'id': r.id, 'label': r.label, 'alias': r.alias,
+            'label_en': r.label_en, 'alias_en': r.alias_en, 'desc_en': r.desc_en,
             'parent_id': r.parent_id, 'level': r.level,
             'source': r.source, 'category': r.category, 'description': r.description,
             'interest': r.interest, 'power': r.power, 'notes': r.notes,

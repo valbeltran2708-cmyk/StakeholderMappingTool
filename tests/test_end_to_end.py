@@ -22,6 +22,9 @@ def _demo_xlsx(path):
         'Importancia en el proyecto': ['Alta', 'Media', 'Media', 'Alta', 'Baja', ''],
         'Alias / acrónimo': ['MinT', '', 'OP', 'OP', '', ''],
         'Notas': [''] * 6,
+        'Nombre (EN)': ['Ministry', '', 'Operator', 'Operator', '', ''],
+        'Alias (EN)': ['MoT', '', '', '', '', ''],
+        'Descripción (EN)': ['gov body', '', '', '', '', ''],
     })
     rel = pd.DataFrame({
         'Desde / entidad origen': ['Ministerio', 'Alcaldía'],
@@ -44,6 +47,8 @@ def _demo_xlsx(path):
         'Escala de importancia': ['Baja', 'Media', 'Alta', '', ''],
         'Temas / fuentes': ['Tema A', 'Tema B', '', '', ''],
         'Color HEX  ': ['#0B5394', '#38761D', '', '', ''],
+        'Término (ES)': ['Gobierno', 'Privado', 'Tema A', '', ''],
+        'Término (EN)': ['Government', 'Private', 'Theme A', '', ''],
     })
     with pd.ExcelWriter(path, engine='openpyxl') as w:
         st.to_excel(w, sheet_name='01_Stakeholders', index=False)
@@ -101,6 +106,22 @@ def test_generate_end_to_end(tmp_path):
     # Títulos de eje del cuadrante bilingües y separados de las marcas
     assert 'Project interest' in html
     assert 'Interés en el proyecto' in html
+
+    # --- bilingüe: columnas EN por entidad y diccionario de términos ---
+    assert by_label['Ministerio']['label_en'] == 'Ministry'
+    assert by_label['Ministerio']['alias_en'] == 'MoT'
+    assert data['terms'].get('Gobierno') == 'Government'
+    assert data['terms'].get('Tema A') == 'Theme A'
+    assert 'langBtn' in html                       # botón de idioma
+
+    # --- zonas de cuadrante con color y bandas recoloreables ---
+    assert html.count("class='qzone'") == 4
+    for z in ('cm', 'ks', 'ki', 'mo'):
+        assert f"data-zone='{z}'" in html
+    assert 'data-lvl=' in html                     # bandas etiquetadas por nivel
+    assert "class='bandC'" in html                 # selector de color de anillo
+    assert "class='zoneC'" in html                 # selector de color de zona
+    assert 'QUAD_ZONE_COLORS' not in html          # colores materializados, no el nombre
 
 
 def test_read_data_warns_on_mixed_scale(tmp_path):

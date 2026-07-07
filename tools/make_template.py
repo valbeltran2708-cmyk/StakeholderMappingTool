@@ -92,8 +92,9 @@ def build(path):
     _head(cfg,
           ['Esfera', 'Color HEX', '', 'Tipo de relación', 'Color HEX',
            'Estilo de línea', '', 'Escala de interés', 'Escala de poder',
-           'Escala de importancia', '', 'Dimensiones', 'Color HEX'],
-          [26, 12, 3, 30, 12, 16, 3, 18, 18, 20, 3, 28, 12],
+           'Escala de importancia', '', 'Dimensiones', 'Color HEX', '',
+           'Término (ES)', 'Término (EN)'],
+          [26, 12, 3, 30, 12, 16, 3, 18, 18, 20, 3, 28, 12, 3, 26, 26],
           comments={
               'Esfera': 'Una esfera por fila (columna A) con su color en la '
                            'columna B (#RRGGBB). Añade o cambia libremente: las '
@@ -114,6 +115,13 @@ def build(path):
                                        'proyecto, de MENOR a MAYOR (ej. Baja / Media / '
                                        'Alta). Alimenta las casillas del filtro '
                                        '"Importancia en el proyecto".',
+              'Término (ES)': 'BILINGÜE (opcional): término en español tal como '
+                              'aparece en los datos (una esfera, dimensión, '
+                              'categoría o tipo de relación). El botón ES/EN de la '
+                              'herramienta mostrará su traducción sin alterar el '
+                              'dato. NO se traducen nombres de entidades: esos van '
+                              'en columnas (EN) de 01_Stakeholders.',
+              'Término (EN)': 'Traducción al inglés del término de la columna O.',
               'Dimensiones': 'Dimensiones de análisis (ej. Electrificación de '
                                  'flota, Resiliencia climática). Alimenta el desplegable '
                                  'de "Tema / fuente" en las dos hojas de datos. El color '
@@ -145,6 +153,11 @@ def build(path):
         c = cfg.cell(row=i, column=13, value=col)
         c.fill = PatternFill('solid', fgColor=col.lstrip('#'))
         c.font = Font(color='FFFFFF', bold=True, size=9)
+    for r, (es_t, en_t) in enumerate([('Gobierno', 'Government'),
+                                      ('Sociedad civil', 'Civil society'),
+                                      ('Academia', 'Academia')], start=2):
+        cfg.cell(row=r, column=15, value=es_t)
+        cfg.cell(row=r, column=16, value=en_t)
     _dv(cfg, f'F2:F{MAXR}', '"Sólida,Punteada"', strict=True)
 
     # ---------- 01_Stakeholders ----------
@@ -152,8 +165,9 @@ def build(path):
     st_headers = ['Stakeholder / entidad', 'Entidad padre / grupo', 'Nivel',
                   'Dimensión', 'Esfera', 'Categorías', 'Descripción / función',
                   'Interés en el proyecto', 'Poder / influencia',
-                  'Importancia en el proyecto', 'Notas', 'Alias / acrónimo']
-    _head(st, st_headers, [34, 26, 14, 22, 24, 30, 40, 20, 20, 22, 30, 18], comments={
+                  'Importancia en el proyecto', 'Notas', 'Alias / acrónimo',
+                  'Nombre (EN)', 'Alias (EN)', 'Descripción (EN)']
+    _head(st, st_headers, [34, 26, 14, 22, 24, 30, 40, 20, 20, 22, 30, 18, 34, 18, 40], comments={
         'Stakeholder / entidad': 'Nombre visible del actor. Obligatorio.\n\n'
                                  'Multi-tema: repite el MISMO nombre en otra fila con '
                                  'otra "Dimensión" y sus propios interés/poder; la '
@@ -185,6 +199,12 @@ def build(path):
                                       'col. J). En la herramienta se filtra con '
                                       'casillas por nivel.',
         'Notas': 'Contexto adicional; aparece en el panel de detalle.',
+        'Nombre (EN)': 'BILINGÜE (opcional): nombre OFICIAL de la entidad en '
+                       'inglés. El botón ES/EN lo muestra en lugar del nombre en '
+                       'español. Déjalo vacío si no aplica; no se inventa una '
+                       'traducción.',
+        'Alias (EN)': 'BILINGÜE (opcional): alias o sigla en inglés.',
+        'Descripción (EN)': 'BILINGÜE (opcional): descripción / función en inglés.',
         'Alias / acrónimo': 'OPCIONAL: nombre corto o sigla del actor (ej. TM, '
                             'SDM). Se muestra dentro del círculo y en las listas; '
                             'el nombre completo aparece en la ficha, el tooltip y '

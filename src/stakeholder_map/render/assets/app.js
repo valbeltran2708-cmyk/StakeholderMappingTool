@@ -28,14 +28,120 @@ var IDX={}, NODE_EL={}, CHILDREN={}, DEG={}, SUPPORT={}, LPOS={};
 DATA.nodes.forEach(function(n){IDX[n.id]=n; if(n.parent_id){(CHILDREN[n.parent_id]=CHILDREN[n.parent_id]||[]).push(n);}});
 DATA.edges.forEach(function(e){DEG[e.source]=(DEG[e.source]||0)+1;DEG[e.target]=(DEG[e.target]||0)+1;
   var s=e.pol==='pos'?1:(e.pol==='neg'?-1:0); SUPPORT[e.target]=(SUPPORT[e.target]||0)+s*(parseInt(e.strength,10)||0);});
-var POLCOL={pos:'#2e9e5b',neg:'#d64545',neu:'#9aa3af'};
-var ZONE={
-  cm:{l:'Gestionar de cerca',a:'Involucrar de forma activa: co-decisión y comunicación frecuente.'},
-  ks:{l:'Mantener satisfecho',a:'Mantener conforme: consultar en decisiones clave, sin saturar.'},
-  ki:{l:'Mantener informado',a:'Informar y escuchar: aprovechar como aliado o vocero.'},
-  mo:{l:'Monitorear',a:'Seguimiento ligero: reevaluar si cambia su poder o interés.'},
-  no:{l:'Sin clasificar',a:'Falta poder o interés en los datos.'}
+
+var LANG={
+ es:{
+  app_title:'Mapa de Stakeholders \u00b7 Poder\u2013Inter\u00e9s y Relaciones',
+  nodes:'nodos',edges_lbl:'relaciones',view:'Vista',filters:'Filtros',key_actors:'Actores clave',
+  how_read:'C\u00f3mo leer',legends:'Leyendas',export:'Exportar',validation:'Validaci\u00f3n',
+  v_pi:'Poder\u2013inter\u00e9s',v_net:'Conexiones',v_quad:'Cuadrante',
+  c_edges:'Relaciones',c_subs:'Subdivisiones',c_rings:'Anillos de inter\u00e9s',c_pol:'Color por efecto (polaridad)',
+  spread:'Separaci\u00f3n de anillos',band_colors:'Colores de anillos (radial)',zone_colors:'Colores de cuadrantes',
+  f_sphere:'Esfera',f_dim:'Dimensi\u00f3n',f_reltype:'Tipo de relaci\u00f3n',all_f:'Todas',all_consol:'Todas (consolidado)',
+  dim_hint:'Elegir una dimensi\u00f3n reposiciona y redimensiona cada actor seg\u00fan su puntaje en ella.',
+  k_score:'Inter\u00e9s + poder',k_deg:'Conexiones',k_isolate:'Mostrar solo estos en el mapa',
+  h_size:'Tama\u00f1o del c\u00edrculo = poder',h_dist:'Distancia al centro = inter\u00e9s',
+  h_border:'Borde = dimensi\u00f3n',h_border_txt:'L\u00ednea punteada = subdivisi\u00f3n. Click en una entidad abre su mapa local.',
+  h_views:'Vistas',h_views_txt:'Poder\u2013inter\u00e9s: posici\u00f3n por inter\u00e9s y tama\u00f1o por poder. Conexiones: distribuye por relaciones, c\u00edrculos iguales. Cuadrante: matriz de Mendelow, c\u00edrculos de igual tama\u00f1o (la posici\u00f3n ya codifica inter\u00e9s y poder).',
+  l_spheres:'Esferas',l_dims:'Dimensiones (borde)',l_rels:'Relaciones',l_effect:'Efecto (color por polaridad)',
+  l_pos:'Apoya / positiva',l_neg:'Se opone / negativa',l_neu:'Neutral',
+  btn_report_img:'Imagen para reporte\u2026',csv_strategy:'CSV estrategia',csv_nodes:'CSV nodos',csv_edges:'CSV relaciones',
+  export_hint:'La imagen exporta lo que est\u00e1 visible en el mapa (filtros incluidos); el di\u00e1logo controla formato, etiquetas, color, leyenda y pie de figura.',
+  sheet_nodes:'Hoja nodos',sheet_edges:'Hoja relaciones',search_ph:'Buscar stakeholder\u2026',clear:'Limpiar',close:'Cerrar',
+  btn_detail:'Panel detalle',btn_legend:'Leyenda',btn_export:'Exportar\u2026',
+  d_select:'Selecciona un stakeholder',d_select_txt:'Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local.',
+  m_title:'Imagen para reporte',m_sub:'Exporta lo visible en el mapa. Los filtros de actores se controlan en el panel izquierdo.',
+  m_titlelbl:'T\u00edtulo',m_subtitle:'Subt\u00edtulo',m_labels:'Etiquetas de los c\u00edrculos',m_alias:'Alias',m_fullname:'Nombre completo',
+  m_num_pre:'Numerar si supera',m_num_post:'caracteres',m_color:'Color',m_color_on:'Color',m_gray:'Escala de grises',m_font:'Tipograf\u00eda',
+  m_legend:'Leyenda',m_le_esf:'Esferas',m_le_dim:'Dimensiones',m_le_rel:'Relaciones',m_le_size:'Tama\u00f1o = poder',
+  m_legpos:'Posici\u00f3n de la leyenda',m_bottom:'Abajo',m_right:'Derecha',m_res:'Resoluci\u00f3n PNG',m_2x:'2x (pantalla)',m_3x:'3x (impresi\u00f3n)',
+  m_bg:'Fondo',m_white:'Blanco',m_transp:'Transparente',m_reltypes:'Tipos de relaci\u00f3n a incluir en la imagen',
+  m_foot:'Incluir pie de figura',m_source_ph:'Elaboraci\u00f3n propia',m_date:'Incluir fecha',m_copy:'Copiar imagen',m_dlsvg:'Descargar SVG',m_dlpng:'Descargar PNG',
+  to_quad:'Vista cuadrante',to_radial:'Vista radial',multi_dims:'',
+  q_cm:'Gestionar de cerca',q_ks:'Mantener satisfecho',q_ki:'Mantener informado',q_mo:'Monitorear',
+  axis_interest:'Inter\u00e9s en el proyecto',axis_power:'Poder / influencia',
+  g_dimension:'Dimensi\u00f3n',g_interest:'Inter\u00e9s',g_power:'Poder',g_importance:'Importancia',g_connections:'Conexiones',
+  g_support:'Apoyo (entrante)',g_by_dim:'Por dimensi\u00f3n (inter\u00e9s \u00b7 poder)',g_categories:'Categor\u00edas',g_notes:'Notas',
+  g_out_rel:'Relaciones salientes',g_in_rel:'Relaciones entrantes',g_no_rel:'Sin relaciones',g_strength:'fuerza',g_strength_cap:'Fuerza',
+  g_by_dim_tag:'dimensi\u00f3n',g_relationship:'Relaci\u00f3n',
+  how_read_pre:'C\u00f3mo leer',
+  key_pi:'tama\u00f1o = poder \u00b7 distancia al centro = inter\u00e9s \u00b7 borde = dimensi\u00f3n \u00b7 color = esfera',
+  key_quad:'Cuadrante de Mendelow \u00b7 tama\u00f1o uniforme \u00b7 posici\u00f3n = inter\u00e9s (x) y poder (y)',
+  key_net:'Distribuci\u00f3n por relaciones \u00b7 tama\u00f1o uniforme \u00b7 borde = dimensi\u00f3n',
+  sub_consol:'consolidado',sub_multi:'solo entidades en varias dimensiones',sub_dim:'dimensi\u00f3n',
+  conventions:'Convenciones',size_from:'de',size_inner:'(interior) a',size_outer:'(exterior)',
+  f_hidden:'Este actor est\u00e1 oculto por los filtros actuales.',f_svg_dl:'SVG descargado',f_png_dl:'PNG descargado',
+  f_nobg:', sin fondo',f_png_fail:'No se pudo generar el PNG; usa el bot\u00f3n SVG.',f_copy_ok:'Imagen copiada al portapapeles',
+  f_copy_na:'Copiar no disponible aqu\u00ed; descargando PNG.',f_copy_fail:'No se pudo copiar; descargando PNG.'
+ },
+ en:{
+  app_title:'Stakeholder Map \u00b7 Power\u2013Interest and Relationships',
+  nodes:'nodes',edges_lbl:'relationships',view:'View',filters:'Filters',key_actors:'Key actors',
+  how_read:'How to read',legends:'Legends',export:'Export',validation:'Validation',
+  v_pi:'Power\u2013interest',v_net:'Connections',v_quad:'Quadrant',
+  c_edges:'Relationships',c_subs:'Subdivisions',c_rings:'Interest rings',c_pol:'Color by effect (polarity)',
+  spread:'Ring spacing',band_colors:'Ring colors (radial)',zone_colors:'Quadrant colors',
+  f_sphere:'Sphere',f_dim:'Dimension',f_reltype:'Relationship type',all_f:'All',all_consol:'All (consolidated)',
+  dim_hint:'Choosing a dimension repositions and resizes each actor by its score in it.',
+  k_score:'Interest + power',k_deg:'Connections',k_isolate:'Show only these on the map',
+  h_size:'Circle size = power',h_dist:'Distance to center = interest',
+  h_border:'Border = dimension',h_border_txt:'Dotted line = subdivision. Click an entity to open its local map.',
+  h_views:'Views',h_views_txt:'Power\u2013interest: position by interest and size by power. Connections: distributed by relationships, equal circles. Quadrant: Mendelow matrix, equal-size circles (position already encodes interest and power).',
+  l_spheres:'Spheres',l_dims:'Dimensions (border)',l_rels:'Relationships',l_effect:'Effect (color by polarity)',
+  l_pos:'Supports / positive',l_neg:'Opposes / negative',l_neu:'Neutral',
+  btn_report_img:'Image for report\u2026',csv_strategy:'Strategy CSV',csv_nodes:'Nodes CSV',csv_edges:'Relationships CSV',
+  export_hint:'The image exports what is visible on the map (filters included); the dialog controls format, labels, color, legend and figure caption.',
+  sheet_nodes:'Nodes sheet',sheet_edges:'Relationships sheet',search_ph:'Search stakeholder\u2026',clear:'Clear',close:'Close',
+  btn_detail:'Detail panel',btn_legend:'Legend',btn_export:'Export\u2026',
+  d_select:'Select a stakeholder',d_select_txt:'Click a node to highlight its connections. If it is an entity with subdivisions, its local map opens.',
+  m_title:'Image for report',m_sub:'Exports what is visible on the map. Actor filters are controlled in the left panel.',
+  m_titlelbl:'Title',m_subtitle:'Subtitle',m_labels:'Circle labels',m_alias:'Alias',m_fullname:'Full name',
+  m_num_pre:'Number if longer than',m_num_post:'characters',m_color:'Color',m_color_on:'Color',m_gray:'Grayscale',m_font:'Typography',
+  m_legend:'Legend',m_le_esf:'Spheres',m_le_dim:'Dimensions',m_le_rel:'Relationships',m_le_size:'Size = power',
+  m_legpos:'Legend position',m_bottom:'Bottom',m_right:'Right',m_res:'PNG resolution',m_2x:'2x (screen)',m_3x:'3x (print)',
+  m_bg:'Background',m_white:'White',m_transp:'Transparent',m_reltypes:'Relationship types to include in the image',
+  m_foot:'Include figure caption',m_source_ph:'Own elaboration',m_date:'Include date',m_copy:'Copy image',m_dlsvg:'Download SVG',m_dlpng:'Download PNG',
+  to_quad:'Quadrant view',to_radial:'Radial view',multi_dims:'',
+  q_cm:'Manage closely',q_ks:'Keep satisfied',q_ki:'Keep informed',q_mo:'Monitor',
+  axis_interest:'Project interest',axis_power:'Power / influence',
+  g_dimension:'Dimension',g_interest:'Interest',g_power:'Power',g_importance:'Importance',g_connections:'Connections',
+  g_support:'Support (incoming)',g_by_dim:'By dimension (interest \u00b7 power)',g_categories:'Categories',g_notes:'Notes',
+  g_out_rel:'Outgoing relationships',g_in_rel:'Incoming relationships',g_no_rel:'No relationships',g_strength:'strength',g_strength_cap:'Strength',
+  g_by_dim_tag:'dimension',g_relationship:'Relationship',
+  how_read_pre:'How to read',
+  key_pi:'size = power \u00b7 distance to center = interest \u00b7 border = dimension \u00b7 color = sphere',
+  key_quad:'Mendelow matrix \u00b7 uniform size \u00b7 position = interest (x) and power (y)',
+  key_net:'Relationship-based layout \u00b7 uniform size \u00b7 border = dimension',
+  sub_consol:'consolidated',sub_multi:'only entities in several dimensions',sub_dim:'dimension',
+  conventions:'Legend of labels',size_from:'from',size_inner:'(inner) to',size_outer:'(outer)',
+  f_hidden:'This actor is hidden by the current filters.',f_svg_dl:'SVG downloaded',f_png_dl:'PNG downloaded',
+  f_nobg:', no background',f_png_fail:"Couldn't generate PNG; use the SVG button.",f_copy_ok:'Image copied to clipboard',
+  f_copy_na:'Copy not available here; downloading PNG.',f_copy_fail:"Couldn't copy; downloading PNG."
+ }
 };
+var LANG_CUR='es';
+function t(k){var d=LANG[LANG_CUR]||LANG.es;return (k in d)?d[k]:(LANG.es[k]||k);}
+var TERMS=DATA.terms||{};
+function term(v){if(v==null||v===''){return v;}if(LANG_CUR==='en'&&TERMS[v]){return TERMS[v];}return v;}
+function nodeLabel(n){return (LANG_CUR==='en'&&n&&n.label_en)?n.label_en:(n?n.label:'');}
+function nodeAlias(n){return (LANG_CUR==='en'&&n&&n.alias_en)?n.alias_en:(n?n.alias:'');}
+function nodeDesc(n){return (LANG_CUR==='en'&&n&&n.desc_en)?n.desc_en:(n?n.description:'');}
+var LANGZONE={
+ es:{cm:{l:'Gestionar de cerca',a:'Involucrar de forma activa: co-decisi\u00f3n y comunicaci\u00f3n frecuente.'},
+     ks:{l:'Mantener satisfecho',a:'Mantener conforme: consultar en decisiones clave, sin saturar.'},
+     ki:{l:'Mantener informado',a:'Informar y escuchar: aprovechar como aliado o vocero.'},
+     mo:{l:'Monitorear',a:'Seguimiento ligero: reevaluar si cambia su poder o inter\u00e9s.'},
+     no:{l:'Sin clasificar',a:'Falta poder o inter\u00e9s en los datos.'}},
+ en:{cm:{l:'Manage closely',a:'Engage actively: co-decision and frequent communication.'},
+     ks:{l:'Keep satisfied',a:'Keep on side: consult on key decisions without overloading.'},
+     ki:{l:'Keep informed',a:'Inform and listen: leverage as ally or spokesperson.'},
+     mo:{l:'Monitor',a:'Light follow-up: reassess if power or interest changes.'},
+     no:{l:'Unclassified',a:'Power or interest missing in the data.'}}
+};
+var CURSEL=null;
+
+var POLCOL={pos:'#2e9e5b',neg:'#d64545',neu:'#9aa3af'};
+var ZONE=LANGZONE.es;
 function isHigh(rank,n){return n>1?(rank>=(n-1)/2):(rank>=0);}
 function classify(pr,ir){
   if(pr==null||pr<0||ir==null||ir<0){return ZONE.no;}
@@ -52,7 +158,7 @@ var tip=document.getElementById('tip');
 var main=svg.parentNode;
 var view={x:0,y:0,w:1600,h:1100}, drag=false, start=null, v0=null, quadrant=false, network=false, focused=null;
 var spread=1, lens='', multiOnly=false, lastKey='';
-var DEFAULT_DETAILS='<div class="dtitle">Selecciona un stakeholder</div><p class="small">Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local (interés = distancia, poder = tamaño).</p>';
+function defaultDetails(){return '<div class="dtitle">'+escHtml(t('d_select'))+'</div><p class="small">'+escHtml(t('d_select_txt'))+'</p>';}
 function byId(id){return IDX[id];}
 function escHtml(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 
@@ -384,7 +490,7 @@ function focusEntity(id){
   var pad=150, bw=(maxx-minx)+pad*2, bh=(maxy-miny)+pad*2, sc=Math.max(bw/1600,bh/1100,0.25);
   bw=1600*sc; bh=1100*sc;
   view={x:(minx+maxx)/2-bw/2, y:(miny+maxy)/2-bh/2, w:bw, h:bh}; setView();
-  hint.textContent='Mapa local: '+IDX[id].label+'  \u00b7  click en el fondo para volver';
+  hint.textContent=(LANG_CUR==='en'?'Local map: ':'Mapa local: ')+nodeLabel(IDX[id])+'  \u00b7  '+(LANG_CUR==='en'?'click the background to return':'click en el fondo para volver');
   hint.classList.remove('hidden');
   return true;
 }
@@ -400,7 +506,7 @@ function releaseFocus(){
 window.setMode=function(m){
   if(focused){releaseFocus();}
   network=(m==='network'); quadrant=(m==='quadrant');
-  var qb=document.getElementById('qbtn'); if(qb){qb.textContent=quadrant?'Vista red':'Vista cuadrante';}
+  var qb=document.getElementById('qbtn'); if(qb){qb.textContent=quadrant?t('to_radial'):t('to_quad');}
   document.querySelectorAll('.viewbtn').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-mode')===m);});
   document.getElementById('qgrid').classList.toggle('hidden',!quadrant);
   document.querySelectorAll('.node').forEach(function(g){g.classList.remove('dim','selected','direct');});
@@ -417,7 +523,7 @@ function highlight(id){
 }
 function selectNode(id){
   if(focused){
-    if(id===focused){releaseFocus();details.innerHTML=DEFAULT_DETAILS;return;}
+    if(id===focused){releaseFocus();details.innerHTML=defaultDetails();CURSEL=null;return;}
     var kf=CHILDREN[focused]||[];
     if(kf.some(function(k){return k.id===id;})){var c=curPos(NODE_EL[id]);window.zoomBy(1.35,c.x,c.y);showInfo(id);return;}
     releaseFocus();
@@ -428,8 +534,8 @@ function selectNode(id){
   showInfo(id);
 }
 function relList(arr,arrow,getOther){
-  if(!arr.length){return '<p class="small">Sin relaciones</p>';}
-  return '<ul class="rellist">'+arr.map(function(e){var o=getOther(e)||{};return '<li><span class="ra">'+arrow+'</span><span class="rn">'+escHtml(o.label)+'</span><span class="rm">'+escHtml(e.type)+' \u00b7 fuerza '+escHtml(e.strength)+'</span></li>';}).join('')+'</ul>';
+  if(!arr.length){return '<p class="small">'+escHtml(t('g_no_rel'))+'</p>';}
+  return '<ul class="rellist">'+arr.map(function(e){var o=getOther(e)||{};return '<li><span class="ra">'+arrow+'</span><span class="rn">'+escHtml(nodeLabel(o))+'</span><span class="rm">'+escHtml(term(e.type))+' \u00b7 '+escHtml(t('g_strength'))+' '+escHtml(e.strength)+'</span></li>';}).join('')+'</ul>';
 }
 function showInfo(id){
   var n=byId(id);if(!n){return;}
@@ -438,45 +544,46 @@ function showInfo(id){
   var kids=CHILDREN[id]||[];
   var ei=n.interest, ep=n.power, eir=n.ir, epr=n.pr, lensTag='';
   if(lens){var te=(n.themes||[]).filter(function(t){return t.theme===lens;})[0];
-    if(te){ei=te.interest;ep=te.power;eir=te.ir;epr=te.pr;lensTag=' \u00b7 dimensi\u00f3n '+escHtml(lens);}}
-  var h='<div class="dtitle">'+escHtml(n.label)+(n.alias?(' <span class="small">('+escHtml(n.alias)+')</span>'):'')+'</div>';
-  h+='<div class="pills"><span class="pill">'+escHtml(n.level||'\u2014')+'</span><span class="pill">'+escHtml(n.category||'\u2014')+'</span></div>';
-  h+='<div class="statgrid"><b>Dimensi\u00f3n</b><span>'+escHtml(lens?lens:(n.source||'\u2014'))+'</span>'
-    +'<b>Inter\u00e9s'+(lens?lensTag:'')+'</b><span>'+escHtml(ei||'\u2014')+'</span>'
-    +'<b>Poder'+(lens?lensTag:'')+'</b><span>'+escHtml(ep||'\u2014')+'</span>'
-    +(n.importance?('<b>Importancia</b><span>'+escHtml(n.importance)+'</span>'):'')
-    +'<b>Conexiones</b><span>'+(DEG[id]||0)+'</span>'
-    +'<b>Apoyo (entrante)</b><span>'+((SUPPORT[id]||0)>0?'+':'')+(SUPPORT[id]||0)+'</span></div>';
+    if(te){ei=te.interest;ep=te.power;eir=te.ir;epr=te.pr;lensTag=' \u00b7 '+t('g_by_dim_tag')+' '+escHtml(term(lens));}}
+  CURSEL=id;
+  var h='<div class="dtitle">'+escHtml(nodeLabel(n))+(nodeAlias(n)?(' <span class="small">('+escHtml(nodeAlias(n))+')</span>'):'')+'</div>';
+  h+='<div class="pills"><span class="pill">'+escHtml(n.level?term(n.level):'\u2014')+'</span><span class="pill">'+escHtml(n.category?term(n.category):'\u2014')+'</span></div>';
+  h+='<div class="statgrid"><b>'+escHtml(t('g_dimension'))+'</b><span>'+escHtml(lens?term(lens):(n.source?term(n.source):'\u2014'))+'</span>'
+    +'<b>'+escHtml(t('g_interest'))+(lens?lensTag:'')+'</b><span>'+escHtml(ei||'\u2014')+'</span>'
+    +'<b>'+escHtml(t('g_power'))+(lens?lensTag:'')+'</b><span>'+escHtml(ep||'\u2014')+'</span>'
+    +(n.importance?('<b>'+escHtml(t('g_importance'))+'</b><span>'+escHtml(n.importance)+'</span>'):'')
+    +'<b>'+escHtml(t('g_connections'))+'</b><span>'+(DEG[id]||0)+'</span>'
+    +'<b>'+escHtml(t('g_support'))+'</b><span>'+((SUPPORT[id]||0)>0?'+':'')+(SUPPORT[id]||0)+'</span></div>';
   var z=classify(epr,eir);
-  h+='<div class="note"><b>'+z.l+'</b>'+(lens?' <span class="small">(seg\u00fan dimensi\u00f3n '+escHtml(lens)+')</span>':'')+'<br>'+z.a+'</div>';
+  h+='<div class="note"><b>'+z.l+'</b>'+(lens?' <span class="small">('+(LANG_CUR==='en'?'by '+t('g_by_dim_tag')+' ':'seg\u00fan '+t('g_by_dim_tag')+' ')+escHtml(term(lens))+')</span>':'')+'<br>'+z.a+'</div>';
   if(n.themes&&n.themes.length>1){
-    h+='<div class="hkey" style="margin-top:8px">Por dimensi\u00f3n (inter\u00e9s \u00b7 poder)</div><div class="statgrid">'
-      +n.themes.map(function(t){return '<b>'+escHtml(t.theme||'\u2014')+'</b><span>'+escHtml(t.interest||'\u2014')+' \u00b7 '+escHtml(t.power||'\u2014')+'</span>';}).join('')
+    h+='<div class="hkey" style="margin-top:8px">'+escHtml(t('g_by_dim'))+'</div><div class="statgrid">'
+      +n.themes.map(function(tt){return '<b>'+escHtml(tt.theme?term(tt.theme):'\u2014')+'</b><span>'+escHtml(tt.interest||'\u2014')+' \u00b7 '+escHtml(tt.power||'\u2014')+'</span>';}).join('')
       +'</div>';
   }
-  if(n.tags&&n.tags.length){h+='<div class="hkey" style="margin-top:8px">Categor\u00edas</div><div class="pills">'+n.tags.map(function(t){return '<span class="pill">'+escHtml(t)+'</span>';}).join('')+'</div>';}
-  if(n.description){h+='<p class="dtext">'+escHtml(n.description)+'</p>';}
-  if(n.notes){h+='<p class="small"><b>Notas:</b> '+escHtml(n.notes)+'</p>';}
-  if(kids.length){h+='<div class="note">'+kids.length+' subdivisi\u00f3n(es). Click en la entidad abre su mapa local: distancia = inter\u00e9s propio, tama\u00f1o = poder propio.</div>';}
-  h+='<h4>Relaciones salientes ('+out.length+')</h4>'+relList(out,'\u2192',function(e){return byId(e.target);});
-  h+='<h4>Relaciones entrantes ('+inc.length+')</h4>'+relList(inc,'\u2190',function(e){return byId(e.source);});
+  if(n.tags&&n.tags.length){h+='<div class="hkey" style="margin-top:8px">'+escHtml(t('g_categories'))+'</div><div class="pills">'+n.tags.map(function(tg){return '<span class="pill">'+escHtml(term(tg))+'</span>';}).join('')+'</div>';}
+  if(nodeDesc(n)){h+='<p class="dtext">'+escHtml(nodeDesc(n))+'</p>';}
+  if(n.notes){h+='<p class="small"><b>'+escHtml(t('g_notes'))+':</b> '+escHtml(n.notes)+'</p>';}
+  if(kids.length){h+='<div class="note">'+kids.length+(LANG_CUR==='en'?' subdivision(s). Clicking the entity opens its local map: distance = own interest, size = own power.':' subdivisi\u00f3n(es). Click en la entidad abre su mapa local: distancia = inter\u00e9s propio, tama\u00f1o = poder propio.')+'</div>';}
+  h+='<h4>'+escHtml(t('g_out_rel'))+' ('+out.length+')</h4>'+relList(out,'\u2192',function(e){return byId(e.target);});
+  h+='<h4>'+escHtml(t('g_in_rel'))+' ('+inc.length+')</h4>'+relList(inc,'\u2190',function(e){return byId(e.source);});
   details.innerHTML=h; openRight();
 }
 function clearSel(){
-  if(focused){releaseFocus();details.innerHTML=DEFAULT_DETAILS;closeRight();return;}
+  if(focused){releaseFocus();details.innerHTML=defaultDetails();CURSEL=null;closeRight();return;}
   document.querySelectorAll('.node,.edge').forEach(function(el){el.classList.remove('dim','selected','direct','highlight');});
-  details.innerHTML=DEFAULT_DETAILS; closeRight(); if(!quadrant){window.filters();}
+  details.innerHTML=defaultDetails(); CURSEL=null; closeRight(); if(!quadrant){window.filters();}
 }
 svg.addEventListener('click',function(){hideResults();clearSel();});
 document.querySelectorAll('.node').forEach(function(g){
   var id=g.getAttribute('data-id'); NODE_EL[id]=g;
   g.addEventListener('click',function(e){e.stopPropagation();selectNode(id);});
-  g.addEventListener('mouseenter',function(e){var n=IDX[id];if(!n){return;}showTip('<b>'+escHtml(n.label)+'</b>Inter\u00e9s: '+escHtml(n.interest||'\u2014')+' \u00b7 Poder: '+escHtml(n.power||'\u2014')+'<br>Conexiones: '+(DEG[id]||0),e);});
+  g.addEventListener('mouseenter',function(e){var n=IDX[id];if(!n){return;}showTip('<b>'+escHtml(nodeLabel(n))+'</b>'+escHtml(t('g_interest'))+': '+escHtml(n.interest||'\u2014')+' \u00b7 '+escHtml(t('g_power'))+': '+escHtml(n.power||'\u2014')+'<br>'+escHtml(t('g_connections'))+': '+(DEG[id]||0),e);});
   g.addEventListener('mousemove',moveTip);
   g.addEventListener('mouseleave',hideTip);
 });
 document.querySelectorAll('.edge').forEach(function(p){
-  p.addEventListener('mouseenter',function(e){var s=p.getAttribute('data-source'),t=p.getAttribute('data-target'),ed=null;for(var i=0;i<DATA.edges.length;i++){if(DATA.edges[i].source===s&&DATA.edges[i].target===t){ed=DATA.edges[i];break;}}if(!ed){return;}var sn=IDX[s]||{},tn=IDX[t]||{};showTip('<b>'+escHtml(ed.type||'Relaci\u00f3n')+'</b>'+escHtml(sn.label)+' \u2192 '+escHtml(tn.label)+'<br>Fuerza: '+escHtml(ed.strength),e);});
+  p.addEventListener('mouseenter',function(e){var s=p.getAttribute('data-source'),t=p.getAttribute('data-target'),ed=null;for(var i=0;i<DATA.edges.length;i++){if(DATA.edges[i].source===s&&DATA.edges[i].target===t){ed=DATA.edges[i];break;}}if(!ed){return;}var sn=IDX[s]||{},tn=IDX[t]||{};showTip('<b>'+escHtml(ed.type?term(ed.type):t('g_relationship'))+'</b>'+escHtml(nodeLabel(sn))+' \u2192 '+escHtml(nodeLabel(tn))+'<br>'+escHtml(t('g_strength_cap'))+': '+escHtml(ed.strength),e);});
   p.addEventListener('mousemove',moveTip);
   p.addEventListener('mouseleave',hideTip);
 });
@@ -484,15 +591,15 @@ document.querySelectorAll('.edge').forEach(function(p){
 function fold(t){return String(t==null?'':t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
 function searchMatches(q){
   q=fold(q); if(!q){return [];}
-  return DATA.nodes.filter(function(n){return fold(n.label).indexOf(q)>=0||fold(n.alias).indexOf(q)>=0;}).slice(0,8);
+  return DATA.nodes.filter(function(n){return fold(n.label).indexOf(q)>=0||fold(n.alias).indexOf(q)>=0||fold(n.label_en).indexOf(q)>=0||fold(n.alias_en).indexOf(q)>=0;}).slice(0,8);
 }
 function hideResults(){var ul=document.getElementById('searchResults');if(ul){ul.classList.add('hidden');ul.innerHTML='';}}
 function pickResult(id){
   hideResults();
   var n=IDX[id]; var inp=document.getElementById('search');
-  if(inp&&n){inp.value=n.label;}
+  if(inp&&n){inp.value=nodeLabel(n);}
   var g=NODE_EL[id];
-  if(g&&g.classList.contains('hidden')){showInfo(id);flash('Este actor est\u00e1 oculto por los filtros actuales.');return;}
+  if(g&&g.classList.contains('hidden')){showInfo(id);flash(t('f_hidden'));return;}
   selectNode(id);
 }
 window.searchInput=function(){
@@ -500,9 +607,9 @@ window.searchInput=function(){
   var ul=document.getElementById('searchResults'); if(!ul){return;}
   if(!q.trim()){hideResults();return;}
   var m=searchMatches(q);
-  if(!m.length){ul.innerHTML="<li class='sm'>Sin coincidencias</li>";ul.classList.remove('hidden');return;}
-  ul.innerHTML=m.map(function(n){return "<li data-id='"+escHtml(n.id)+"'>"+escHtml(n.label)+(n.alias?(' <span class="sm" style="display:inline">('+escHtml(n.alias)+')</span>'):'')
-    +"<span class='sm'>"+escHtml(n.category||'')+(n.source?(' \u00b7 '+escHtml(n.source)):'')+"</span></li>";}).join('');
+  if(!m.length){ul.innerHTML="<li class='sm'>"+(LANG_CUR==='en'?'No matches':'Sin coincidencias')+"</li>";ul.classList.remove('hidden');return;}
+  ul.innerHTML=m.map(function(n){return "<li data-id='"+escHtml(n.id)+"'>"+escHtml(nodeLabel(n))+(nodeAlias(n)?(' <span class="sm" style="display:inline">('+escHtml(nodeAlias(n))+')</span>'):'')
+    +"<span class='sm'>"+escHtml(n.category?term(n.category):'')+(n.source?(' \u00b7 '+escHtml(term(n.source))):'')+"</span></li>";}).join('');
   ul.classList.remove('hidden');
   ul.querySelectorAll('li[data-id]').forEach(function(li){li.addEventListener('click',function(e){e.stopPropagation();pickResult(li.getAttribute('data-id'));});});
 };
@@ -547,7 +654,7 @@ function buildKeyActors(){
   ul.innerHTML=keyRank().map(function(n){
     var lv=lensVals(n);
     var meta=KEYMODE==='deg'?((DEG[n.id]||0)+' conex.'):(escHtml(lv.interest||'\u2014')+' \u00b7 '+escHtml(lv.power||'\u2014'));
-    return "<li data-id='"+escHtml(n.id)+"'><span>"+escHtml(n.alias||n.label)+"</span><span class='d'>"+meta+"</span></li>";
+    return "<li data-id='"+escHtml(n.id)+"'><span>"+escHtml(nodeAlias(n)||nodeLabel(n))+"</span><span class='d'>"+meta+"</span></li>";
   }).join('');
   ul.querySelectorAll('li').forEach(function(li){li.addEventListener('click',function(){selectNode(li.getAttribute('data-id'));});});
 }
@@ -586,9 +693,9 @@ function grayify(root){
 }
 window.openExport=function(){
   var back=document.getElementById('expBack'); if(!back){return;}
-  var modeName=quadrant?'cuadrante (poder\u2013inter\u00e9s)':(network?'conexiones (red)':'poder\u2013inter\u00e9s');
+  var modeName=quadrant?t('v_quad'):(network?t('v_net'):t('v_pi'));
   var sub=document.getElementById('expSubtitle');
-  var auto='Vista '+modeName+(lens?(' \u00b7 dimensi\u00f3n: '+lens):(multiOnly?' \u00b7 solo entidades en varias dimensiones':' \u00b7 consolidado'));
+  var auto=t('view')+' '+modeName+(lens?(' \u00b7 '+t('sub_dim')+': '+term(lens)):(multiOnly?' \u00b7 '+t('sub_multi'):' \u00b7 '+t('sub_consol')));
   if(sub&&!sub.value){sub.value=auto;}
   var ti=document.getElementById('expTitle'); if(ti&&!ti.value){ti.value='Mapa de Stakeholders';}
   var hasAlias=DATA.nodes.some(function(n){return n.alias;});
@@ -666,10 +773,10 @@ function buildExportSVG(opts){
     var cand=[];
     clone.querySelectorAll('.node:not(.hidden)').forEach(function(g){
       var n=IDX[g.getAttribute('data-id')]; if(!n){return;}
-      var disp=(opts.lbl==='full')?n.label:(n.alias||n.label);
+      var disp=(opts.lbl==='full')?nodeLabel(n):(nodeAlias(n)||nodeLabel(n));
       if(String(disp).length>opts.numLen){cand.push({g:g,n:n});}
     });
-    cand.sort(function(a,b){return String(a.n.label).localeCompare(String(b.n.label));});
+    cand.sort(function(a,b){return String(nodeLabel(a.n)).localeCompare(String(nodeLabel(b.n)));});
     cand.forEach(function(it,k){
       var num=k+1; numIndex.push({num:num,n:it.n});
       var lb=it.g.querySelector('.lbl');
@@ -715,41 +822,41 @@ function buildExportSVG(opts){
   var visNodes=[]; document.querySelectorAll('.node:not(.hidden)').forEach(function(g){var n=IDX[g.getAttribute('data-id')];if(n){visNodes.push(n);}});
   if(opts.legs.esf){
     var cats={}; visNodes.forEach(function(n){if(n.category){cats[n.category]=n.fill;}});
-    var arr=Object.keys(cats).sort().map(function(k){return {name:k,c:cats[k]};});
-    if(arr.length){header('Esferas');
+    var arr=Object.keys(cats).sort().map(function(k){return {name:term(k),c:cats[k]};});
+    if(arr.length){header(t('l_spheres'));
       itemsN(arr,function(x,y,it){return "<rect x='"+x+"' y='"+(y+1)+"' width='15' height='15' rx='3' fill='"+G(it.c)+"' stroke='#99a'/>";},perRowItems,colW);}
   }
   if(opts.legs.dim){
     var srcs={}; var anyMulti=false;
     visNodes.forEach(function(n){ if(n.multi){anyMulti=true;} else if(n.source){srcs[n.source]=n.stroke;} });
-    var arr2=Object.keys(srcs).sort().map(function(k){return {name:k,c:srcs[k]};});
-    if(anyMulti){var nDims=Object.keys(srcs).length; arr2.push({name:(nDims===2?'En ambas dimensiones':'En varias dimensiones'),c:'#111111'});}
-    if(arr2.length){header('Dimensiones (borde)');
+    var arr2=Object.keys(srcs).sort().map(function(k){return {name:term(k),c:srcs[k]};});
+    if(anyMulti){var nDims=Object.keys(srcs).length; arr2.push({name:(LANG_CUR==='en'?(nDims===2?'In both dimensions':'In several dimensions'):(nDims===2?'En ambas dimensiones':'En varias dimensiones')),c:'#111111',_nt:1});}
+    if(arr2.length){header(t('l_dims'));
       itemsN(arr2,function(x,y,it){return "<rect x='"+x+"' y='"+(y+1)+"' width='15' height='15' rx='3' fill='#ffffff' stroke='"+G(it.c)+"' stroke-width='3'/>";},perRowItems,colW);}
   }
   if(opts.legs.rel){
     var tps={}; clone.querySelectorAll('.edge:not(.hidden)').forEach(function(e){var t=e.getAttribute('data-type');if(t&&!(t in tps)){tps[t]={c:e.getAttribute('data-typecolor')||'#999',d:!!e.getAttribute('stroke-dasharray')};}});
-    var arr3=Object.keys(tps).sort().map(function(k){return {name:k,c:tps[k].c,d:tps[k].d,off:34};});
-    if(arr3.length){header('Relaciones');
+    var arr3=Object.keys(tps).sort().map(function(k){return {name:term(k),c:tps[k].c,d:tps[k].d,off:34};});
+    if(arr3.length){header(t('l_rels'));
       itemsN(arr3,function(x,y,it){return "<line x1='"+x+"' y1='"+(y+9)+"' x2='"+(x+26)+"' y2='"+(y+9)+"' stroke='"+G(it.c)+"' stroke-width='3'"+(it.d?" stroke-dasharray='7 5'":"")+"/>";},perRowRel,colWRel);}
   }
   if(opts.legs.size&&!quadrant&&!network){
-    header('Tama\u00f1o del c\u00edrculo = poder');
+    header(t('h_size'));
     var po=DATA.power_order||[], lo=po[0]||'', hi=po[po.length-1]||'';
     var cx0=lx0+22, cy0=ly+18;
     legSVG+="<circle cx='"+cx0+"' cy='"+cy0+"' r='18' fill='"+G('#c7ccd3')+"'/>";
     legSVG+="<circle cx='"+cx0+"' cy='"+cy0+"' r='13' fill='"+G('#8a94a0')+"'/>";
     legSVG+="<circle cx='"+cx0+"' cy='"+cy0+"' r='8' fill='"+G('#4b5563')+"'/>";
-    legSVG+="<text x='"+(cx0+30)+"' y='"+(cy0+4)+"' font-size='12' fill='"+soft+"'>de "+escHtml(String(lo))+" (interior) a "+escHtml(String(hi))+" (exterior)</text>";
+    legSVG+="<text x='"+(cx0+30)+"' y='"+(cy0+4)+"' font-size='12' fill='"+soft+"'>"+escHtml(t('size_from'))+" "+escHtml(String(lo))+" "+escHtml(t('size_inner'))+" "+escHtml(String(hi))+" "+escHtml(t('size_outer'))+"</text>";
     ly+=48;
   }
   if(opts.num&&numIndex.length){
-    header('Convenciones');
+    header(t('conventions'));
     // El índice debe mostrar el nombre COMPLETO (ese es su propósito), así
     // que solo se usan dos columnas cuando la leyenda va abajo, hay bastantes
     // entradas y el ancho de cada columna alcanza para el nombre más largo.
     var longest=0;
-    numIndex.forEach(function(it){var L=(it.num+'. '+it.n.label+(it.n.alias?(' ('+it.n.alias+')'):'')).length;if(L>longest){longest=L;}});
+    numIndex.forEach(function(it){var L=(it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'')).length;if(L>longest){longest=L;}});
     var needW=longest*6.6+14;
     var ncol=(!right&&numIndex.length>=6&&legW/2>=needW)?2:1;
     var cw=legW/ncol, rows=Math.ceil(numIndex.length/ncol);
@@ -757,16 +864,15 @@ function buildExportSVG(opts){
       var it=numIndex[ci];
       var col=Math.floor(ci/rows), row=ci%rows;   // llenado por columnas
       var x=lx0+col*cw, y=ly+row*20;
-      var full=it.num+'. '+it.n.label+(it.n.alias?(' ('+it.n.alias+')'):'');
+      var full=it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'');
       legSVG+="<text x='"+x+"' y='"+(y+11)+"' font-size='12' fill='"+ink+"'>"+escHtml(full)+"</text>";
     }
     ly+=rows*20+8;
   }
   var legendH=ly;
 
-  var mode=quadrant?'cuadrante (poder\u2013inter\u00e9s)':(network?'conexiones (red)':'poder\u2013inter\u00e9s');
-  var key=quadrant?'Cuadrante de Mendelow \u00b7 tama\u00f1o uniforme \u00b7 posici\u00f3n = inter\u00e9s (x) y poder (y)':(network?'Distribuci\u00f3n por relaciones \u00b7 tama\u00f1o uniforme \u00b7 borde = dimensi\u00f3n':'tama\u00f1o = poder \u00b7 distancia al centro = inter\u00e9s \u00b7 borde = dimensi\u00f3n \u00b7 color = esfera');
-  if(lens){key+=' \u00b7 valores de la dimensi\u00f3n '+lens;}
+  var key=quadrant?t('key_quad'):(network?t('key_net'):t('key_pi'));
+  if(lens){key+=' \u00b7 '+(LANG_CUR==='en'?'values for '+t('sub_dim')+' ':'valores de la '+t('sub_dim')+' ')+term(lens);}
 
   // ------- composición -------
   var titleH=(opts.sub?92:66), keyH=22, footH=opts.footOn?34:6;
@@ -786,7 +892,7 @@ function buildExportSVG(opts){
   var ruleW=right?(bb.w+LW):bb.w;
   head+="<line x1='"+bb.x+"' y1='"+(bb.y-pad-14)+"' x2='"+(bb.x+ruleW)+"' y2='"+(bb.y-pad-14)+"' stroke='"+line+"' stroke-width='1.4'/>";
   var ky=vby+H-footH-10;
-  var keyLine="<text x='"+bb.x+"' y='"+ky+"' font-size='11.5' fill='"+soft+"'>C\u00f3mo leer: "+escHtml(key)+"</text>";
+  var keyLine="<text x='"+bb.x+"' y='"+ky+"' font-size='11.5' fill='"+soft+"'>"+escHtml(t('how_read_pre'))+": "+escHtml(key)+"</text>";
   var foot='';
   if(opts.footOn){
     var fy=vby+H-12;
@@ -814,23 +920,23 @@ window.doExport=function(kind){
     var b=new Blob([buildExportSVG(opts)],{type:'image/svg+xml'});
     var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='stakeholder_map.svg';a.click();
     setTimeout(function(){URL.revokeObjectURL(u);},1000);
-    window.closeExport(); flash('SVG descargado'); return;
+    window.closeExport(); flash(t('f_svg_dl')); return;
   }
   if(kind==='png'){
     rasterize(opts).then(function(c){c.toBlob(function(b){
-      if(!b){flash('No se pudo generar el PNG; usa SVG.');return;}
+      if(!b){flash(t('f_png_fail'));return;}
       var u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='stakeholder_map.png';a.click();
       setTimeout(function(){URL.revokeObjectURL(u);},1000);
-      window.closeExport(); flash('PNG descargado ('+opts.scale+'x'+(opts.bg==='transparent'?', sin fondo':'')+')');
-    });}).catch(function(){flash('No se pudo generar el PNG; usa el bot\u00f3n SVG.');});
+      window.closeExport(); flash(t('f_png_dl')+' ('+opts.scale+'x'+(opts.bg==='transparent'?t('f_nobg'):'')+')');
+    });}).catch(function(){flash(t('f_png_fail'));});
     return;
   }
-  if(!navigator.clipboard||!window.ClipboardItem){flash('Copiar no disponible aqu\u00ed; descargando PNG.');window.doExport('png');return;}
+  if(!navigator.clipboard||!window.ClipboardItem){flash(t('f_copy_na'));window.doExport('png');return;}
   rasterize(opts).then(function(c){c.toBlob(function(b){
     if(!b){window.doExport('png');return;}
     navigator.clipboard.write([new window.ClipboardItem({'image/png':b})])
-      .then(function(){window.closeExport();flash('Imagen copiada al portapapeles');})
-      .catch(function(){flash('No se pudo copiar; descargando PNG.');window.doExport('png');});
+      .then(function(){window.closeExport();flash(t('f_copy_ok'));})
+      .catch(function(){flash(t('f_copy_fail'));window.doExport('png');});
   });}).catch(function(){window.doExport('png');});
 };
 window.exportPNG=function(){window.doExport('png');};
@@ -849,5 +955,45 @@ window.downloadStrategy=function(){
 };
 window.downloadSVG=function(){var b=new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='stakeholder_map.svg';a.click();};
 
-details.innerHTML=DEFAULT_DETAILS; applyEdgeColors(); window.filters();
+
+// ---- idioma ES/EN ----
+window.setBandColor=function(lvl,color){
+  document.querySelectorAll('#ringBands circle[data-lvl="'+lvl+'"]').forEach(function(c){c.setAttribute('fill',color);});
+};
+window.setZoneColor=function(zone,color){
+  document.querySelectorAll('.qzone[data-zone="'+zone+'"]').forEach(function(r){r.setAttribute('fill',color);});
+};
+function setLang(lang){
+  LANG_CUR=(lang==='en')?'en':'es';
+  ZONE=LANGZONE[LANG_CUR];
+  document.documentElement.setAttribute('lang',LANG_CUR);
+  // textos fijos
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var k=el.getAttribute('data-i18n'); if(!(k in (LANG[LANG_CUR]||{}))&&!(k in LANG.es)){return;}
+    var suf=el.getAttribute('data-suffix')||'';
+    // options y elementos con hijos: si es OPTION o no tiene elementos hijos, set textContent
+    if(el.tagName==='OPTION'){el.textContent=t(k);}
+    else if(el.children.length===0){el.textContent=t(k)+suf;}
+    else {el.firstChild&&el.firstChild.nodeType===3?(el.firstChild.textContent=t(k)):(el.textContent=t(k));}
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){el.setAttribute('placeholder',t(el.getAttribute('data-i18n-ph')));});
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el){el.setAttribute('title',t(el.getAttribute('data-i18n-title')));});
+  // términos de datos en leyendas y opciones (valor intacto, texto traducido)
+  document.querySelectorAll('.ltxt[data-term]').forEach(function(el){el.textContent=term(el.getAttribute('data-term'));});
+  document.querySelectorAll('option[data-term]').forEach(function(el){el.textContent=term(el.getAttribute('data-term'));});
+  // 'cómo leer' con interpolación de datos
+  var hs=document.getElementById('hSizeTxt');
+  if(hs){var po=DATA.power_order||[];hs.textContent=t('size_from')+' '+(po[0]||'')+' '+t('size_inner')+' '+(po[po.length-1]||'')+' '+t('size_outer');}
+  var hd=document.getElementById('hDistTxt');
+  if(hd){var io=(DATA.interest_order||[]).slice().reverse().join(', ');
+    hd.textContent=(LANG_CUR==='en'?'Closer to the center, higher interest. Levels: ':'Más cerca del centro, mayor interés. Niveles: ')+(io||'n/d')+'.';}
+  // botones dinámicos y ficha abierta
+  var qb=document.getElementById('qbtn'); if(qb){qb.textContent=quadrant?t('to_radial'):t('to_quad');}
+  var lb=document.getElementById('langBtn'); if(lb){lb.textContent=(LANG_CUR==='es')?'EN':'ES';}
+  if(CURSEL&&IDX[CURSEL]){showInfo(CURSEL);} else {details.innerHTML=defaultDetails();}
+  buildKeyActors();
+}
+window.toggleLang=function(){setLang(LANG_CUR==='es'?'en':'es');};
+
+details.innerHTML=defaultDetails(); applyEdgeColors(); window.filters(); setLang('es');
 })();

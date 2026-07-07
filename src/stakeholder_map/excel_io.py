@@ -197,3 +197,30 @@ def ask_dir():
         return d
     except Exception:
         return ''
+
+
+def load_term_dict(path, warnings):
+    """Diccionario de traducción de términos de datos (esferas, dimensiones,
+    categorías, tipos de relación) desde el bloque 'Traducciones' de 03_Config.
+    Busca una columna cuyo encabezado contenga '(es)' como origen y '(en)' como
+    destino. Devuelve {ES: EN}; vacío si no hay bloque. Nunca traduce nombres de
+    entidades (esos van en columnas por fila)."""
+    from .normalize import clean
+    df, _ = sheet(path, ['03_Config', 'Config', 'configuracion', 'configuración'])
+    if df is None or df.empty:
+        return {}
+    es_col = en_col = None
+    for c in df.columns:
+        lc = str(c).lower()
+        if '(es)' in lc or 'término es' in lc or 'termino es' in lc:
+            es_col = c
+        elif '(en)' in lc or 'término en' in lc or 'termino en' in lc:
+            en_col = c
+    if es_col is None or en_col is None:
+        return {}
+    terms = {}
+    for _, r in df.iterrows():
+        k = clean(r.get(es_col)); v = clean(r.get(en_col))
+        if k and v:
+            terms[k] = v
+    return terms

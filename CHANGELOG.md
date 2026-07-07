@@ -1,5 +1,40 @@
 # Changelog
 
+## 1.9.0 (2026-07-07)
+
+### Nuevo
+- Interfaz bilingüe español / inglés con un botón ES/EN en la barra superior.
+  Cambia todos los rótulos de la herramienta (paneles, filtros, "cómo leer",
+  leyendas, buscador, ficha de detalle, diálogo de imagen, mensajes) y también
+  las etiquetas de las vistas: cuadrante de Mendelow y ejes se muestran en el
+  idioma activo, y la figura exportada hereda ese idioma.
+- Traducción de los términos de datos (esferas, dimensiones, categorías, tipos
+  de relación) mediante un bloque "Traducciones" en 03_Config con columnas
+  "Término (ES)" y "Término (EN)". El valor interno permanece en español, así
+  que los filtros siguen funcionando; solo cambia el texto visible.
+- Nombres de entidad bilingües mediante columnas "Nombre (EN)", "Alias (EN)" y
+  "Descripción (EN)" en 01_Stakeholders, que el usuario llena. La herramienta
+  NO traduce automáticamente nombres de instituciones: mostrar una traducción
+  inventada de un nombre propio sería un dato falso. Si una celda EN está
+  vacía, se usa el nombre en español.
+- Fondo de color por zona de Mendelow en la vista de cuadrante (semáforo
+  tenue): gestionar de cerca, mantener satisfecho, mantener informado y
+  monitorear, cada una con su tinte, para leer la estrategia sin recorrer los
+  ejes. El fondo tiñe la zona sin competir con el color de esfera de los
+  círculos.
+- Control dinámico de colores en pantalla y en la exportación: un selector por
+  cada anillo de interés (radial) y uno por cada zona de cuadrante. Como la
+  imagen se genera clonando el SVG en vivo, lo que se ve en el mapa es lo que
+  se exporta. Los colores de anillos y zonas son andamiaje (nivel de interés,
+  zona de Mendelow), no datos por actor; por eso son configurables, mientras
+  que el recoloreo por actor sigue sin permitirse.
+
+### Notas
+- El buscador indexa también los nombres en inglés, de modo que una entidad se
+  puede encontrar por su nombre en cualquiera de los dos idiomas.
+- Con fondo transparente en la exportación, los textos en gris oscuro pueden
+  perderse sobre diapositivas oscuras; usar fondo blanco en ese caso.
+
 ## 1.8.0 (2026-07-07)
 
 ### Nuevo

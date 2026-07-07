@@ -113,3 +113,11 @@ label{font-size:13px}
 .count{display:flex;gap:18px;font-size:14px;align-items:flex-start}.count b{font-size:20px}
 .count>div{line-height:1.1}
 details>summary{cursor:pointer;font-weight:700;font-size:13px;color:#5b6675}
+.topbtns{display:flex;gap:8px;align-items:center}
+.langbtn{margin:0;padding:6px 12px;border:1px solid #1f4e79;background:#fff;color:#1f4e79;border-radius:7px;cursor:pointer;font-size:12.5px;font-weight:700;letter-spacing:.03em}
+.langbtn:hover{background:#eef3fb}
+.qzone{stroke:none}
+.swrow{display:flex;flex-wrap:wrap;gap:8px 10px;margin:3px 0 4px}
+.swcol{display:flex;flex-direction:column;gap:5px;margin:3px 0 4px}
+.swpick{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#39424f;cursor:pointer}
+.swpick input[type=color]{width:24px;height:20px;padding:0;border:1px solid #cdd4dd;border-radius:4px;background:#fff;cursor:pointer;flex:0 0 auto}

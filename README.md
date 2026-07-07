@@ -11,13 +11,29 @@ dependencias en el navegador), con tres vistas:
 2. **Conexiones (red)**: distribución por relaciones (systems thinking),
    círculos de tamaño uniforme.
 3. **Cuadrante (Mendelow)**: matriz interés x poder con las cuatro zonas
-   de estrategia. Aquí los círculos son de tamaño uniforme (la posición ya
-   codifica interés y poder) y los títulos de eje son configurables en
-   español, inglés o bilingües (`UI_LANG` en `config.py`).
+   de estrategia, cada una con un fondo de color tenue (semáforo). Los
+   círculos son de tamaño uniforme (la posición ya codifica interés y
+   poder).
 
 Las tres vistas recalculan el layout con el subconjunto visible cada vez
 que cambian los filtros (categoría, tema, subdivisiones): los círculos se
 reordenan sin huecos y sin solaparse.
+
+**Interfaz bilingüe.** Un botón ES/EN cambia todos los rótulos de la
+herramienta y de las vistas (incluidos cuadrante y ejes), y la figura
+exportada hereda el idioma activo. Los términos de datos (esferas,
+dimensiones, categorías, tipos de relación) se traducen con un bloque
+"Traducciones" en `03_Config`; el valor interno permanece en español, así
+que los filtros no se rompen. Los nombres de entidad se traducen con
+columnas `Nombre (EN)`, `Alias (EN)` y `Descripción (EN)` en
+`01_Stakeholders`: la herramienta nunca inventa la traducción de un nombre
+propio.
+
+**Colores configurables.** Un selector por anillo de interés (radial) y uno
+por zona de cuadrante permiten ajustar el color en pantalla; como la imagen
+se genera clonando el SVG en vivo, lo que se ve es lo que se exporta. Estos
+colores son andamiaje (nivel de interés, zona de Mendelow), no datos por
+actor.
 
 Además exporta tablas (XLSX de coordenadas y CSVs) y, desde el propio
 HTML, imágenes PNG/SVG y un CSV de estrategia por actor.
