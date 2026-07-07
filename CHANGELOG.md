@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.6.0 (2026-07-06)
+
+### Nuevo
+- Campo "Alias / acrónimo" (columna L de 01_Stakeholders, opcional, al
+  final para no mover columnas existentes): el alias se muestra dentro
+  del círculo y en la lista de actores clave; el nombre completo aparece
+  en la ficha, el tooltip y el buscador (que también encuentra por
+  alias).
+- Diálogo "Imagen para reporte" para exportar o copiar la imagen (botón
+  en la tarjeta Exportar y en la barra del mapa). Controla propiedades de
+  la IMAGEN sin tocar el mapa en pantalla: título y subtítulo editables,
+  etiquetas con alias o nombre completo, color o escala de grises,
+  tipografía (Arial, Georgia, Calibri), bloques de leyenda a incluir
+  (esferas, dimensiones, relaciones, tamaño = poder), tipos de relación a
+  incluir solo en la imagen, resolución PNG 2x o 3x, y pie de figura con
+  número, fuente y fecha. Salida SVG (vectorial, para informes) o PNG.
+  Tonos neutros. Qué actores se ven lo siguen decidiendo los filtros del
+  panel: lo que ves es lo que se exporta.
+- Las aristas llevan data-type, lo que corrige la identificación ambigua
+  de tipo cuando hay varias relaciones entre el mismo par.
+
+
 ## 1.5.0 (2026-07-06)
 
 ### Nuevo

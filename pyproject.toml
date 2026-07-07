@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stakeholder-map"
-version = "1.5.0"
+version = "1.6.0"
 description = "Mapa interactivo de stakeholders (poder-interés, red de conexiones y matriz de Mendelow) a partir de un Excel."
 readme = "README.md"
 requires-python = ">=3.9"

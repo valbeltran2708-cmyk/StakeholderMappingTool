@@ -152,8 +152,8 @@ def build(path):
     st_headers = ['Stakeholder / entidad', 'Entidad padre / grupo', 'Nivel',
                   'Dimensión', 'Esfera', 'Categorías', 'Descripción / función',
                   'Interés en el proyecto', 'Poder / influencia',
-                  'Importancia en el proyecto', 'Notas']
-    _head(st, st_headers, [34, 26, 14, 22, 24, 30, 40, 20, 20, 22, 30], comments={
+                  'Importancia en el proyecto', 'Notas', 'Alias / acrónimo']
+    _head(st, st_headers, [34, 26, 14, 22, 24, 30, 40, 20, 20, 22, 30, 18], comments={
         'Stakeholder / entidad': 'Nombre visible del actor. Obligatorio.\n\n'
                                  'Multi-tema: repite el MISMO nombre en otra fila con '
                                  'otra "Dimensión" y sus propios interés/poder; la '
@@ -185,6 +185,12 @@ def build(path):
                                       'col. J). En la herramienta se filtra con '
                                       'casillas por nivel.',
         'Notas': 'Contexto adicional; aparece en el panel de detalle.',
+        'Alias / acrónimo': 'OPCIONAL: nombre corto o sigla del actor (ej. TM, '
+                            'SDM). Se muestra dentro del círculo y en las listas; '
+                            'el nombre completo aparece en la ficha, el tooltip y '
+                            'puede elegirse al exportar la imagen. Va al final '
+                            'para no mover tus columnas; el orden no importa, la '
+                            'lectura es por nombre de cabecera.',
     })
     _dv(st, f'C2:C{MAXR}', '"Entidad,Subdivisión"', strict=True)
     _dv(st, f'D2:D{MAXR}', f"'03_Config'!$L$2:$L${MAXR}",

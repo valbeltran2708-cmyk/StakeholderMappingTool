@@ -73,11 +73,11 @@
   <details class='card'>
     <summary>Exportar</summary>
     <div class='btns'>
-      <button onclick='exportPNG()'>Imagen PNG</button><button onclick='copyImage()'>Copiar imagen</button>
+      <button class='primary' onclick='openExport()' style='background:#1f4e79;border-color:#1f4e79;color:#fff'>Imagen para reporte…</button>
       <button onclick='downloadStrategy()'>CSV estrategia</button>
-      <button onclick='downloadSVG()'>SVG</button><button onclick='downloadNodes()'>CSV nodos</button><button onclick='downloadEdges()'>CSV relaciones</button>
+      <button onclick='downloadNodes()'>CSV nodos</button><button onclick='downloadEdges()'>CSV relaciones</button>
     </div>
-    <p class='small' style='margin-top:9px'>La imagen exporta la vista activa completa. "CSV estrategia" incluye clasificación y acción sugerida por actor.</p>
+    <p class='small' style='margin-top:9px'>La imagen exporta lo que está visible en el mapa (filtros incluidos); el diálogo controla formato, etiquetas, color, leyenda y pie de figura.</p>
   </details>
   <details class='card'>
     <summary>Validación (%%WARN_COUNT%%)</summary>
@@ -88,7 +88,7 @@
 <main>
   <div class='search'><input id='search' placeholder='Buscar stakeholder…' oninput='searchInput()' onkeydown='searchKey(event)' autocomplete='off'><button class='sclr' onclick='searchClear()' title='Limpiar'>×</button><ul id='searchResults' class='sres hidden'></ul></div>
   <div class='zoom'><button onclick='zoomBy(1.2)'>+</button><button onclick='zoomBy(.83)'>−</button><button onclick='resetView()'>⌂</button></div>
-  <div class='bar'><button onclick='toggleRight()'>Panel detalle</button><button onclick='toggleFloatLegend()'>Leyenda</button></div>
+  <div class='bar'><button onclick='toggleRight()'>Panel detalle</button><button onclick='toggleFloatLegend()'>Leyenda</button><button onclick='openExport()'>Exportar…</button></div>
   <div id='floatLegend' class='floatLegend hidden'><button class='xbtn' onclick='toggleFloatLegend()' title='Cerrar'>×</button><div id='floatLegendBody'></div></div>
   <div id='focusHint' class='focusHint hidden'></div>
   <div id='tip' class='tip hidden'></div>
@@ -98,6 +98,62 @@
   </svg>
 </main>
 <aside id='right' class='right rightHidden'><div class='card'><button class='xbtn' onclick='closeRight()' title='Cerrar'>×</button><div id='details'><div class='dtitle'>Selecciona un stakeholder</div><p class='small'>Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local.</p></div></div></aside>
+</div>
+<div id='expBack' class='modalBack hidden' onclick='if(event.target===this){closeExport();}'>
+  <div class='modal'>
+    <button class='xbtn' onclick='closeExport()' title='Cerrar'>×</button>
+    <h2>Imagen para reporte</h2>
+    <p class='msub'>Exporta lo visible en el mapa. Los filtros de actores se controlan en el panel izquierdo.</p>
+    <div class='mgrid'>
+      <div class='mrow'>
+        <label class='formlabel'>Título</label>
+        <input id='expTitle' type='text' placeholder='Mapa de Stakeholders'>
+        <label class='formlabel'>Subtítulo</label>
+        <input id='expSubtitle' type='text' placeholder='Vista poder–interés · consolidado'>
+      </div>
+      <div>
+        <label class='formlabel'>Etiquetas de los círculos</label>
+        <label class='chk'><input type='radio' name='expLbl' value='alias' checked> Alias</label>
+        <label class='chk'><input type='radio' name='expLbl' value='full'> Nombre completo</label>
+        <label class='formlabel'>Color</label>
+        <label class='chk'><input type='radio' name='expColor' value='color' checked> Color</label>
+        <label class='chk'><input type='radio' name='expColor' value='gray'> Escala de grises</label>
+        <label class='formlabel'>Tipografía</label>
+        <select id='expFont'>
+          <option value='arial'>Arial (sans serif)</option>
+          <option value='georgia'>Georgia (serif)</option>
+          <option value='calibri'>Calibri / Segoe UI</option>
+        </select>
+      </div>
+      <div>
+        <label class='formlabel'>Leyenda</label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='esf' checked> Esferas</label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='dim' checked> Dimensiones</label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='rel' checked> Relaciones</label>
+        <label class='chk'><input type='checkbox' class='expLeg' value='size' checked id='expLegSize'> Tamaño = poder</label>
+        <label class='formlabel'>Resolución PNG</label>
+        <label class='chk'><input type='radio' name='expScale' value='2' checked> 2x (pantalla)</label>
+        <label class='chk'><input type='radio' name='expScale' value='3'> 3x (impresión)</label>
+      </div>
+      <div class='mrow' id='expRelBlock'>
+        <label class='formlabel'>Tipos de relación a incluir en la imagen</label>
+        <div id='expRelTypes'></div>
+      </div>
+      <div class='mrow'>
+        <label class='formlabel'>Pie de figura</label>
+        <div style='display:flex;gap:8px'>
+          <input id='expFigura' type='text' placeholder='Figura 1' style='flex:0 0 130px'>
+          <input id='expFuente' type='text' placeholder='Elaboración propia' style='flex:1'>
+        </div>
+        <label class='chk' style='margin-top:6px'><input type='checkbox' id='expFecha' checked> Incluir fecha</label>
+      </div>
+    </div>
+    <div class='mactions'>
+      <button onclick='doExport("copy")'>Copiar imagen</button>
+      <button onclick='doExport("svg")'>Descargar SVG</button>
+      <button class='primary' onclick='doExport("png")'>Descargar PNG</button>
+    </div>
+  </div>
 </div>
 <script id='data' type='application/json'>%%DATA_JSON%%</script>
 <script>%%APP_JS%%</script>

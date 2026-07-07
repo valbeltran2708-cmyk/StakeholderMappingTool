@@ -29,6 +29,8 @@ NODE_RENAMES = {
     'Categorías': 'tags', 'Categorias': 'tags', 'Etiquetas': 'tags',
     'Descripción / función': 'description',
     'Dimensión': 'source', 'Dimension': 'source',
+    'Alias / acrónimo': 'alias', 'Alias / acronimo': 'alias', 'Alias': 'alias',
+    'Acrónimo': 'alias', 'Acronimo': 'alias', 'Short name': 'alias',
     'Importancia en el proyecto': 'importance', 'Importancia': 'importance',
     'Importance': 'importance', 'Project importance': 'importance',
     'Descripcion / funcion': 'description', 'Interés en el proyecto': 'interest',
@@ -128,6 +130,7 @@ def read_data(path):
                                      'ir': n['ir'], 'pr': n['pr']}])
             n.setdefault('multi', False)
             n['importance'] = cell_val(n.get('importance', ''))
+            n.setdefault('alias', '')
             tv = n.get('tags', [])
             if not isinstance(tv, list):
                 tv = str(tv).strip().strip('[]')
@@ -145,7 +148,7 @@ def read_data(path):
                          'o el Excel de coordenadas.')
 
     st = st.rename(columns=NODE_RENAMES)
-    for col in ['id', 'label', 'parent_id', 'parent_name', 'level', 'source',
+    for col in ['id', 'label', 'alias', 'parent_id', 'parent_name', 'level', 'source',
                 'category', 'tags', 'description', 'interest', 'power',
                 'importance', 'notes']:
         if col not in st.columns:
@@ -198,7 +201,7 @@ def read_data(path):
                 if t not in seen_t:
                     seen_t.append(t)
         base['tags'] = seen_t
-        for c in ['id', 'description', 'notes', 'category', 'level',
+        for c in ['id', 'alias', 'description', 'notes', 'category', 'level',
                   'parent_name', 'parent_id']:
             ne = [x for x in g[c] if str(x).strip()]
             base[c] = ne[0] if ne else base.get(c, '')
@@ -288,7 +291,8 @@ def read_data(path):
     for _, r in st.iterrows():
         p = pos.get(r.id, {'x': CX, 'y': CY})
         nodes.append({
-            'id': r.id, 'label': r.label, 'parent_id': r.parent_id, 'level': r.level,
+            'id': r.id, 'label': r.label, 'alias': r.alias,
+            'parent_id': r.parent_id, 'level': r.level,
             'source': r.source, 'category': r.category, 'description': r.description,
             'interest': r.interest, 'power': r.power, 'notes': r.notes,
             'tags': list(r.tags) if isinstance(r.tags, list) else parse_tags(r.tags),

@@ -11,6 +11,7 @@ import json
 import math
 from importlib import resources
 
+from ..normalize import clean
 from ..config import (W, H, CX, CY, THEME, APP_TITLE, RING_LABEL_PREFIX,
                       QUAD_MX, QUAD_MY, QUAD_R_MAX, QUAD_R_MIN,
                       R_IN, R_OUT, S_MIN, S_MAX, LABEL_FONT_MIN,
@@ -168,7 +169,8 @@ def _edges_svg(nodes, edges):
         marker = "marker-end='url(#arrow)'" if e.get('directed', True) else ''
         out.append(
             f"<path class='edge' data-source='{esc(e['source'])}' data-target='{esc(e['target'])}' "
-            f"data-curv='{offset}' data-pol='{esc(e.get('pol', 'neu'))}' data-typecolor='{esc(e.get('color', '#999'))}' "
+            f"data-curv='{offset}' data-pol='{esc(e.get('pol', 'neu'))}' "
+            f"data-type='{esc(e.get('type', ''))}' data-typecolor='{esc(e.get('color', '#999'))}' "
             f"d='{edge_path(a, b, offset)}' stroke='{esc(e.get('color', '#999'))}' "
             f"stroke-width='{max(1.5, e.get('strength', 2))}' fill='none' {dash} {marker}/>")
     return ''.join(out)
@@ -177,15 +179,24 @@ def _edges_svg(nodes, edges):
 def _nodes_svg(nodes):
     out = []
     for n in nodes:
-        f, lines = fit_label(n['label'], n['r'])
         tf = text_color(n.get('fill'))
-        lh = f * 1.18
-        sy = -(len(lines) - 1) * lh / 2
         style = f"fill:{tf}"
-        text = ''.join(
-            f"<text text-anchor='middle' dominant-baseline='middle' y='{round(sy + j * lh, 1)}' "
-            f"font-size='{f}' style='{style}'>{esc(line)}</text>"
-            for j, line in enumerate(lines))
+
+        def _lbl_group(texto, cls):
+            f, lines = fit_label(texto, n['r'])
+            lh = f * 1.18
+            sy = -(len(lines) - 1) * lh / 2
+            inner = ''.join(
+                f"<text text-anchor='middle' dominant-baseline='middle' "
+                f"y='{round(sy + j * lh, 1)}' font-size='{f}' style='{style}'>"
+                f"{esc(line)}</text>" for j, line in enumerate(lines))
+            return f"<g class='{cls}'>{inner}</g>"
+
+        alias = clean(n.get('alias'))
+        disp = alias or n['label']
+        text = _lbl_group(disp, 'lbl lblA')
+        if alias and alias != n['label']:
+            text += _lbl_group(n['label'], 'lbl lblF')
         marker2 = (f"<circle class='marker2' r='{max(4, n['r'] - 5)}' fill='none' stroke='#ffffff' "
                    f"stroke-width='1.6' stroke-dasharray='3 3' opacity='.85'/>") if n.get('multi') else ''
         out.append(
@@ -193,7 +204,7 @@ def _nodes_svg(nodes):
             f"data-source='{esc(n.get('source', ''))}' data-level='{esc(n.get('level', ''))}' "
             f"transform='translate({n['x']},{n['y']})'>"
             f"<circle r='{n['r']}' fill='{esc(n['fill'])}' stroke='{esc(n['stroke'])}' stroke-width='3'/>{marker2}"
-            f"<g class='lbl'>{text}</g></g>")
+            f"{text}</g>")
     return ''.join(out)
 
 

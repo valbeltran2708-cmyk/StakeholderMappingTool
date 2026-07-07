@@ -20,6 +20,7 @@ def _demo_xlsx(path):
         'Interés en el proyecto': [4.5, 3.2, 5, 4.1, 2.7, 1.4],
         'Poder / influencia': [4.8, 5, 3.3, 3.1, 2.2, 1.1],
         'Importancia en el proyecto': ['Alta', 'Media', 'Media', 'Alta', 'Baja', ''],
+        'Alias / acrónimo': ['MinT', '', 'OP', 'OP', '', ''],
         'Notas': [''] * 6,
     })
     rel = pd.DataFrame({
@@ -83,6 +84,10 @@ def test_generate_end_to_end(tmp_path):
 
     # Relación automática padre -> subdivisión
     assert res['n_edges'] == 3
+
+    # Alias: dentro del círculo va el alias, el nombre completo queda en lblF
+    assert by_label['Ministerio']['alias'] == 'MinT'
+    assert "lblF" in html and "data-type=" in html
 
     # Importancia: fusión por rango máximo, casillas en el HTML y (Sin valor)
     assert by_label['Operador']['importance'] == 'Alta'

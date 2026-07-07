@@ -56,7 +56,7 @@ Genera la plantilla con `python tools/make_template.py` (queda en
 
 | Hoja | Contenido |
 |---|---|
-| `01_Stakeholders` | Un actor por fila: nombre, nivel (Entidad/Subdivisión), entidad padre, dimensión, esfera, categorías (etiquetas múltiples opcionales separadas por ";"), descripción, interés, poder, importancia en el proyecto, notas. |
+| `01_Stakeholders` | Un actor por fila: nombre, nivel (Entidad/Subdivisión), entidad padre, dimensión, esfera, categorías (etiquetas múltiples opcionales separadas por ";"), descripción, interés, poder, importancia en el proyecto, notas, alias/acrónimo (opcional). |
 | `02_Relaciones` | Una relación por fila: origen, destino, tipo, fuerza 1-5, dirección, efecto (positiva/negativa/neutral), tema, descripción. |
 | `03_Config` | TODA la configuración en una hoja: esferas + color, tipos de relación + color + estilo de línea, escalas de interés, poder e importancia, y dimensiones + color (el color de la dimensión define el borde de los nodos y la leyenda). Las listas desplegables de las hojas de datos se alimentan de aquí. |
 
