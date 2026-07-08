@@ -57,7 +57,8 @@ var LANG={
   m_legpos:'Posici\u00f3n de la leyenda',m_bottom:'Abajo',m_right:'Derecha',m_res:'Resoluci\u00f3n PNG',m_2x:'2x (pantalla)',m_3x:'3x (impresi\u00f3n)',
   m_bg:'Fondo',m_white:'Blanco',m_transp:'Transparente',m_reltypes:'Tipos de relaci\u00f3n a incluir en la imagen',
   m_foot:'Incluir pie de figura',m_source_ph:'Elaboraci\u00f3n propia',m_date:'Incluir fecha',m_copy:'Copiar imagen',m_dlsvg:'Descargar SVG',m_dlpng:'Descargar PNG',
-  to_quad:'Vista cuadrante',to_radial:'Vista radial',multi_dims:'',
+  m_idx_cols:'Columnas del \u00edndice',m_idx_font:'Letra del \u00edndice (px)',m_auto:'Autom\u00e1tico',
+  to_quad:'Vista cuadrante',to_radial:'Vista radial',multi_both:'En ambas dimensiones',multi_several:'En varias dimensiones',
   q_cm:'Gestionar de cerca',q_ks:'Mantener satisfecho',q_ki:'Mantener informado',q_mo:'Monitorear',
   axis_interest:'Inter\u00e9s en el proyecto',axis_power:'Poder / influencia',
   g_dimension:'Dimensi\u00f3n',g_interest:'Inter\u00e9s',g_power:'Poder',g_importance:'Importancia',g_connections:'Conexiones',
@@ -101,7 +102,8 @@ var LANG={
   m_legpos:'Legend position',m_bottom:'Bottom',m_right:'Right',m_res:'PNG resolution',m_2x:'2x (screen)',m_3x:'3x (print)',
   m_bg:'Background',m_white:'White',m_transp:'Transparent',m_reltypes:'Relationship types to include in the image',
   m_foot:'Include figure caption',m_source_ph:'Own elaboration',m_date:'Include date',m_copy:'Copy image',m_dlsvg:'Download SVG',m_dlpng:'Download PNG',
-  to_quad:'Quadrant view',to_radial:'Radial view',multi_dims:'',
+  m_idx_cols:'Index columns',m_idx_font:'Index font (px)',m_auto:'Automatic',
+  to_quad:'Quadrant view',to_radial:'Radial view',multi_both:'In both dimensions',multi_several:'In several dimensions',
   q_cm:'Manage closely',q_ks:'Keep satisfied',q_ki:'Keep informed',q_mo:'Monitor',
   axis_interest:'Project interest',axis_power:'Power / influence',
   g_dimension:'Dimension',g_interest:'Interest',g_power:'Power',g_importance:'Importance',g_connections:'Connections',
@@ -720,6 +722,8 @@ function collectExpOpts(){
   if(boxes.length){rel={}; document.querySelectorAll('.expRelT:checked').forEach(function(c){rel[c.value]=1;});}
   var fe=document.getElementById('expFecha'), fo=document.getElementById('expFootOn');
   var nm=document.getElementById('expNum'), nl=document.getElementById('expNumLen');
+  var ic=document.getElementById('expIdxCols'), ifz=document.getElementById('expIdxFont');
+  var icv=(ic||{}).value||'auto';
   return {
     title:(document.getElementById('expTitle')||{}).value||'Mapa de Stakeholders',
     sub:(document.getElementById('expSubtitle')||{}).value||'',
@@ -730,6 +734,8 @@ function collectExpOpts(){
     pos:radio('expLegPos')||'bottom',
     legs:legs, rel:rel,
     num:!!(nm&&nm.checked), numLen:Math.max(4,parseInt((nl||{}).value||'14',10)||14),
+    idxCols:(icv==='auto'?0:Math.max(1,Math.min(8,parseInt(icv,10)||0))),
+    idxFont:Math.max(7,Math.min(20,parseInt((ifz||{}).value||'12',10)||12)),
     footOn:!fo||fo.checked,
     figura:(document.getElementById('expFigura')||{}).value||'',
     fuente:(document.getElementById('expFuente')||{}).value||'Elaboraci\u00f3n propia',
@@ -807,7 +813,26 @@ function buildExportSVG(opts){
   var ink='#1f2733', mut='#5b6675', soft='#6b7480', line='#c9d0d8';
   function G(c){return opts.gray?toGray(c):c;}
   var right=(opts.pos==='right');
-  var LW=300, legW=right?(LW-20):bb.w;
+  // Ancho del panel derecho: crece para alojar el índice en varias columnas
+  // (acotadas al alto de la figura) sin cortar nombres.
+  var idxFs=opts.idxFont||12, idxCharW=idxFs*0.55, idxRowH=idxFs+8;
+  var idxColsRight=1, idxNeedW=0;
+  if(opts.num&&numIndex.length){
+    var lc=0;
+    numIndex.forEach(function(it){var L=(it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'')).length; if(L>lc){lc=L;}});
+    idxNeedW=lc*idxCharW+16;
+    if(right){
+      if(opts.idxCols>0){ idxColsRight=opts.idxCols; }   // el usuario fija las columnas
+      else {
+        var perColR=Math.max(4, Math.floor(bb.h/idxRowH));
+        var ncR=Math.ceil(numIndex.length/perColR);
+        if(numIndex.length>Math.floor(bb.h/idxRowH*0.55)){ncR=Math.max(ncR,2);}  // mismo criterio que abajo
+        idxColsRight=Math.min(3, Math.max(1, ncR));
+      }
+    }
+  }
+  var LW=right?Math.max(300, Math.round(idxColsRight*idxNeedW+(idxColsRight-1)*18)+24):300;
+  var legW=right?(LW-20):bb.w;
   var perRowItems=right?1:3, perRowRel=right?1:2, colW=legW/perRowItems, colWRel=legW/perRowRel;
   var legSVG='', ly=0, lx0=0, rowH=24;
   function header(txt){legSVG+="<text x='"+lx0+"' y='"+ly+"' font-size='13' font-weight='700' fill='"+mut+"'>"+escHtml(txt)+"</text>"; ly+=20;}
@@ -857,17 +882,28 @@ function buildExportSVG(opts){
     // entradas y el ancho de cada columna alcanza para el nombre más largo.
     var longest=0;
     numIndex.forEach(function(it){var L=(it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'')).length;if(L>longest){longest=L;}});
-    var needW=longest*6.6+14;
-    var ncol=(!right&&numIndex.length>=6&&legW/2>=needW)?2:1;
+    var needW=longest*idxCharW+16, gap=18, rowH2=idxRowH, ncol;
+    if(opts.idxCols>0){
+      ncol=opts.idxCols;                          // columnas fijadas por el usuario
+    } else if(right){
+      ncol=idxColsRight;
+    } else {
+      // Auto (abajo): tantas columnas como quepan sin cortar nombres, acotadas
+      // al alto de la figura; una sola si la lista es corta.
+      var maxColsW=Math.max(1, Math.floor((legW+gap)/(needW+gap)));
+      ncol=Math.ceil(numIndex.length/Math.max(4, Math.floor(bb.h/rowH2)));
+      if(numIndex.length>Math.floor(bb.h/rowH2*0.55)){ncol=Math.max(ncol,2);}
+      ncol=Math.max(1,Math.min(ncol,maxColsW));
+    }
     var cw=legW/ncol, rows=Math.ceil(numIndex.length/ncol);
     for(var ci=0;ci<numIndex.length;ci++){
       var it=numIndex[ci];
       var col=Math.floor(ci/rows), row=ci%rows;   // llenado por columnas
-      var x=lx0+col*cw, y=ly+row*20;
+      var x=lx0+col*cw, y=ly+row*rowH2;
       var full=it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'');
-      legSVG+="<text x='"+x+"' y='"+(y+11)+"' font-size='12' fill='"+ink+"'>"+escHtml(full)+"</text>";
+      legSVG+="<text x='"+x+"' y='"+(y+Math.round(idxFs*0.9))+"' font-size='"+idxFs+"' fill='"+ink+"'>"+escHtml(full)+"</text>";
     }
-    ly+=rows*20+8;
+    ly+=rows*rowH2+8;
   }
   var legendH=ly;
 

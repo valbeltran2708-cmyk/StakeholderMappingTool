@@ -1,5 +1,40 @@
 # Changelog
 
+## 1.9.3 (2026-07-07)
+
+### Nuevo
+- El diálogo de imagen permite elegir a mano el número de columnas del índice
+  de "Convenciones" (o dejarlo en Automático) y el tamaño de letra del índice.
+  Al fijar columnas, el reparto las respeta: a la derecha el panel se ensancha
+  para alojarlas sin cortar nombres; abajo se divide el ancho de la figura. El
+  modo Automático se adapta al tamaño de letra elegido (una letra más grande
+  ocupa más y dispara antes el paso a varias columnas).
+
+## 1.9.2 (2026-07-07)
+
+### Cambiado
+- El reparto en varias columnas del índice de "Convenciones" ahora aplica
+  también cuando la leyenda de la imagen se coloca a la derecha, no solo
+  abajo. El panel derecho crece lo necesario para alojar las columnas sin
+  cortar los nombres, y el número de columnas se limita para no exceder el
+  alto de la figura (mismo criterio que en la leyenda inferior).
+
+## 1.9.1 (2026-07-07)
+
+### Corregido
+- La leyenda de "Convenciones" (índice número → nombre completo, que aparece al
+  numerar nombres largos en la imagen) se reparte ahora en varias columnas
+  cuando la lista se alarga, acotada al alto de la figura (el cuadro en
+  cuadrante, los anillos en radial), sin cortar nunca los nombres. El número de
+  columnas se elige para no exceder ese alto y, a la vez, para que cada columna
+  sea suficientemente ancha para el nombre más largo; si ambas condiciones no
+  caben, prima no truncar. Listas cortas siguen en una sola columna.
+- La entrada "En ambas dimensiones" / "En varias dimensiones" (borde de las
+  entidades que aparecen en más de una dimensión) volvió a mostrar su texto en
+  la leyenda lateral y en el filtro. En la refactorización bilingüe había
+  quedado ligada a una clave vacía; ahora usa la etiqueta correcta según el
+  número de dimensiones y se traduce con el botón ES/EN.
+
 ## 1.9.0 (2026-07-07)
 
 ### Nuevo

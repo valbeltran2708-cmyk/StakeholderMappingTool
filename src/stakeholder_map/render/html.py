@@ -254,12 +254,13 @@ def _legends(nodes, edges, rel_styles):
         f"<span class='ltxt' data-term=\"{esc(s)}\">{esc(s)}</span></div>"
         for s, c in sorted(srcs.items()))
     multi_label = ('En ambas dimensiones' if len(srcs) == 2 else 'En varias dimensiones')
+    multi_key = 'multi_both' if len(srcs) == 2 else 'multi_several'
     if any(n.get('multi') for n in nodes):
         legend_src += (f"<div class='legend clk' data-src='__multi__' "
                        f"onclick='filterSrc(this.dataset.src)'>"
                        f"<span class='sw' style='border:3px solid {MULTI_STROKE};"
                        f"background:#fff'></span>"
-                       f"<span class='ltxt' data-i18n='multi_dims'>{esc(multi_label)}</span></div>")
+                       f"<span class='ltxt' data-i18n='{multi_key}'>{esc(multi_label)}</span></div>")
     types_used = sorted({e['type'] for e in edges})
     legend_rel = ''.join(
         f"<div class='legend clk' data-type=\"{esc(t)}\" onclick='filterType(this.dataset.type)'>"
@@ -272,7 +273,7 @@ def _legends(nodes, edges, rel_styles):
     sources = sorted({n.get('source', '') for n in nodes if n.get('source', '')})
     options_src = ''.join(f"<option value='{esc(s)}' data-term=\"{esc(s)}\">{esc(s)}</option>" for s in sources)
     if any(n.get('multi') for n in nodes):
-        options_src += f"<option value='__multi__' data-i18n='multi_dims'>{esc(multi_label)}</option>"
+        options_src += f"<option value='__multi__' data-i18n='{multi_key}'>{esc(multi_label)}</option>"
     types_opts = ''.join(f"<option value='{esc(t)}' data-term=\"{esc(t)}\">{esc(t)}</option>" for t in types_used)
     return legend_cat, legend_src, legend_rel, options_cat, options_src, types_opts
 
