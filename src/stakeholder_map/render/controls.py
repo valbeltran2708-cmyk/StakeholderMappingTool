@@ -36,17 +36,18 @@ def _color_controls(scale):
     ni = max(scale['NI'], 1); npw = max(scale['NP'], 1)
     parts.append("<div class='formlabel' data-i18n='zone_colors'>Colores de cuadrantes</div>")
     parts.append("<div class='seg'>"
-                 "<button type='button' class='segbtn qcm active' data-m='zone' "
+                 "<button type='button' class='segbtn qcm active' data-m='zone' data-tip='tip_qzone' "
                  "onclick='setQColorMode(\"zone\")' data-i18n='quad_by_zone'>Por zona</button>"
-                 "<button type='button' class='segbtn qcm' data-m='cell' "
+                 "<button type='button' class='segbtn qcm' data-m='cell' data-tip='tip_qcell' "
                  "onclick='setQColorMode(\"cell\")' data-i18n='quad_by_cell'>Por celda</button>"
                  "</div>")
     # por zona (Mendelow): cuatro selectores, blanco por defecto
     parts.append("<div id='qzonePick' class='swcol'>")
     for z, key in (('cm', 'q_cm'), ('ks', 'q_ks'), ('ki', 'q_ki'), ('mo', 'q_mo')):
+        _zc = QUAD_ZONE_COLORS.get(z, '#ffffff')
         parts.append(f"<label class='swpick'><button type='button' class='swatch zoneC' "
-                     f"data-kind='zone' data-zone='{z}' data-color='#ffffff' "
-                     f"style='background:#ffffff' onclick='openSwatch(this)'></button>"
+                     f"data-kind='zone' data-zone='{z}' data-color='{_zc}' "
+                     f"style='background:{_zc}' onclick='openSwatch(this)'></button>"
                      f"<span data-i18n='{key}'></span></label>")
     parts.append("</div>")
     # por celda: clic en la celda del cuadrante y, si la rejilla no es enorme,
@@ -54,6 +55,8 @@ def _color_controls(scale):
     parts.append("<div id='qcellPick' class='hidden'>")
     parts.append("<div class='small' data-i18n='quad_cell_hint' style='margin:2px 0 6px;color:#6b7480'>"
                  "Clic en una celda del cuadrante para colorearla.</div>")
+    def _hi(rank, nn):
+        return (rank >= (nn - 1) / 2) if nn > 1 else (rank >= 0)
     if ni * npw <= 25:
         po = scale['power_order']
         parts.append(f"<div class='cellgrid' style='grid-template-columns:repeat({ni},1fr)'>")
@@ -61,10 +64,13 @@ def _color_controls(scale):
             for i in range(ni):
                 iv = io[i] if i < len(io) else ''
                 pv = po[p] if p < len(po) else ''
+                _iH = _hi(i, ni); _pH = _hi(p, npw)
+                _zone = 'cm' if (_pH and _iH) else ('ks' if (_pH and not _iH) else ('ki' if ((not _pH) and _iH) else 'mo'))
+                _cc = QUAD_ZONE_COLORS.get(_zone, '#ffffff')
                 parts.append(f"<label class='cellpick' title='{esc(str(iv))} / {esc(str(pv))}'>"
                              f"<button type='button' class='swatch cellC' data-kind='cell' "
-                             f"data-col='{i}' data-row='{p}' data-color='#ffffff' "
-                             f"style='background:#ffffff' onclick='openSwatch(this)'></button></label>")
+                             f"data-col='{i}' data-row='{p}' data-color='{_cc}' "
+                             f"style='background:{_cc}' onclick='openSwatch(this)'></button></label>")
         parts.append("</div>")
     parts.append("</div>")
     return ''.join(parts)

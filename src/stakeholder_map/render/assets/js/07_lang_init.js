@@ -27,9 +27,10 @@ function setLang(lang){
   var lb=document.getElementById('langBtn'); if(lb){lb.textContent=(LANG_CUR==='es')?'EN':'ES';}
   if(CURSEL&&IDX[CURSEL]){showInfo(CURSEL);} else {details.innerHTML=defaultDetails();}
   buildKeyActors();
+  buildSummary();
   applyLabels();
 }
 window.toggleLang=function(){setLang(LANG_CUR==='es'?'en':'es');};
 
-details.innerHTML=defaultDetails(); applyEdgeColors(); window.filters(); setLang('es');
+details.innerHTML=defaultDetails(); applyEdgeColors(); window.filters(); setLang('es'); try{buildSummary();}catch(e){}
 })();

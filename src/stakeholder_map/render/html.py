@@ -52,7 +52,7 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
         if none_needed:
             rows += ("<label class='chk'><input type='checkbox' class='impF' "
                      "value='__none__' checked onchange='filters()'> (Sin valor)</label>")
-        imp_filter = ("<label class='formlabel'>Importancia en el proyecto</label>" + rows)
+        imp_filter = ("<label class='formlabel' data-tip='tip_imp'>Importancia en el proyecto</label>" + rows)
     else:
         imp_filter = ''
 

@@ -22,6 +22,7 @@ function _swBg(el,color){ if(el){el.setAttribute('data-color',color); el.style.b
 window.setBandColor=function(lvl,color){
   document.querySelectorAll('#ringBands circle[data-lvl="'+lvl+'"]').forEach(function(c){c.setAttribute('fill',color);});
   _swBg(document.querySelector('.bandC[data-lvl="'+lvl+'"]'),color);
+  if(quadrant||network){window.setMode('radial');}
 };
 window.setZoneColor=function(zone,color){
   document.querySelectorAll('.qcell[data-zone="'+zone+'"]').forEach(function(r){
@@ -29,11 +30,13 @@ window.setZoneColor=function(zone,color){
     _swBg(document.querySelector('.cellC[data-col="'+r.getAttribute('data-col')+'"][data-row="'+r.getAttribute('data-row')+'"]'),color);
   });
   _swBg(document.querySelector('.zoneC[data-zone="'+zone+'"]'),color);
+  if(!quadrant){window.setMode('quadrant');}
 };
 window.setCellColor=function(col,row,color){
   var r=document.querySelector('.qcell[data-col="'+col+'"][data-row="'+row+'"]');
   if(r){r.setAttribute('fill',color);}
   _swBg(document.querySelector('.cellC[data-col="'+col+'"][data-row="'+row+'"]'),color);
+  if(!quadrant){window.setMode('quadrant');}
 };
 window.setQColorMode=function(m){
   qColorMode=(m==='cell')?'cell':'zone';

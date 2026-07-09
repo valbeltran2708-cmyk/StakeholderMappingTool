@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.10.2 - Colores de cuadrante y del panel
+
+### Vista de cuadrante (Mendelow)
+- Las celdas ya muestran color por defecto, con un tinte sutil por zona
+  (gestionar de cerca / mantener satisfecho / mantener informado / monitorear),
+  asi se distinguen de un vistazo sin tener que colorearlas a mano. Los
+  selectores "por zona" y "por celda" parten de esos tintes y siguen
+  permitiendo personalizar; la imagen exportada hereda los colores.
+
+### Panel derecho
+- Se reemplazaron los colores sueltos por los tokens de marca: la nota de
+  estrategia usa el azul primario y las listas de relaciones un gris neutro,
+  coherente con el resto de la interfaz.
+
+## 1.10.1 - Panel derecho y espaciado de columnas
+
+### Panel derecho (detalle del actor)
+- Encabezado propio con la X (cierra el panel y le da todo el ancho al mapa) y
+  cuerpo con scroll y mas aire entre secciones.
+- Mini-mapa de conexiones directas (ego-red): el actor al centro y sus vecinos
+  alrededor, coloreados por esfera y unidos por lineas segun efecto
+  (apoyo/oposicion/neutral). Clic en un vecino abre su ficha. Actores sin
+  relaciones no muestran mini-mapa.
+
+### Exportar: espaciado entre columnas
+- El control de espaciado ahora separa las columnas de verdad (antes, en
+  Automatico, subir el valor reducia el numero de columnas en vez de
+  separarlas). El conteo de columnas ya no depende del espaciado, y la figura
+  se ensancha para alojar las columnas separadas. Aplica tanto al indice de
+  convenciones como a las columnas de la leyenda (esferas, dimensiones,
+  relaciones). La previsualizacion responde al instante.
+
 ## No publicado - rama refactor/modular
 
 ### Estructura (sin cambios de comportamiento; salida byte a byte idéntica)

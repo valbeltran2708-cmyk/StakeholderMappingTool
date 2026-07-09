@@ -80,7 +80,7 @@ def _qgrid_svg(scale):
             zone = 'cm' if (pH and iH) else ('ks' if (pH and not iH) else ('ki' if ((not pH) and iH) else 'mo'))
             parts.append(f"<rect class='qcell' data-col='{i}' data-row='{p}' data-zone='{zone}' "
                          f"x='{round(x, 1)}' y='{round(y, 1)}' width='{round(gwq, 1)}' "
-                         f"height='{round(ghq, 1)}' fill='{QUAD_CELL_DEFAULT}'/>")
+                         f"height='{round(ghq, 1)}' fill='{QUAD_ZONE_COLORS.get(zone, QUAD_CELL_DEFAULT)}'/>")
     parts.append("</g>")
     parts.append(f"<rect x='{mxq}' y='{myq}' width='{W - 2 * mxq}' height='{H - 2 * myq}' "
                  f"fill='none' class='qline'/>")
@@ -178,7 +178,7 @@ def _nodes_svg(nodes):
 def _legends(nodes, edges, rel_styles):
     cats = {n.get('category', ''): n.get('fill', '#aaa') for n in nodes if n.get('category', '')}
     legend_cat = ''.join(
-        f"<div class='legend clk' data-cat=\"{esc(k)}\" onclick='filterCat(this.dataset.cat)'>"
+        f"<div class='legend clk' data-tip='tip_legrow' data-cat=\"{esc(k)}\" onclick='filterCat(this.dataset.cat)'>"
         f"<span class='sw' style='background:{esc(v)}'></span>"
         f"<span class='ltxt' data-term=\"{esc(k)}\">{esc(k)}</span></div>"
         for k, v in sorted(cats.items()))
@@ -188,21 +188,21 @@ def _legends(nodes, edges, rel_styles):
         if s and s not in srcs:
             srcs[s] = n.get('stroke', '#667085')
     legend_src = ''.join(
-        f"<div class='legend clk' data-src=\"{esc(s)}\" onclick='filterSrc(this.dataset.src)'>"
+        f"<div class='legend clk' data-tip='tip_legrow' data-src=\"{esc(s)}\" onclick='filterSrc(this.dataset.src)'>"
         f"<span class='sw' style='border:3px solid {esc(c)};background:#fff'></span>"
         f"<span class='ltxt' data-term=\"{esc(s)}\">{esc(s)}</span></div>"
         for s, c in sorted(srcs.items()))
     multi_label = ('En ambas dimensiones' if len(srcs) == 2 else 'En varias dimensiones')
     multi_key = 'multi_both' if len(srcs) == 2 else 'multi_several'
     if any(n.get('multi') for n in nodes):
-        legend_src += (f"<div class='legend clk' data-src='__multi__' "
+        legend_src += (f"<div class='legend clk' data-tip='tip_legrow' data-src='__multi__' "
                        f"onclick='filterSrc(this.dataset.src)'>"
                        f"<span class='sw' style='border:3px solid {MULTI_STROKE};"
                        f"background:#fff'></span>"
                        f"<span class='ltxt' data-i18n='{multi_key}'>{esc(multi_label)}</span></div>")
     types_used = sorted({e['type'] for e in edges})
     legend_rel = ''.join(
-        f"<div class='legend clk' data-type=\"{esc(t)}\" onclick='filterType(this.dataset.type)'>"
+        f"<div class='legend clk' data-tip='tip_legrow' data-type=\"{esc(t)}\" onclick='filterType(this.dataset.type)'>"
         f"<span class='line' style='border-top:3px "
         f"{('dashed' if rel_styles.get(t, {}).get('dash') else 'solid')} "
         f"{esc(rel_styles.get(t, {}).get('color', '#999'))}'></span>"
