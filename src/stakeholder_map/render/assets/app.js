@@ -51,13 +51,14 @@ var LANG={
   btn_detail:'Panel detalle',btn_legend:'Leyenda',btn_export:'Exportar\u2026',
   d_select:'Selecciona un stakeholder',d_select_txt:'Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local.',
   m_title:'Imagen para reporte',m_sub:'Exporta lo visible en el mapa. Los filtros de actores se controlan en el panel izquierdo.',
-  m_titlelbl:'T\u00edtulo',m_subtitle:'Subt\u00edtulo',m_labels:'Etiquetas de los c\u00edrculos',m_alias:'Alias',m_fullname:'Nombre completo',
+  m_titlelbl:'T\u00edtulo',m_subtitle:'Subt\u00edtulo',m_labels:'Etiquetas de los c\u00edrculos',m_alias:'Acr\u00f3nimo',m_fullname:'Nombre completo',m_number:'N\u00famero',
   m_num_pre:'Numerar si supera',m_num_post:'caracteres',m_color:'Color',m_color_on:'Color',m_gray:'Escala de grises',m_font:'Tipograf\u00eda',
   m_legend:'Leyenda',m_le_esf:'Esferas',m_le_dim:'Dimensiones',m_le_rel:'Relaciones',m_le_size:'Tama\u00f1o = poder',
   m_legpos:'Posici\u00f3n de la leyenda',m_bottom:'Abajo',m_right:'Derecha',m_res:'Resoluci\u00f3n PNG',m_2x:'2x (pantalla)',m_3x:'3x (impresi\u00f3n)',
   m_bg:'Fondo',m_white:'Blanco',m_transp:'Transparente',m_reltypes:'Tipos de relaci\u00f3n a incluir en la imagen',
   m_foot:'Incluir pie de figura',m_source_ph:'Elaboraci\u00f3n propia',m_date:'Incluir fecha',m_copy:'Copiar imagen',m_dlsvg:'Descargar SVG',m_dlpng:'Descargar PNG',
   m_idx_cols:'Columnas del \u00edndice',m_idx_font:'Letra del \u00edndice (px)',m_auto:'Autom\u00e1tico',
+  m_idx_show:'El \u00edndice muestra',m_idx_both:'Nombre y sigla',m_idx_name:'Solo nombre completo',m_idx_alias:'Solo acr\u00f3nimo',
   to_quad:'Vista cuadrante',to_radial:'Vista radial',multi_both:'En ambas dimensiones',multi_several:'En varias dimensiones',
   q_cm:'Gestionar de cerca',q_ks:'Mantener satisfecho',q_ki:'Mantener informado',q_mo:'Monitorear',
   axis_interest:'Inter\u00e9s en el proyecto',axis_power:'Poder / influencia',
@@ -96,13 +97,14 @@ var LANG={
   btn_detail:'Detail panel',btn_legend:'Legend',btn_export:'Export\u2026',
   d_select:'Select a stakeholder',d_select_txt:'Click a node to highlight its connections. If it is an entity with subdivisions, its local map opens.',
   m_title:'Image for report',m_sub:'Exports what is visible on the map. Actor filters are controlled in the left panel.',
-  m_titlelbl:'Title',m_subtitle:'Subtitle',m_labels:'Circle labels',m_alias:'Alias',m_fullname:'Full name',
+  m_titlelbl:'Title',m_subtitle:'Subtitle',m_labels:'Circle labels',m_alias:'Acronym',m_fullname:'Full name',m_number:'Number',
   m_num_pre:'Number if longer than',m_num_post:'characters',m_color:'Color',m_color_on:'Color',m_gray:'Grayscale',m_font:'Typography',
   m_legend:'Legend',m_le_esf:'Spheres',m_le_dim:'Dimensions',m_le_rel:'Relationships',m_le_size:'Size = power',
   m_legpos:'Legend position',m_bottom:'Bottom',m_right:'Right',m_res:'PNG resolution',m_2x:'2x (screen)',m_3x:'3x (print)',
   m_bg:'Background',m_white:'White',m_transp:'Transparent',m_reltypes:'Relationship types to include in the image',
   m_foot:'Include figure caption',m_source_ph:'Own elaboration',m_date:'Include date',m_copy:'Copy image',m_dlsvg:'Download SVG',m_dlpng:'Download PNG',
   m_idx_cols:'Index columns',m_idx_font:'Index font (px)',m_auto:'Automatic',
+  m_idx_show:'Index shows',m_idx_both:'Name and acronym',m_idx_name:'Full name only',m_idx_alias:'Acronym only',
   to_quad:'Quadrant view',to_radial:'Radial view',multi_both:'In both dimensions',multi_several:'In several dimensions',
   q_cm:'Manage closely',q_ks:'Keep satisfied',q_ki:'Keep informed',q_mo:'Monitor',
   axis_interest:'Project interest',axis_power:'Power / influence',
@@ -735,6 +737,7 @@ function collectExpOpts(){
     legs:legs, rel:rel,
     num:!!(nm&&nm.checked), numLen:Math.max(4,parseInt((nl||{}).value||'14',10)||14),
     idxCols:(icv==='auto'?0:Math.max(1,Math.min(8,parseInt(icv,10)||0))),
+    idxLabel:radio('expIdxLbl')||'both',
     idxFont:Math.max(7,Math.min(20,parseInt((ifz||{}).value||'12',10)||12)),
     footOn:!fo||fo.checked,
     figura:(document.getElementById('expFigura')||{}).value||'',
@@ -773,12 +776,14 @@ function buildExportSVG(opts){
     if(f){ if(opts.lbl==='full'){var a=g.querySelector('.lblA'); if(a){a.parentNode.removeChild(a);} f.setAttribute('class','lbl lblA'); }
            else {f.parentNode.removeChild(f);} }
   });
-  // numeración de nombres largos: número en el círculo + bloque Convenciones
+  // numeración: modo "número" (todos) o refinamiento "numerar si supera N caracteres"
   var numIndex=[];
-  if(opts.num){
+  var numberAll=(opts.lbl==='num');
+  if(numberAll||opts.num){
     var cand=[];
     clone.querySelectorAll('.node:not(.hidden)').forEach(function(g){
       var n=IDX[g.getAttribute('data-id')]; if(!n){return;}
+      if(numberAll){cand.push({g:g,n:n});return;}
       var disp=(opts.lbl==='full')?nodeLabel(n):(nodeAlias(n)||nodeLabel(n));
       if(String(disp).length>opts.numLen){cand.push({g:g,n:n});}
     });
@@ -807,6 +812,7 @@ function buildExportSVG(opts){
     });
   }
   if(opts.gray){grayify(clone);}
+  function idxText(it){var full=nodeLabel(it.n),al=nodeAlias(it.n);var body=(opts.idxLabel==='name')?full:((opts.idxLabel==='alias')?(al||full):(full+(al?(' ('+al+')'):'')));return it.num+'. '+body;}
   var inner=clone.innerHTML;
 
   // ------- leyenda por bloques (abajo o a la derecha) -------
@@ -817,9 +823,9 @@ function buildExportSVG(opts){
   // (acotadas al alto de la figura) sin cortar nombres.
   var idxFs=opts.idxFont||12, idxCharW=idxFs*0.55, idxRowH=idxFs+8;
   var idxColsRight=1, idxNeedW=0;
-  if(opts.num&&numIndex.length){
+  if(numIndex.length){
     var lc=0;
-    numIndex.forEach(function(it){var L=(it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'')).length; if(L>lc){lc=L;}});
+    numIndex.forEach(function(it){var L=idxText(it).length; if(L>lc){lc=L;}});
     idxNeedW=lc*idxCharW+16;
     if(right){
       if(opts.idxCols>0){ idxColsRight=opts.idxCols; }   // el usuario fija las columnas
@@ -875,13 +881,13 @@ function buildExportSVG(opts){
     legSVG+="<text x='"+(cx0+30)+"' y='"+(cy0+4)+"' font-size='12' fill='"+soft+"'>"+escHtml(t('size_from'))+" "+escHtml(String(lo))+" "+escHtml(t('size_inner'))+" "+escHtml(String(hi))+" "+escHtml(t('size_outer'))+"</text>";
     ly+=48;
   }
-  if(opts.num&&numIndex.length){
+  if(numIndex.length){
     header(t('conventions'));
     // El índice debe mostrar el nombre COMPLETO (ese es su propósito), así
     // que solo se usan dos columnas cuando la leyenda va abajo, hay bastantes
     // entradas y el ancho de cada columna alcanza para el nombre más largo.
     var longest=0;
-    numIndex.forEach(function(it){var L=(it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'')).length;if(L>longest){longest=L;}});
+    numIndex.forEach(function(it){var L=idxText(it).length;if(L>longest){longest=L;}});
     var needW=longest*idxCharW+16, gap=18, rowH2=idxRowH, ncol;
     if(opts.idxCols>0){
       ncol=opts.idxCols;                          // columnas fijadas por el usuario
@@ -900,7 +906,7 @@ function buildExportSVG(opts){
       var it=numIndex[ci];
       var col=Math.floor(ci/rows), row=ci%rows;   // llenado por columnas
       var x=lx0+col*cw, y=ly+row*rowH2;
-      var full=it.num+'. '+nodeLabel(it.n)+(nodeAlias(it.n)?(' ('+nodeAlias(it.n)+')'):'');
+      var full=idxText(it);
       legSVG+="<text x='"+x+"' y='"+(y+Math.round(idxFs*0.9))+"' font-size='"+idxFs+"' fill='"+ink+"'>"+escHtml(full)+"</text>";
     }
     ly+=rows*rowH2+8;

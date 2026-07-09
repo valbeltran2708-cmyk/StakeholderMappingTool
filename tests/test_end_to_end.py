@@ -113,6 +113,7 @@ def test_generate_end_to_end(tmp_path):
     assert data['terms'].get('Gobierno') == 'Government'
     assert data['terms'].get('Tema A') == 'Theme A'
     assert 'langBtn' in html                       # botón de idioma
+    assert "name='expLbl' value='num'" in html     # tercer modo de etiqueta (número)
     # la entrada multi de la leyenda tiene clave real (no la vacía multi_dims)
     assert "data-i18n='multi_both'" in html
     assert 'multi_dims' not in html

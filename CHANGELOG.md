@@ -1,5 +1,25 @@
 # Changelog
 
+## 1.9.5 (2026-07-07)
+
+### Nuevo
+- El índice de "Convenciones" de la imagen ahora deja elegir qué muestra cada
+  entrada: nombre completo con sigla (por defecto), solo el nombre completo, o
+  solo el acrónimo. Aplica en cualquier modo de círculo que genere índice
+  (Número, o Acrónimo/Nombre con la numeración de largos activada) y el ancho
+  de columnas se ajusta al texto elegido.
+
+## 1.9.4 (2026-07-07)
+
+### Nuevo
+- En la imagen exportada, la etiqueta dentro de los círculos es un selector de
+  tres modos intercambiables: Acrónimo (la sigla, o el nombre si no hay sigla),
+  Nombre completo, o Número (todos los círculos numerados, con el glosario
+  completo de "Convenciones" mapeando número a nombre y sigla). La casilla
+  "Numerar si supera N caracteres" sigue disponible como refinamiento de los
+  modos Acrónimo y Nombre (numera solo los que se pasan de largo); en el modo
+  Número se numeran todos.
+
 ## 1.9.3 (2026-07-07)
 
 ### Nuevo

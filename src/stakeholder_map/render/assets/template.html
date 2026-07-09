@@ -115,8 +115,9 @@
       </div>
       <div>
         <label class='formlabel' data-i18n='m_labels'>Etiquetas de los círculos</label>
-        <label class='chk'><input type='radio' name='expLbl' value='alias' checked> <span data-i18n='m_alias'>Alias</span></label>
+        <label class='chk'><input type='radio' name='expLbl' value='alias' checked> <span data-i18n='m_alias'>Acrónimo</span></label>
         <label class='chk'><input type='radio' name='expLbl' value='full'> <span data-i18n='m_fullname'>Nombre completo</span></label>
+        <label class='chk'><input type='radio' name='expLbl' value='num'> <span data-i18n='m_number'>Número</span></label>
         <label class='chk'><input type='checkbox' id='expNum'> <span data-i18n='m_num_pre'>Numerar si supera</span> <input id='expNumLen' type='number' value='14' min='4' style='width:54px;display:inline-block;padding:3px;margin:0'> <span data-i18n='m_num_post'>caracteres</span></label>
         <div style='display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap'>
           <div><label class='formlabel' data-i18n='m_idx_cols'>Columnas del índice</label>
@@ -127,6 +128,10 @@
           <div><label class='formlabel' data-i18n='m_idx_font'>Letra del índice (px)</label>
             <input id='expIdxFont' type='number' value='12' min='7' max='20' style='width:80px'></div>
         </div>
+        <label class='formlabel' data-i18n='m_idx_show'>El índice muestra</label>
+        <label class='chk'><input type='radio' name='expIdxLbl' value='both' checked> <span data-i18n='m_idx_both'>Nombre y sigla</span></label>
+        <label class='chk'><input type='radio' name='expIdxLbl' value='name'> <span data-i18n='m_idx_name'>Solo nombre completo</span></label>
+        <label class='chk'><input type='radio' name='expIdxLbl' value='alias'> <span data-i18n='m_idx_alias'>Solo acrónimo</span></label>
         <label class='formlabel' data-i18n='m_color'>Color</label>
         <label class='chk'><input type='radio' name='expColor' value='color' checked> <span data-i18n='m_color_on'>Color</span></label>
         <label class='chk'><input type='radio' name='expColor' value='gray'> <span data-i18n='m_gray'>Escala de grises</span></label>
