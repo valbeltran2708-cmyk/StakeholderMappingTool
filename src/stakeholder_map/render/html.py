@@ -79,12 +79,12 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
                             ensure_ascii=False)
                  .replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026'))
 
-    styles = (_asset('styles.css')
-              .replace('%%ACCENT_DARK%%', THEME['accent_dark'])
-              .replace('%%ACCENT%%', THEME['accent'])
-              .replace('%%INK%%', THEME['ink'])
-              .replace('%%BG%%', THEME['bg'])
-              .replace('%%PANEL%%', THEME['panel']))
+    # Los tokens de color del CSS (:root) se alimentan del THEME de config.py.
+    # Cada clave 'foo_bar' del THEME sustituye a %%FOO_BAR%% en styles.css, así
+    # que agregar un color nuevo es solo agregarlo al THEME y usar su var().
+    styles = _asset('styles.css')
+    for key, value in THEME.items():
+        styles = styles.replace('%%' + key.upper() + '%%', value)
 
     doc = _asset('template.html')
     for token, value in (

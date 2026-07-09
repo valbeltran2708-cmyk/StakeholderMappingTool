@@ -21,15 +21,36 @@ ARUP_RED = '#E61E28'
 ARUP_RED_DARK = '#B4121B'   # variante oscura para hover / estados activos
 ARUP_INK = '#1D1D1B'        # casi negro corporativo
 
-# El tema controla acentos de la interfaz (botones activos, barra superior).
-# No se usa para colorear datos: los datos usan la paleta de categorías,
-# porque un solo rojo no distingue seis categorías.
+# El tema controla TODO el color de la interfaz (botones, paneles, bordes,
+# texto). No se usa para colorear datos: los datos usan la paleta de categorías,
+# porque un solo color no distingue seis categorías.
+#
+# Roles: 'accent' = color de MARCA (franja superior, detalle de actores clave).
+#        'primary' = color de INTERACCIÓN unificado (todo botón activo/primario,
+#        hover y foco). Si quieres que todo sea del color de marca, pon
+#        'primary'/'primary_dark' iguales a 'accent'/'accent_dark'.
+PRIMARY = '#E61E28'         # azul de interacción (botones activos, acciones)
+PRIMARY_DARK = '#B4121B'    # variante oscura para hover / activo
 THEME = {
+    # marca (identidad Arup)
     'accent': ARUP_RED,
     'accent_dark': ARUP_RED_DARK,
-    'ink': '#1F2733',
-    'bg': '#F7F8FA',
-    'panel': '#E7EBF0',
+    # interacción (unificado en todos los botones activos/primarios)
+    'primary': PRIMARY,
+    'primary_dark': PRIMARY_DARK,
+    # texto
+    'ink': '#1F2733',        # texto principal
+    'muted': '#5B6675',      # texto secundario / etiquetas
+    'faint': '#8A93A0',      # texto tenue / iconos
+    # superficies
+    'bg': '#F7F8FA',         # fondo de página
+    'panel': '#E7EBF0',      # panel lateral
+    'surface': '#FFFFFF',    # tarjetas / botones
+    'surface_2': '#F1F4F8',  # botón inactivo / filas (un gris frío y neutro)
+    'hover': '#E7EEF6',      # fondo al pasar el cursor
+    # bordes
+    'border': '#D5DCE5',     # borde estándar (unifica los grises dispersos)
+    'border_soft': '#E7EBF0',# borde suave (tarjetas, separadores)
 }
 
 APP_TITLE = 'Mapa de Stakeholders · Poder–Interés y Relaciones'

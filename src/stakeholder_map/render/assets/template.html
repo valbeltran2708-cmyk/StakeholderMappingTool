@@ -3,12 +3,25 @@
 <div class='topbtns'><button id='langBtn' class='langbtn' onclick='toggleLang()'>EN</button>
 <button id='qbtn' onclick='toggleQuadrant()'>Vista cuadrante</button></div></div>
 <div id='app' class='app hideRight'>
-<aside>
-  <div class='card summary'>
-    <div class='count'><div><b>%%NODE_COUNT%%</b><br><span class='small' data-i18n='nodes'>nodos</span></div><div><b>%%EDGE_COUNT%%</b><br><span class='small' data-i18n='edges_lbl'>relaciones</span></div></div>
-  </div>
-  <details class='card' open>
-    <summary data-i18n='view'>Vista</summary>
+<aside class='leftpanel'>
+  <nav class='rail'>
+    <button type='button' class='railitem active' data-sec='resumen' onclick='selectSection("resumen")'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M4 20V10M10 20V4M16 20v-7M22 20H2'/></svg><span data-i18n='resumen'>Resumen</span></button>
+    <button type='button' class='railitem' data-sec='vista' onclick='selectSection("vista")'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z'/><circle cx='12' cy='12' r='3'/></svg><span data-i18n='view'>Vista</span></button>
+    <button type='button' class='railitem' data-sec='filtros' onclick='selectSection("filtros")'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M22 3H2l8 9.46V19l4 2v-8.54L22 3z'/></svg><span data-i18n='filters'>Filtros</span></button>
+    <button type='button' class='railitem' data-sec='actores' onclick='selectSection("actores")'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1L12 2z'/></svg><span data-i18n='key_actors'>Actores</span></button>
+    <button type='button' class='railitem' data-sec='leyendas' onclick='selectSection("leyendas")'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01'/></svg><span data-i18n='legends'>Leyendas</span></button>
+    <button type='button' class='railitem' data-sec='exportar' onclick='selectSection("exportar")'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3'/></svg><span data-i18n='export'>Exportar</span></button>
+    <div class='railspacer'></div>
+    <button type='button' class='railitem railval' data-sec='validacion' onclick='selectSection("validacion")'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z'/><path d='M12 9v4M12 17h.01'/></svg><span data-i18n='validation'>Validación</span></button>
+    <button type='button' class='railtoggle' onclick='toggleRail()' title='Contraer panel'><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M15 18l-6-6 6-6'/></svg></button>
+  </nav>
+  <div class='section'>
+    <section class='secpane' data-sec='resumen'>
+      <div class='count'><div><b>%%NODE_COUNT%%</b><br><span class='small' data-i18n='actors'>actores</span></div><div><b>%%EDGE_COUNT%%</b><br><span class='small' data-i18n='edges_lbl'>relaciones</span></div></div>
+      <div id='sphereStats' class='sphereStats'></div>
+    </section>
+    <section class='secpane hidden' data-sec='vista'>
+      <h2 data-i18n='view'>Vista</h2>
     <div class='viewsel'>
       <button class='viewbtn active' data-mode='radial' onclick='setMode("radial")' data-i18n='v_pi'>Poder–interés</button>
       <button class='viewbtn' data-mode='network' onclick='setMode("network")' data-i18n='v_net'>Conexiones</button>
@@ -25,19 +38,19 @@
     <label class='chk'><input id='polColor' type='checkbox' onchange='togglePolColor()'> <span data-i18n='c_pol'>Color por efecto (polaridad)</span></label>
     <label class='formlabel'><span data-i18n='spread'>Separación de anillos</span> <span id='spreadVal' class='small'>1.00×</span></label>
     <input id='spread' type='range' min='0.45' max='1.6' step='0.05' value='1' oninput='setSpread(this.value)'>
-    %%COLOR_CONTROLS%%
-  </details>
-  <details class='card' open>
-    <summary data-i18n='filters'>Filtros</summary>
+      %%COLOR_CONTROLS%%
+    </section>
+    <section class='secpane hidden' data-sec='filtros'>
+      <h2 data-i18n='filters'>Filtros</h2>
     <label data-i18n='f_sphere'>Esfera</label><select id='catF' onchange='filters()'><option value='' data-i18n='all_f'>Todas</option>%%OPTIONS_CAT%%</select>
     <label data-i18n='f_dim'>Dimensión</label><select id='srcF' onchange='filters()'><option value='' data-i18n='all_consol'>Todas (consolidado)</option>%%OPTIONS_SRC%%</select>
     <div class='small' style='margin-top:3px;color:#6b7480' data-i18n='dim_hint'>Elegir una dimensión reposiciona y redimensiona cada actor según su puntaje en ella.</div>
     %%IMP_FILTER%%
     %%TAG_FILTER%%
     <label data-i18n='f_reltype'>Tipo de relación</label><select id='typF' onchange='filters()'><option value='' data-i18n='all_f'>Todas</option>%%TYPES_OPTS%%</select>
-  </details>
-  <details class='card' open>
-    <summary data-i18n='key_actors'>Actores clave</summary>
+    </section>
+    <section class='secpane hidden' data-sec='actores'>
+      <h2 data-i18n='key_actors'>Actores clave</h2>
     <div class='seg'>
       <button class='segbtn kmode active' data-k='score' onclick='setKeyMode("score")' data-i18n='k_score'>Interés + poder</button>
       <button class='segbtn kmode' data-k='deg' onclick='setKeyMode("deg")' data-i18n='k_deg'>Conexiones</button>
@@ -49,8 +62,19 @@
     <ul id='keyList' class='toplist'></ul>
     <label class='chk'><input id='keyIsolate' type='checkbox' onchange='filters()'> <span data-i18n='k_isolate'>Mostrar solo estos en el mapa</span></label>
   </details>
-  <details class='card'>
-    <summary data-i18n='how_read'>Cómo leer</summary>
+    </section>
+    <section class='secpane hidden' data-sec='leyendas'>
+      <h2 data-i18n='legends'>Leyendas</h2>
+    <div id='legendCard'>
+    <div class='hkey' data-i18n='l_spheres'>Esferas</div>%%LEGEND_CAT%%
+    <div class='hkey' style='margin-top:11px' data-i18n='l_dims'>Dimensiones (borde)</div>%%LEGEND_SRC%%
+    <div class='hkey' style='margin-top:11px' data-i18n='l_rels'>Relaciones</div>%%LEGEND_REL%%
+    <div class='hkey' style='margin-top:11px' data-i18n='l_effect'>Efecto (color por polaridad)</div>
+    <div class='legend'><span class='line' style='border-top:3px solid #2e9e5b'></span><span data-i18n='l_pos'>Apoya / positiva</span></div>
+    <div class='legend'><span class='line' style='border-top:3px solid #d64545'></span><span data-i18n='l_neg'>Se opone / negativa</span></div>
+    <div class='legend'><span class='line' style='border-top:3px solid #9aa3af'></span><span data-i18n='l_neu'>Neutral</span></div>
+    </div>
+      <div class='hkey' style='margin-top:13px' data-i18n='how_read'>Cómo leer</div>
     <div class='howto'>
       <div class='hkey' data-i18n='h_size'>Tamaño del círculo = poder</div>
       <svg width='256' height='48' viewBox='0 0 256 48'>
@@ -65,32 +89,22 @@
       <p class='small' style='margin:1px 0 4px' data-i18n='h_border_txt'>Línea punteada = subdivisión. Click en una entidad abre su mapa local.</p>
       <div class='hkey' data-i18n='h_views'>Vistas</div>
       <p class='small' style='margin:1px 0' data-i18n='h_views_txt'>Poder–interés: posición por interés y tamaño por poder. Conexiones: distribuye por relaciones, círculos iguales. Cuadrante: matriz de Mendelow, círculos de igual tamaño (la posición ya codifica interés y poder).</p>
-    </div>
-  </details>
-  <details class='card' id='legendCard'>
-    <summary data-i18n='legends'>Leyendas</summary>
-    <div class='hkey' data-i18n='l_spheres'>Esferas</div>%%LEGEND_CAT%%
-    <div class='hkey' style='margin-top:11px' data-i18n='l_dims'>Dimensiones (borde)</div>%%LEGEND_SRC%%
-    <div class='hkey' style='margin-top:11px' data-i18n='l_rels'>Relaciones</div>%%LEGEND_REL%%
-    <div class='hkey' style='margin-top:11px' data-i18n='l_effect'>Efecto (color por polaridad)</div>
-    <div class='legend'><span class='line' style='border-top:3px solid #2e9e5b'></span><span data-i18n='l_pos'>Apoya / positiva</span></div>
-    <div class='legend'><span class='line' style='border-top:3px solid #d64545'></span><span data-i18n='l_neg'>Se opone / negativa</span></div>
-    <div class='legend'><span class='line' style='border-top:3px solid #9aa3af'></span><span data-i18n='l_neu'>Neutral</span></div>
-  </details>
-  <details class='card'>
-    <summary data-i18n='export'>Exportar</summary>
+    </section>
+    <section class='secpane hidden' data-sec='exportar'>
+      <h2 data-i18n='export'>Exportar</h2>
     <div class='btns'>
-      <button class='primary' onclick='openExport()' style='background:#1f4e79;border-color:#1f4e79;color:#fff' data-i18n='btn_report_img'>Imagen para reporte…</button>
+      <button class='primary' onclick='openExport()' data-i18n='btn_report_img'>Imagen para reporte…</button>
       <button onclick='downloadStrategy()' data-i18n='csv_strategy'>CSV estrategia</button>
       <button onclick='downloadNodes()' data-i18n='csv_nodes'>CSV nodos</button><button onclick='downloadEdges()' data-i18n='csv_edges'>CSV relaciones</button>
     </div>
     <p class='small' style='margin-top:9px' data-i18n='export_hint'>La imagen exporta lo que está visible en el mapa (filtros incluidos); el diálogo controla formato, etiquetas, color, leyenda y pie de figura.</p>
-  </details>
-  <details class='card'>
-    <summary><span data-i18n='validation'>Validación</span> (%%WARN_COUNT%%)</summary>
+    </section>
+    <section class='secpane hidden' data-sec='validacion'>
+      <h2><span data-i18n='validation'>Validación</span> (%%WARN_COUNT%%)</h2>
     <div style='margin-top:6px'>%%WARN_HTML%%</div>
     <p class='small'><span data-i18n='sheet_nodes'>Hoja nodos</span>: %%SHEET_NODES%% · <span data-i18n='sheet_edges'>Hoja relaciones</span>: %%SHEET_EDGES%%</p>
-  </details>
+    </section>
+  </div>
 </aside>
 <main>
   <div class='search'><input id='search' placeholder='Buscar stakeholder…' data-i18n-ph='search_ph' oninput='searchInput()' onkeydown='searchKey(event)' autocomplete='off'><button class='sclr' onclick='searchClear()' data-i18n-title='clear' title='Limpiar'>×</button><ul id='searchResults' class='sres hidden'></ul></div>

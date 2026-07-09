@@ -1,7 +1,7 @@
 var LANG={
  es:{
   app_title:'Mapa de Stakeholders \u00b7 Poder\u2013Inter\u00e9s y Relaciones',
-  nodes:'nodos',edges_lbl:'relaciones',view:'Vista',filters:'Filtros',key_actors:'Actores clave',
+  nodes:'nodos',actors:'actores',by_sphere:'Actores por esfera',edges_lbl:'relaciones',view:'Vista',resumen:'Resumen',filters:'Filtros',key_actors:'Actores clave',
   how_read:'C\u00f3mo leer',legends:'Leyendas',export:'Exportar',validation:'Validaci\u00f3n',
   v_pi:'Poder\u2013inter\u00e9s',v_net:'Conexiones',v_quad:'Cuadrante',
   c_edges:'Relaciones',c_subs:'Subdivisiones',c_rings:'Anillos de inter\u00e9s',c_pol:'Color por efecto (polaridad)',
@@ -49,7 +49,7 @@ var LANG={
  },
  en:{
   app_title:'Stakeholder Map \u00b7 Power\u2013Interest and Relationships',
-  nodes:'nodes',edges_lbl:'relationships',view:'View',filters:'Filters',key_actors:'Key actors',
+  nodes:'nodes',actors:'actors',by_sphere:'Actors by sphere',edges_lbl:'relationships',view:'View',resumen:'Summary',filters:'Filters',key_actors:'Key actors',
   how_read:'How to read',legends:'Legends',export:'Export',validation:'Validation',
   v_pi:'Power\u2013interest',v_net:'Connections',v_quad:'Quadrant',
   c_edges:'Relationships',c_subs:'Subdivisions',c_rings:'Interest rings',c_pol:'Color by effect (polarity)',

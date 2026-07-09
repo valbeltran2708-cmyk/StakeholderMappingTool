@@ -211,6 +211,12 @@ window.toggleFloatLegend=function(){
     fl.classList.remove('hidden');
   } else {fl.classList.add('hidden');}
 };
+window.selectSection=function(name){
+  var items=document.querySelectorAll('.railitem'); for(var i=0;i<items.length;i++){items[i].classList.toggle('active',items[i].getAttribute('data-sec')===name);}
+  var panes=document.querySelectorAll('.secpane'); for(var j=0;j<panes.length;j++){panes[j].classList.toggle('hidden',panes[j].getAttribute('data-sec')!==name);}
+  document.getElementById('app').classList.remove('railClosed');
+};
+window.toggleRail=function(){document.getElementById('app').classList.toggle('railClosed');};
 window.toggleRight=function(){document.getElementById('app').classList.toggle('hideRight');document.getElementById('right').classList.toggle('rightHidden');};
 
 window.filterCat=function(c){if(focused){releaseFocus();}var s=document.getElementById('catF');if(s.value===c){c='';}s.value=c;window.filters();};
@@ -232,6 +238,19 @@ function keyRank(){
   if(KEYMODE==='deg'){arr.sort(function(a,b){return (DEG[b.id]||0)-(DEG[a.id]||0)||keyScore(b)-keyScore(a);});}
   else{arr.sort(function(a,b){return keyScore(b)-keyScore(a)||(DEG[b.id]||0)-(DEG[a.id]||0);});}
   return arr.slice(0,KEYN);
+}
+function buildSummary(){
+  var box=document.getElementById("sphereStats"); if(!box){return;}
+  var counts={}, colors={};
+  DATA.nodes.forEach(function(n){var c=n.category||""; if(!c){return;} counts[c]=(counts[c]||0)+1; if(!colors[c]){colors[c]=n.fill||"#999";}});
+  var cats=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];});
+  if(!cats.length){box.innerHTML=""; return;}
+  var h="<div class=\"sphdr\">"+escHtml(t("by_sphere"))+"</div>";
+  cats.forEach(function(c){
+    h+="<div class=\"sphrow\"><span class=\"sphsw\" style=\"background:"+escHtml(colors[c])+"\"></span>"
+      +"<span class=\"sphn\">"+escHtml(term(c))+"</span><span class=\"sphc\">"+counts[c]+"</span></div>";
+  });
+  box.innerHTML=h;
 }
 function buildKeyActors(){
   var ul=document.getElementById('keyList'); if(!ul){return;}
