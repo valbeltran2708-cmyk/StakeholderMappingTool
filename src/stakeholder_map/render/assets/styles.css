@@ -37,7 +37,7 @@ aside .formlabel,aside>.card>label:not(.chk){display:block;font-size:11.5px;font
 .node circle{filter:drop-shadow(0 2px 4px #0003);transition:stroke-width .15s}
 .node text{font-family:Arial,Segoe UI,sans-serif;font-weight:600;pointer-events:none}
 .nolbl text{display:none}
-.lblF{display:none}
+.lblF,.lblAen,.lblFen{display:none}
 .modalBack{position:fixed;inset:0;background:#1f273355;z-index:20;display:flex;align-items:center;justify-content:center}
 .modal{background:#fff;border:1px solid #d6dbe3;border-radius:12px;box-shadow:0 12px 40px #00000033;width:560px;max-width:94vw;max-height:88vh;overflow:auto;padding:16px 18px}
 .modal h2{margin:0 0 4px;font-size:16px;color:#1f2733}
@@ -121,3 +121,20 @@ details>summary{cursor:pointer;font-weight:700;font-size:13px;color:#5b6675}
 .swcol{display:flex;flex-direction:column;gap:5px;margin:3px 0 4px}
 .swpick{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#39424f;cursor:pointer}
 .swpick input[type=color]{width:24px;height:20px;padding:0;border:1px solid #cdd4dd;border-radius:4px;background:#fff;cursor:pointer;flex:0 0 auto}
+.cellgrid{display:grid;gap:3px;margin:3px 0 4px}
+.cellpick{display:block}
+.cellpick input[type=color]{width:100%;height:22px;padding:0;border:1px solid #cdd4dd;border-radius:4px;background:#fff;cursor:pointer}
+.qcell{fill:#ffffff}
+.qcell.clickable{cursor:pointer}
+.qcell.clickable:hover{stroke:#1f4e79;stroke-width:2}
+.swatch{width:24px;height:20px;padding:0;border:1px solid #cdd4dd;border-radius:4px;cursor:pointer;flex:0 0 auto;box-shadow:inset 0 0 0 1px #ffffff55}
+.swatch:hover{border-color:#1f4e79}
+.cellpick .swatch{width:100%;height:22px}
+.colorPop{position:fixed;z-index:50;background:#fff;border:1px solid #cdd4dd;border-radius:10px;box-shadow:0 6px 24px #0003;padding:9px;width:184px}
+.colorPop .palette{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.colorPop .sw{width:100%;aspect-ratio:1/1;height:20px;border:1px solid #cdd4dd;border-radius:4px;cursor:pointer;padding:0}
+.colorPop .sw:hover{outline:2px solid #1f4e79;outline-offset:1px}
+.colorPop .hexrow{display:flex;align-items:center;gap:4px;margin-top:8px}
+.colorPop .hexrow .hx{color:#6b7480;font-weight:700}
+.colorPop .hexrow input{flex:1;padding:5px 6px;margin:0;border:1px solid #cdd4dd;border-radius:6px;font-family:monospace;text-transform:lowercase}
+.colorPop .hexok{margin:0;padding:5px 10px;border:1px solid #1f4e79;background:#1f4e79;color:#fff;border-radius:6px;cursor:pointer;font-size:12.5px}

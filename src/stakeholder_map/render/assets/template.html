@@ -14,6 +14,11 @@
       <button class='viewbtn' data-mode='network' onclick='setMode("network")' data-i18n='v_net'>Conexiones</button>
       <button class='viewbtn' data-mode='quadrant' onclick='setMode("quadrant")' data-i18n='v_quad'>Cuadrante</button>
     </div>
+    <label class='formlabel' data-i18n='lbl_view'>Etiqueta de los nodos</label>
+    <div class='seg'>
+      <button type='button' class='segbtn lblmode active' data-lm='alias' onclick='setLabelMode("alias")' data-i18n='lbl_alias'>Alias</button>
+      <button type='button' class='segbtn lblmode' data-lm='full' onclick='setLabelMode("full")' data-i18n='lbl_full'>Nombre completo</button>
+    </div>
     <label class='chk'><input id='showEdges' type='checkbox' checked onchange='filters()'> <span data-i18n='c_edges'>Relaciones</span></label>
     <label class='chk'><input id='showSub' type='checkbox' checked onchange='filters()'> <span data-i18n='c_subs'>Subdivisiones</span></label>
     <label class='chk'><input id='showRings' type='checkbox' checked onchange='filters()'> <span data-i18n='c_rings'>Anillos de interés</span></label>
@@ -178,6 +183,10 @@
       <button class='primary' onclick='doExport("png")' data-i18n='m_dlpng'>Descargar PNG</button>
     </div>
   </div>
+</div>
+<div id='colorPop' class='colorPop hidden'>
+  <div class='palette' id='paletteGrid'></div>
+  <div class='hexrow'><span class='hx'>#</span><input id='hexIn' type='text' maxlength='7' spellcheck='false' autocomplete='off' onkeydown='if(event.key==="Enter"){applyHex();}'><button type='button' class='hexok' onclick='applyHex()' data-i18n='apply'>OK</button></div>
 </div>
 <script id='data' type='application/json'>%%DATA_JSON%%</script>
 <script>%%APP_JS%%</script>

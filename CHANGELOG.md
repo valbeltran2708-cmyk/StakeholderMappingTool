@@ -1,5 +1,45 @@
 # Changelog
 
+## 1.9.7 (2026-07-08)
+
+### Corregido
+- Los selectores de color ya NO usan el `<input type="color">` nativo, que en
+  visores embebidos abría un diálogo del sistema y dejaba la página inerte
+  (solo respondía al tabulador, el mouse dejaba de clickear). En su lugar hay
+  un selector propio dentro del HTML: un botón-muestra que abre un popover con
+  una paleta y un campo hexadecimal. Nunca abre un diálogo del sistema, así que
+  no atrapa el foco. Aplica a anillos, zonas de cuadrante y celdas.
+
+### Nuevo
+- El botón de idioma ES/EN ahora también cambia las etiquetas de los círculos
+  (los nombres de los actores): en inglés muestra el Nombre (EN) / Alias (EN)
+  de cada entidad; si una entidad no tiene versión en inglés, se queda con el
+  texto en español.
+- En la tarjeta Vista hay un control "Etiqueta de los nodos" para alternar en
+  vivo entre Alias y Nombre completo en el mapa (antes solo se elegía en la
+  imagen exportada). Se combina con el idioma: alias/nombre en español o en
+  inglés según corresponda.
+
+## 1.9.6 (2026-07-07)
+
+### Corregido
+- Los selectores de color (anillos y cuadrantes) usaban `oninput`, que dispara
+  en cada micro-cambio mientras el selector nativo está abierto y re-renderiza
+  sin parar; en visores embebidos eso podía dejar el selector "pegado". Ahora
+  aplican con `onchange` (al cerrar el selector), lo que elimina ese problema.
+
+### Cambiado
+- Las celdas del cuadrante ahora son BLANCAS por defecto (antes un semáforo
+  tenue). El color es opcional y manual, con dos formas:
+  - Por zona de Mendelow: cuatro selectores (gestionar de cerca, mantener
+    satisfecho, mantener informado, monitorear) que tiñen todas las celdas de
+    esa zona.
+  - Por celda: cada celda interés x poder se puede colorear por separado, ya
+    sea con clic sobre la celda en el cuadrante o desde la mini-rejilla de
+    selectores del panel. El fondo del cuadrante se dibuja como una celda por
+    combinación de niveles, con su zona de Mendelow asociada.
+- La imagen exportada hereda estos colores (se clona el SVG en vivo).
+
 ## 1.9.5 (2026-07-07)
 
 ### Nuevo

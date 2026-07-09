@@ -16,7 +16,8 @@ from ..config import (W, H, CX, CY, THEME, APP_TITLE, RING_LABEL_PREFIX,
                       QUAD_MX, QUAD_MY, QUAD_R_MAX, QUAD_R_MIN,
                       R_IN, R_OUT, S_MIN, S_MAX, LABEL_FONT_MIN,
                       UI_LANG, AXIS_LABELS, NET_R_MAX, NET_R_MIN, NET_FILL,
-                      MULTI_STROKE, QUAD_ZONE_COLORS, BAND_GRAY_INNER,
+                      MULTI_STROKE, QUAD_ZONE_COLORS, QUAD_CELL_DEFAULT,
+                      BAND_GRAY_INNER,
                       BAND_GRAY_OUTER)
 from ..scales import radius_for_rank
 
@@ -141,17 +142,22 @@ def _qgrid_svg(scale):
     ncol = max(scale['NI'], 1); nrow = max(scale['NP'], 1)
     gwq = (W - 2 * mxq) / ncol; ghq = (H - 2 * myq) / nrow
     parts = ["<g id='qgrid' class='hidden'>"]
-    # Fondo de zonas de Mendelow (detrás de la rejilla): cuatro rectángulos
-    # divididos en el centro. data-zone permite recolorearlos en vivo.
-    zc = QUAD_ZONE_COLORS
-    zones = [('ks', mxq, myq, CX - mxq, CY - myq),
-             ('cm', CX, myq, (W - mxq) - CX, CY - myq),
-             ('mo', mxq, CY, CX - mxq, (H - myq) - CY),
-             ('ki', CX, CY, (W - mxq) - CX, (H - myq) - CY)]
-    for z, x, y, w, h in zones:
-        parts.append(f"<rect class='qzone' data-zone='{z}' x='{round(x,1)}' "
-                     f"y='{round(y,1)}' width='{round(w,1)}' height='{round(h,1)}' "
-                     f"fill='{zc[z]}'/>")
+    def _hi(rank, nn):
+        return (rank >= (nn - 1) / 2) if nn > 1 else (rank >= 0)
+    # Fondo por celda (interés x poder), blanco por defecto. data-zone = zona de
+    # Mendelow de la celda (para teñir por zona); data-col/data-row para teñir
+    # celda por celda. Las celdas van detrás de la rejilla y los nodos.
+    parts.append("<g id='qcells'>")
+    for p in range(nrow):
+        for i in range(ncol):
+            x = mxq + i * gwq
+            y = myq + (nrow - 1 - p) * ghq
+            iH = _hi(i, ncol); pH = _hi(p, nrow)
+            zone = 'cm' if (pH and iH) else ('ks' if (pH and not iH) else ('ki' if ((not pH) and iH) else 'mo'))
+            parts.append(f"<rect class='qcell' data-col='{i}' data-row='{p}' data-zone='{zone}' "
+                         f"x='{round(x, 1)}' y='{round(y, 1)}' width='{round(gwq, 1)}' "
+                         f"height='{round(ghq, 1)}' fill='{QUAD_CELL_DEFAULT}'/>")
+    parts.append("</g>")
     parts.append(f"<rect x='{mxq}' y='{myq}' width='{W - 2 * mxq}' height='{H - 2 * myq}' "
                  f"fill='none' class='qline'/>")
     for i in range(1, ncol):
@@ -221,10 +227,19 @@ def _nodes_svg(nodes):
             return f"<g class='{cls}'>{inner}</g>"
 
         alias = clean(n.get('alias'))
-        disp = alias or n['label']
+        label = n['label']
+        disp = alias or label
         text = _lbl_group(disp, 'lbl lblA')
-        if alias and alias != n['label']:
-            text += _lbl_group(n['label'], 'lbl lblF')
+        if alias and alias != label:
+            text += _lbl_group(label, 'lbl lblF')
+        # Etiquetas en inglés (si la entidad tiene nombre/alias EN); el toggle de
+        # idioma y el de alias/nombre eligen cuál se ve. Si no hay EN, en modo
+        # inglés se cae a la etiqueta en español.
+        le = clean(n.get('label_en'))
+        ae = clean(n.get('alias_en'))
+        if le or ae:
+            text += _lbl_group(ae or le or disp, 'lbl lblAen')
+            text += _lbl_group(le or label, 'lbl lblFen')
         marker2 = (f"<circle class='marker2' r='{max(4, n['r'] - 5)}' fill='none' stroke='#ffffff' "
                    f"stroke-width='1.6' stroke-dasharray='3 3' opacity='.85'/>") if n.get('multi') else ''
         out.append(
@@ -296,17 +311,45 @@ def _color_controls(scale):
         for i in range(n):
             level = io[n - 1 - i]      # de mayor interés (interior) a menor
             color = _band_gray(i, n)
-            parts.append(f"<label class='swpick'><input type='color' class='bandC' "
-                         f"data-lvl='{i}' value='{color}' oninput='setBandColor(this.dataset.lvl,this.value)'>"
+            parts.append(f"<label class='swpick'><button type='button' class='swatch bandC' "
+                         f"data-kind='band' data-lvl='{i}' data-color='{color}' "
+                         f"style='background:{color}' onclick='openSwatch(this)'></button>"
                          f"<span>{esc(str(level))}</span></label>")
         parts.append("</div>")
-    zc = QUAD_ZONE_COLORS
+    # --- Cuadrantes: blanco por defecto; teñir por zona o celda por celda ---
+    ni = max(scale['NI'], 1); npw = max(scale['NP'], 1)
     parts.append("<div class='formlabel' data-i18n='zone_colors'>Colores de cuadrantes</div>")
-    parts.append("<div class='swcol'>")
+    parts.append("<div class='seg'>"
+                 "<button type='button' class='segbtn qcm active' data-m='zone' "
+                 "onclick='setQColorMode(\"zone\")' data-i18n='quad_by_zone'>Por zona</button>"
+                 "<button type='button' class='segbtn qcm' data-m='cell' "
+                 "onclick='setQColorMode(\"cell\")' data-i18n='quad_by_cell'>Por celda</button>"
+                 "</div>")
+    # por zona (Mendelow): cuatro selectores, blanco por defecto
+    parts.append("<div id='qzonePick' class='swcol'>")
     for z, key in (('cm', 'q_cm'), ('ks', 'q_ks'), ('ki', 'q_ki'), ('mo', 'q_mo')):
-        parts.append(f"<label class='swpick'><input type='color' class='zoneC' "
-                     f"data-zone='{z}' value='{zc[z]}' oninput='setZoneColor(this.dataset.zone,this.value)'>"
+        parts.append(f"<label class='swpick'><button type='button' class='swatch zoneC' "
+                     f"data-kind='zone' data-zone='{z}' data-color='#ffffff' "
+                     f"style='background:#ffffff' onclick='openSwatch(this)'></button>"
                      f"<span data-i18n='{key}'></span></label>")
+    parts.append("</div>")
+    # por celda: clic en la celda del cuadrante y, si la rejilla no es enorme,
+    # una mini-rejilla de selectores (arriba = mayor poder; izquierda = menor interés)
+    parts.append("<div id='qcellPick' class='hidden'>")
+    parts.append("<div class='small' data-i18n='quad_cell_hint' style='margin:2px 0 6px;color:#6b7480'>"
+                 "Clic en una celda del cuadrante para colorearla.</div>")
+    if ni * npw <= 25:
+        po = scale['power_order']
+        parts.append(f"<div class='cellgrid' style='grid-template-columns:repeat({ni},1fr)'>")
+        for p in range(npw - 1, -1, -1):
+            for i in range(ni):
+                iv = io[i] if i < len(io) else ''
+                pv = po[p] if p < len(po) else ''
+                parts.append(f"<label class='cellpick' title='{esc(str(iv))} / {esc(str(pv))}'>"
+                             f"<button type='button' class='swatch cellC' data-kind='cell' "
+                             f"data-col='{i}' data-row='{p}' data-color='#ffffff' "
+                             f"style='background:#ffffff' onclick='openSwatch(this)'></button></label>")
+        parts.append("</div>")
     parts.append("</div>")
     return ''.join(parts)
 

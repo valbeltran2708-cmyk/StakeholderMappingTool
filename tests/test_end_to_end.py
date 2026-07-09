@@ -119,12 +119,14 @@ def test_generate_end_to_end(tmp_path):
     assert 'multi_dims' not in html
 
     # --- zonas de cuadrante con color y bandas recoloreables ---
-    assert html.count("class='qzone'") == 4
+    assert "class='qcell'" in html                 # fondo del cuadrante por celdas
     for z in ('cm', 'ks', 'ki', 'mo'):
-        assert f"data-zone='{z}'" in html
+        assert f"data-zone='{z}'" in html          # cada celda conoce su zona Mendelow
+    assert "zoneC" in html and "swatch" in html   # selectores de color propios (no input nativo)
+    assert "type='color'" not in html            # sin input de color nativo (atrapaba el foco)
     assert 'data-lvl=' in html                     # bandas etiquetadas por nivel
-    assert "class='bandC'" in html                 # selector de color de anillo
-    assert "class='zoneC'" in html                 # selector de color de zona
+    assert "bandC" in html                          # selector de color de anillo (botón-muestra)
+    assert "zoneC" in html                          # selector de color de zona (botón-muestra)
     assert 'QUAD_ZONE_COLORS' not in html          # colores materializados, no el nombre
 
 

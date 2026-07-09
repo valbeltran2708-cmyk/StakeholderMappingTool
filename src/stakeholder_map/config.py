@@ -79,15 +79,17 @@ LABEL_FONT_MIN = 8
 QUAD_MX, QUAD_MY = 190, 130   # márgenes del área de la matriz en el lienzo
 QUAD_R_MAX, QUAD_R_MIN = 40, 14
 
-# Colores de fondo (tenues) de las cuatro zonas de Mendelow. Semáforo suave:
-# el fondo tiñe la zona sin competir con el color de esfera de los círculos.
-# El usuario puede cambiarlos en la herramienta; estos son los valores base.
+# Colores por defecto de las cuatro zonas de Mendelow. Ahora BLANCO: el usuario
+# decide si tiñe por zona (gestionar de cerca, mantener satisfecho, mantener
+# informado, monitorear) o celda por celda. El fondo no compite con el color de
+# esfera de los círculos salvo que se coloree a propósito.
 QUAD_ZONE_COLORS = {
-    'cm': '#f6dede',   # gestionar de cerca (alto poder + alto interés)
-    'ks': '#fdf1dc',   # mantener satisfecho (alto poder + bajo interés)
-    'ki': '#dfeaf5',   # mantener informado (bajo poder + alto interés)
-    'mo': '#eef0ee',   # monitorear (bajo poder + bajo interés)
+    'cm': '#ffffff',   # gestionar de cerca (alto poder + alto interés)
+    'ks': '#ffffff',   # mantener satisfecho (alto poder + bajo interés)
+    'ki': '#ffffff',   # mantener informado (bajo poder + alto interés)
+    'mo': '#ffffff',   # monitorear (bajo poder + bajo interés)
 }
+QUAD_CELL_DEFAULT = '#ffffff'
 # Degradado por defecto de las bandas de interés (gris): interior oscuro a
 # exterior claro. Se calcula por nivel; estos son los extremos.
 BAND_GRAY_INNER, BAND_GRAY_OUTER = 172, 228
