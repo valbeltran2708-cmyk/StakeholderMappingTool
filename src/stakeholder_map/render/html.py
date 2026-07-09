@@ -21,7 +21,7 @@ from .svg_parts import _rings_svg, _qgrid_svg, _edges_svg, _nodes_svg, _legends
 from .controls import _color_controls
 
 
-def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
+def build_html(nodes, edges, warnings, ns, es, scale, rel_styles, logo_html='', logo_position='right'):
     rings, ring_labels = _rings_svg(scale)
     qgrid = _qgrid_svg(scale)
     legend_cat, legend_src, legend_rel, options_cat, options_src, types_opts = \
@@ -87,7 +87,11 @@ def build_html(nodes, edges, warnings, ns, es, scale, rel_styles):
         styles = styles.replace('%%' + key.upper() + '%%', value)
 
     doc = _asset('template.html')
+    _logo_l = logo_html if logo_position == 'left' else ''
+    _logo_r = logo_html if logo_position != 'left' else ''
     for token, value in (
+            ('%%LOGO_L%%', _logo_l),
+            ('%%LOGO_R%%', _logo_r),
             ('%%TITLE%%', esc(APP_TITLE)),
             ('%%STYLES%%', styles),
             ('%%NODE_COUNT%%', str(len(nodes))),

@@ -1,5 +1,5 @@
 
-var EXPORT_CSS=".band{stroke:none}.ring{fill:none;stroke:#d6dbe3;stroke-dasharray:6 6}.ringlab{fill:#8a93a0;font-weight:600;font-size:13px;paint-order:stroke;stroke:#ffffff;stroke-width:4px}.spoke{stroke:#aab2bf;stroke-width:1.5;stroke-dasharray:3 4}.edge{fill:none;opacity:.5}.node circle{stroke-width:3px}.node text{font-weight:600}.hidden{display:none}.lblF{display:none}.qline{stroke:#c3cad6;stroke-width:1.5}.qlab{font-size:14px;fill:#5b6675;font-weight:700}.qtick{font-size:15px;fill:#39424f;font-weight:700}.qaxis{font-size:16px;fill:#39424f;font-weight:700}";
+var EXPORT_CSS=".band{stroke:none}.ring{fill:none;stroke:#d6dbe3;stroke-dasharray:6 6}.ringlab{fill:#8a93a0;font-weight:600;font-size:13px;paint-order:stroke;stroke:#ffffff;stroke-width:4px}.spoke{stroke:#aab2bf;stroke-width:1.5;stroke-dasharray:3 4}.edge{fill:none;opacity:.5}.node circle{stroke-width:3px}.node text{font-weight:600}.hidden{display:none}.lblF{display:none}.nrect,.nrect2{display:none}svg.shapeRect .node>circle{display:none}svg.shapeRect .node>.nrect{display:inline}svg.shapeRect .node>.nrect2{display:inline}.qline{stroke:#c3cad6;stroke-width:1.5}.qlab{font-size:14px;fill:#5b6675;font-weight:700}.qtick{font-size:15px;fill:#39424f;font-weight:700}.qaxis{font-size:16px;fill:#39424f;font-weight:700}";
 var EXP_FONTS={arial:"Arial, Helvetica, sans-serif",georgia:"Georgia, 'Times New Roman', serif",times:"'Times New Roman', Times, serif",calibri:"Calibri, 'Segoe UI', Arial, sans-serif"};
 function visBBox(){
   var minx=1e9,miny=1e9,maxx=-1e9,maxy=-1e9,any=false;
@@ -73,10 +73,13 @@ function collectExpOpts(){
     pos:radio('expLegPos')||'bottom',
     legs:legs, rel:rel,
     num:!!(nm&&nm.checked), numLen:Math.max(4,parseInt((nl||{}).value||'14',10)||14),
+    numUniform:(document.getElementById('expNumUniform')?document.getElementById('expNumUniform').checked:true),
+    numSize:Math.max(6,Math.min(40,parseInt((document.getElementById('expNumSize')||{}).value||'16',10)||16)),
     idxCols:(icv==='auto'?0:Math.max(1,Math.min(8,parseInt(icv,10)||0))),
     idxLabel:radio('expIdxLbl')||'both',
     idxFont:Math.max(7,Math.min(20,parseInt((ifz||{}).value||'12',10)||12)),
-    idxGap:Math.max(4,Math.min(80,parseInt((document.getElementById('expIdxGap')||{}).value||'18',10)||18)),
+    idxGap:Math.max(-400,Math.min(120,(function(){var v=parseInt((document.getElementById('expIdxGap')||{}).value,10);return isNaN(v)?12:v;})())),
+    entryGap:Math.max(-200,Math.min(120,(function(){var v=parseInt((document.getElementById('expEntryGap')||{}).value,10);return isNaN(v)?12:v;})())),
     showTitle:(document.getElementById('expShowTitle')?document.getElementById('expShowTitle').checked:true),
     showSub:(document.getElementById('expShowSub')?document.getElementById('expShowSub').checked:true),
     footOn:!fo||fo.checked,
@@ -143,9 +146,13 @@ function buildExportSVG(opts){
       if(t0){var st=t0.getAttribute('style')||'';var m=/fill:(#[0-9a-fA-F]{3,6})/.exec(st);if(m){fill=m[1];}}
       if(lb){
         while(lb.firstChild){lb.removeChild(lb.firstChild);}
+        // El grupo .lbl trae una escala por nodo (para las etiquetas ajustadas).
+        // Para los numeros la neutralizamos: asi el font-size es el tamano REAL
+        // y todos quedan iguales (uniforme) o exactamente segun su circulo.
+        lb.setAttribute('transform','scale(1)');
         var tx=clone.ownerDocument.createElementNS('http://www.w3.org/2000/svg','text');
         tx.setAttribute('text-anchor','middle');tx.setAttribute('dominant-baseline','middle');
-        tx.setAttribute('font-size',Math.max(12,Math.min(Math.round(r*0.95),24)));
+        tx.setAttribute('font-size', opts.numUniform ? opts.numSize : Math.max(10,Math.min(Math.round(r*0.62),opts.numSize)));
         tx.setAttribute('style','fill:'+fill);tx.textContent=String(num);
         lb.appendChild(tx);
       }
@@ -168,7 +175,7 @@ function buildExportSVG(opts){
   // Ancho del panel derecho: crece para alojar el índice en varias columnas
   // (acotadas al alto de la figura) sin cortar nombres.
   var idxFs=opts.idxFont||12, idxCharW=idxFs*0.55, idxRowH=idxFs+8;
-  var ls=idxFs/12.5, idxGap=(opts.idxGap!=null?opts.idxGap:18);
+  var ls=idxFs/12.5, idxGap=(opts.idxGap!=null?opts.idxGap:18), entryGap=(opts.entryGap!=null?opts.entryGap:12);
   var idxColsRight=1, idxNeedW=0;
   if(numIndex.length){
     var lc=0;
@@ -190,18 +197,18 @@ function buildExportSVG(opts){
   var legSVG='', ly=0, lx0=0, legMaxW=0, rowH=Math.round(24*ls);
   function header(txt){legSVG+="<text x='"+lx0+"' y='"+ly+"' font-size='"+Math.round(13*ls)+"' font-weight='700' fill='"+mut+"'>"+escHtml(txt)+"</text>"; ly+=Math.round(20*ls); legMaxW=Math.max(legMaxW, lx0+txt.length*idxCharW*1.05);}
   function itemsN(arr,swatch,per){
-    // Ancho de columna = contenido (mayor swatch + nombre mas largo) + el espaciado
-    // elegido por el usuario. Asi el gap SEPARA columnas de verdad y la figura crece.
-    var offMax=24, nameMax=0;
-    arr.forEach(function(it){ if(it.off&&it.off>offMax){offMax=it.off;} var L=(it.name||'').length; if(L>nameMax){nameMax=L;} });
-    var contentW=offMax + Math.ceil(nameMax*idxCharW) + 10;
-    var stride=contentW + idxGap;
-    var ncol=Math.max(1, per);
+    // Ancho POR COLUMNA (solo lo que necesita el contenido de esa columna) + el
+    // espaciado elegido. Asi columnas con nombres cortos quedan juntas y el gap
+    // controla de verdad la separacion. La figura crece para alojarlas.
+    var ncol=Math.max(1,per);
+    var off=24; arr.forEach(function(it){ if(it.off&&it.off>off){off=it.off;} });
+    var cwArr=[]; for(var c=0;c<ncol;c++){var mx=0; for(var i=c;i<arr.length;i+=ncol){var L=(arr[i].name||'').length; if(L>mx){mx=L;}} cwArr[c]=off+Math.ceil(mx*idxCharW)+6;}
+    var cxArr=[0]; for(var c=1;c<ncol;c++){cxArr[c]=cxArr[c-1]+cwArr[c-1]+entryGap;}
     arr.forEach(function(it,i){
-      var col=i%ncol,row=Math.floor(i/ncol),x=lx0+col*stride,y=ly+row*rowH;
+      var col=i%ncol,row=Math.floor(i/ncol),x=lx0+cxArr[col],y=ly+row*rowH;
       legSVG+=swatch(x,y,it);
       legSVG+="<text x='"+(x+(it.off||24))+"' y='"+(y+12)+"' font-size='"+idxFs+"' fill='"+ink+"'>"+escHtml(it.name)+"</text>";
-      legMaxW=Math.max(legMaxW, x+contentW);
+      legMaxW=Math.max(legMaxW, x+cwArr[col]);
     });
     ly+=Math.ceil(arr.length/ncol)*rowH+8;
   }
@@ -256,13 +263,16 @@ function buildExportSVG(opts){
       if(numIndex.length>Math.floor(bb.h/rowH2*0.55)){ncol=Math.max(ncol,2);}
       ncol=Math.max(1,Math.min(ncol,maxColsW));
     }
-    var cw=(ncol>1?(needW+gap):legW), rows=Math.ceil(numIndex.length/ncol);
+    var rows=Math.ceil(numIndex.length/ncol);
+    // ancho POR COLUMNA (llenado por columnas): cada columna solo lo que necesita
+    var cwA=[]; for(var c=0;c<ncol;c++){var mx=0; for(var rr=0;rr<rows;rr++){var idx=c*rows+rr; if(idx<numIndex.length){var L=idxText(numIndex[idx]).length; if(L>mx){mx=L;}}} cwA[c]=Math.ceil(mx*idxCharW)+8;}
+    var cxA=[0]; for(var c=1;c<ncol;c++){cxA[c]=cxA[c-1]+cwA[c-1]+gap;}
     for(var ci=0;ci<numIndex.length;ci++){
       var it=numIndex[ci];
       var col=Math.floor(ci/rows), row=ci%rows;   // llenado por columnas
-      var x=lx0+col*cw, y=ly+row*rowH2;
+      var x=lx0+cxA[col], y=ly+row*rowH2;
       var full=idxText(it);
-      legMaxW=Math.max(legMaxW, x+needW);
+      legMaxW=Math.max(legMaxW, x+cwA[col]);
       legSVG+="<text x='"+x+"' y='"+(y+Math.round(idxFs*0.9))+"' font-size='"+idxFs+"' fill='"+ink+"'>"+escHtml(full)+"</text>";
     }
     ly+=rows*rowH2+8;
@@ -304,7 +314,8 @@ function buildExportSVG(opts){
   }
   var fam=EXP_FONTS[opts.font]||EXP_FONTS.arial;
   var bgRect=(opts.bg==='transparent')?'':("<rect x='"+vbx+"' y='"+vby+"' width='"+W+"' height='"+H+"' fill='#ffffff'/>");
-  return "<svg xmlns='http://www.w3.org/2000/svg' width='"+Math.round(W)+"' height='"+Math.round(H)+"' viewBox='"+vbx+" "+vby+" "+W+" "+H+"' font-family=\""+fam+"\"><style>"+EXPORT_CSS+"</style>"+bgRect+head+inner+legPlace+keyLine+foot+"</svg>";
+  var shapeCls=(svg.classList&&svg.classList.contains('shapeRect'))?" class='shapeRect'":"";
+  return "<svg xmlns='http://www.w3.org/2000/svg'"+shapeCls+" width='"+Math.round(W)+"' height='"+Math.round(H)+"' viewBox='"+vbx+" "+vby+" "+W+" "+H+"' font-family=\""+fam+"\"><style>"+EXPORT_CSS+"</style>"+bgRect+head+inner+legPlace+keyLine+foot+"</svg>";
 }
 window.buildExportSVG=buildExportSVG;
 window.expTab=function(name){
@@ -313,7 +324,7 @@ window.expTab=function(name){
 };
 function updateExpPreview(){var box=document.getElementById('expPreview'); if(!box){return;} try{box.innerHTML=buildExportSVG(collectExpOpts());}catch(e){box.textContent='\u2014';}}
 window.updateExpPreview=updateExpPreview;
-(function(){var back=document.getElementById('expBack'); if(back){back.addEventListener('change',updateExpPreview); back.addEventListener('input',function(e){var id=(e.target&&e.target.id)||'';if(id==='expTitle'||id==='expSubtitle'||id==='expFigura'||id==='expFuente'||id==='expIdxGap'||id==='expIdxFont'){updateExpPreview();}});}})();
+(function(){var back=document.getElementById('expBack'); if(back){back.addEventListener('change',updateExpPreview); back.addEventListener('input',function(e){var id=(e.target&&e.target.id)||'';if(id==='expTitle'||id==='expSubtitle'||id==='expFigura'||id==='expFuente'||id==='expIdxGap'||id==='expEntryGap'||id==='expIdxFont'||id==='expNumSize'||id==='expNumLen'){updateExpPreview();}});}})();
 function rasterize(opts){return new Promise(function(res,rej){
   opts=opts||collectExpOpts();
   var s=buildExportSVG(opts), blob=new Blob([s],{type:'image/svg+xml;charset=utf-8'}), url=URL.createObjectURL(blob), img=new Image();

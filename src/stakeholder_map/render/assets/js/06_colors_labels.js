@@ -38,6 +38,11 @@ window.setCellColor=function(col,row,color){
   _swBg(document.querySelector('.cellC[data-col="'+col+'"][data-row="'+row+'"]'),color);
   if(!quadrant){window.setMode('quadrant');}
 };
+window.setNodeShape=function(shape){
+  var s=(shape==='rect')?'rect':'circle';
+  var svg=document.getElementById('svg'); if(svg){svg.classList.toggle('shapeRect', s==='rect');}
+  document.querySelectorAll('.shapebtn').forEach(function(b){b.classList.toggle('active', b.getAttribute('data-shape')===s);});
+};
 window.setQColorMode=function(m){
   qColorMode=(m==='cell')?'cell':'zone';
   var zp=document.getElementById('qzonePick'), cp=document.getElementById('qcellPick');

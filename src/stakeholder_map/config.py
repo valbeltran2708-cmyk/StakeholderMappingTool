@@ -29,8 +29,8 @@ ARUP_INK = '#1D1D1B'        # casi negro corporativo
 #        'primary' = color de INTERACCIÓN unificado (todo botón activo/primario,
 #        hover y foco). Si quieres que todo sea del color de marca, pon
 #        'primary'/'primary_dark' iguales a 'accent'/'accent_dark'.
-PRIMARY = '#E61E28'        # Rojo Arup de interacción (botones activos, acciones)
-PRIMARY_DARK = '#B4121B'     # variante oscura para hover / activo
+PRIMARY = '#E61E28'         # azul de interacción (botones activos, acciones)
+PRIMARY_DARK = '#B4121B'    # variante oscura para hover / activo
 THEME = {
     # marca (identidad Arup)
     'accent': ARUP_RED,
@@ -105,10 +105,10 @@ QUAD_R_MAX, QUAD_R_MIN = 40, 14
 # informado, monitorear) o celda por celda. El fondo no compite con el color de
 # esfera de los círculos salvo que se coloree a propósito.
 QUAD_ZONE_COLORS = {
-    'cm': '#FBE7E4',   # gestionar de cerca (alto poder + alto interés) — tinte cálido, mayor prioridad
-    'ks': '#FDF1DA',   # mantener satisfecho (alto poder + bajo interés) — ámbar
-    'ki': '#E5EFF4',   # mantener informado (bajo poder + alto interés) — azul
-    'mo': '#EEF1F5',   # monitorear (bajo poder + bajo interés) — gris neutro, menor prioridad
+    'cm': '#ffffff',   # gestionar de cerca (alto poder + alto interés)
+    'ks': '#ffffff',   # mantener satisfecho (alto poder + bajo interés)
+    'ki': '#ffffff',   # mantener informado (bajo poder + alto interés)
+    'mo': '#ffffff',   # monitorear (bajo poder + bajo interés)
 }
 QUAD_CELL_DEFAULT = '#ffffff'
 # Degradado por defecto de las bandas de interés (gris): interior oscuro a

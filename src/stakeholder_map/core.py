@@ -403,7 +403,48 @@ def read_data(path):
     return nodes, edges, ns, es, warnings, cat_colors, rel_styles, scale
 
 
-def generate(input_path, outdir):
+_LOGO_MIME = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+              '.gif': 'image/gif', '.svg': 'image/svg+xml', '.webp': 'image/webp'}
+_LOGO_NAMES = ('logo.png', 'logo.jpg', 'logo.jpeg', 'logo.svg', 'logo.webp')
+
+
+def _logo_img(data, ext):
+    import base64 as _b64
+    mime = _LOGO_MIME.get(str(ext).lower(), 'image/png')
+    b = _b64.b64encode(data).decode('ascii')
+    return f"<img class='topLogo' src='data:{mime};base64,{b}' alt='logo'/>"
+
+
+def _logo_html(logo_path):
+    if not logo_path:
+        return ''
+    from pathlib import Path as _P
+    q = _P(logo_path)
+    if not q.exists() or not q.is_file():
+        return ''
+    return _logo_img(q.read_bytes(), q.suffix)
+
+
+def _bundled_logo():
+    """Busca un archivo logo.* dentro de los assets del paquete
+    (src/stakeholder_map/render/assets/). Si existe, lo devuelve incrustado.
+    Permite dejar el logo junto al codigo y que viaje con el."""
+    try:
+        from importlib import resources
+        base = resources.files('stakeholder_map.render').joinpath('assets')
+    except Exception:
+        return ''
+    for name in _LOGO_NAMES:
+        try:
+            f = base.joinpath(name)
+            if f.is_file():
+                return _logo_img(f.read_bytes(), '.' + name.rsplit('.', 1)[1])
+        except Exception:
+            continue
+    return ''
+
+
+def generate(input_path, outdir, logo_path=None, logo_position='right'):
     """Ejecuta el pipeline completo y escribe todas las salidas en `outdir`.
     Devuelve un dict con rutas, conteos y advertencias."""
     from .render.html import build_html
@@ -412,9 +453,12 @@ def generate(input_path, outdir):
     nodes, edges, ns, es, warnings, cat_colors, rel_styles, scale = read_data(Path(input_path))
     outdir = Path(outdir)
     outdir.mkdir(parents=True, exist_ok=True)
-    html_doc = build_html(nodes, edges, warnings, ns, es, scale, rel_styles)
-    html_path = outdir / 'stakeholder_map.html'
+    from datetime import datetime as _dt
+    prefix = _dt.now().strftime('%y%m%d') + '_'
+    logo_html = _logo_html(logo_path) or _bundled_logo()
+    html_doc = build_html(nodes, edges, warnings, ns, es, scale, rel_styles, logo_html=logo_html, logo_position=logo_position)
+    html_path = outdir / f'{prefix}stakeholder_map.html'
     html_path.write_text(html_doc, encoding='utf-8')
-    paths = write_tables(nodes, edges, outdir)
+    paths = write_tables(nodes, edges, outdir, prefix)
     return {'html': html_path, 'tables': paths, 'warnings': warnings,
             'n_nodes': len(nodes), 'n_edges': len(edges), 'sheets': (ns, es)}

@@ -23,6 +23,10 @@ def main(argv=None):
     ap.add_argument('--output-dir', '-o', default=None,
                     help='Carpeta de resultados. Si se omite en modo interactivo, '
                          'se abre un selector de carpeta; si no, se usa ./outputs.')
+    ap.add_argument('--logo', default=None,
+                    help='Ruta a una imagen (png/jpg/svg) para la barra superior del HTML.')
+    ap.add_argument('--logo-position', default='right', choices=['left', 'right'],
+                    help='Posicion del logo en la barra superior (por defecto: right).')
     ap.add_argument('--open', action='store_true',
                     help='Abrir el HTML en el navegador al terminar.')
     ap.add_argument('--version', action='version', version=f'%(prog)s {__version__}')
@@ -36,7 +40,14 @@ def main(argv=None):
     if outdir is None:
         outdir = (ask_dir() if interactive else '') or 'outputs'
 
-    res = generate(f, outdir)
+    logo = args.logo
+    if logo is None:
+        from pathlib import Path as _P
+        for _name in ('logo.png', 'logo.jpg', 'logo.jpeg', 'logo.svg', 'logo.webp'):
+            _c = _P.cwd() / _name
+            if _c.exists():
+                logo = str(_c); break
+    res = generate(f, outdir, logo_path=logo, logo_position=args.logo_position)
     ns, es = res['sheets']
     print('Hoja nodos:', ns, '| Hoja relaciones:', es)
     print('Nodos:', res['n_nodes'], '| Relaciones:', res['n_edges'])

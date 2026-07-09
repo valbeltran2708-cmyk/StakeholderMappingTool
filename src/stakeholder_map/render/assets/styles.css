@@ -19,6 +19,9 @@
 }
 body{margin:0;font-family:Arial,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
 .top{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#fff;border-bottom:1px solid var(--border-soft);border-top:4px solid var(--accent)}
+.topLogo{height:30px;width:auto;max-width:180px;object-fit:contain;display:block}
+.top .topLogo{margin-right:12px}
+.topbtns .topLogo{margin-right:12px;margin-left:4px}
 .top b{font-size:15px}
 .app{display:grid;grid-template-columns:352px 1fr 360px;height:calc(100vh - 56px)}
 .app.hideRight{grid-template-columns:352px 1fr 0}
@@ -133,7 +136,6 @@ details>summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--muted)
 .cellgrid{display:grid;gap:3px;margin:3px 0 4px}
 .cellpick{display:block}
 .cellpick input[type=color]{width:100%;height:22px;padding:0;border:1px solid var(--border);border-radius:4px;background:#fff;cursor:pointer}
-.qcell{fill:#ffffff}
 .qcell.clickable{cursor:pointer}
 .qcell.clickable:hover{stroke:var(--primary);stroke-width:2}
 .swatch{width:24px;height:20px;padding:0;border:1px solid var(--border);border-radius:4px;cursor:pointer;flex:0 0 auto;box-shadow:inset 0 0 0 1px #ffffff55}
@@ -148,7 +150,8 @@ details>summary{cursor:pointer;font-weight:700;font-size:13px;color:var(--muted)
 .colorPop .hexrow input{flex:1;padding:5px 6px;margin:0;border:1px solid var(--border);border-radius:6px;font-family:monospace;text-transform:lowercase}
 .colorPop .hexok{margin:0;padding:5px 10px;border:1px solid var(--primary);background:var(--primary);color:#fff;border-radius:6px;cursor:pointer;font-size:12.5px}
 .sphereStats{margin-top:10px;border-top:1px solid var(--border-soft);padding-top:8px}
-.sphdr{font-size:10.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.sphdr{font-size:10.5px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin:20px 0 6px}
+#sphereStats .sphdr:first-child{margin-top:2px}
 .sphrow{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink);padding:2px 0}
 .sphsw{width:11px;height:11px;border-radius:3px;flex:0 0 auto;box-shadow:inset 0 0 0 1px #00000018}
 .sphn{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -221,3 +224,10 @@ button[data-tip],label[data-tip]{cursor:pointer}
 .egon{cursor:pointer}
 .egon circle{transition:stroke-width .12s}
 .egon:hover circle{stroke:var(--primary);stroke-width:2.5}
+
+/* ---- Forma de los nodos: rectángulo redondeado en cualquier vista (opción) ---- */
+.nrect,.nrect2{display:none}
+#svg.shapeRect .node>circle{display:none}
+#svg.shapeRect .node>.nrect{display:inline}
+#svg.shapeRect .node>.nrect2{display:inline}
+.nrect{filter:drop-shadow(0 2px 4px #0003)}

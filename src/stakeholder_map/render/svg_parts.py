@@ -166,12 +166,21 @@ def _nodes_svg(nodes):
             text += _lbl_group(le or label, 'lbl lblFen')
         marker2 = (f"<circle class='marker2' r='{max(4, n['r'] - 5)}' fill='none' stroke='#ffffff' "
                    f"stroke-width='1.6' stroke-dasharray='3 3' opacity='.85'/>") if n.get('multi') else ''
+        _rr = n['r']; _wf = 1.35; _hw = round(_rr * _wf, 1); _rx = round(_rr * 0.28, 1)
+        nrect = (f"<rect class='nrect' x='{-_hw}' y='{-_rr}' width='{round(2 * _hw, 1)}' height='{2 * _rr}' "
+                 f"rx='{_rx}' fill='{esc(n['fill'])}' stroke='{esc(n['stroke'])}' stroke-width='3'/>")
+        nrect2 = ''
+        if n.get('multi'):
+            _r2 = max(4, _rr - 5); _hw2 = round(_r2 * _wf, 1); _rx2 = round(_r2 * 0.28, 1)
+            nrect2 = (f"<rect class='nrect2' x='{-_hw2}' y='{-_r2}' width='{round(2 * _hw2, 1)}' height='{2 * _r2}' "
+                      f"rx='{_rx2}' fill='none' stroke='#ffffff' stroke-width='1.6' "
+                      f"stroke-dasharray='3 3' opacity='.85'/>")
         out.append(
             f"<g class='node' data-id='{esc(n['id'])}' data-category='{esc(n.get('category', ''))}' "
             f"data-source='{esc(n.get('source', ''))}' data-level='{esc(n.get('level', ''))}' "
             f"transform='translate({n['x']},{n['y']})'>"
             f"<circle r='{n['r']}' fill='{esc(n['fill'])}' stroke='{esc(n['stroke'])}' stroke-width='3'/>{marker2}"
-            f"{text}</g>")
+            f"{nrect}{nrect2}{text}</g>")
     return ''.join(out)
 
 

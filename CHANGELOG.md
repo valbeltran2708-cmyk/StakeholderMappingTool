@@ -1,5 +1,65 @@
 # Changelog
 
+## 1.10.8 - Numeros uniformes de verdad, espaciado separado, rects mas anchos, dashboard con aire
+
+- Numeros dentro de los circulos "del mismo tamano": ahora son realmente iguales
+  en todos los cuadrantes. Antes los de bajo poder salian mas grandes porque el
+  numero heredaba la escala del circulo; se neutraliza esa escala.
+- Espaciado entre columnas de la leyenda en DOS controles separados: uno para
+  esferas/dimensiones/relaciones y otro para el indice de actores.
+- Los rectangulos de los nodos son un poco mas anchos que altos (mejor para el
+  texto), en vez de cuadrados.
+- Mas separacion vertical entre los bloques del resumen ejecutivo.
+
+## 1.10.6 - Forma de los nodos (circulo o rectangulo redondeado)
+
+- Nueva opcion en el panel Vista: "Forma de los nodos" con Circulo (por defecto)
+  o Rectangulo de esquinas levemente redondeadas. Pensada para mejorar la
+  lectura en la vista de cuadrante, pero funciona en todas las vistas y se
+  refleja al exportar la figura.
+
+## 1.10.5 - Tamano uniforme de los numeros en los circulos
+
+- Al exportar con "Numero" dentro de los circulos, se puede elegir un tamano
+  unico para todos los numeros y ajustarlo manualmente (antes cada numero
+  tomaba el tamano de su circulo, por eso se veian de distinto tamano).
+  Control nuevo en la pestana Etiquetas: "Numeros del mismo tamano" + tamano.
+
+## 1.10.4 - Logo, fecha en salidas, pie en Contenido y columnas mas juntas
+
+### Logo en la barra superior
+- Nuevo: se puede mostrar un logo (Arup u otro) en la barra superior del HTML.
+  Basta con dejar un archivo `logo.png` (o .jpg/.svg) en la carpeta desde donde
+  se ejecuta el comando y el codigo lo detecta e incrusta solo. Tambien
+  `--logo RUTA` para indicar otra ubicacion y `--logo-position left|right` para
+  elegir el lado (por defecto: derecha).
+
+### Salidas con fecha
+- Los archivos de salida se nombran con la fecha del dia como prefijo
+  (formato AAMMDD, p. ej. `260709_stakeholder_map.html`).
+
+### Exportar
+- El "Pie de figura" se movio a la pestana Contenido (junto a titulo, subtitulo
+  y extras); se elimino la pestana "Pie" separada.
+- El espaciado entre columnas ahora admite valores negativos: se pueden juntar
+  las columnas del indice al maximo, incluso encimandolas, asi la imagen no se
+  ensancha de mas por culpa de los nombres largos.
+
+## 1.10.3 - Arreglos: color de cuadrante en pantalla y espaciado de columnas
+
+### Cuadrante (Mendelow)
+- Blancos por defecto (como se pidio). Y ahora, al cambiar un color por zona o
+  por celda en el panel Vista, el cambio SE VE en el HTML en pantalla, no solo
+  al exportar. La causa era una regla CSS (.qcell{fill:#ffffff}) que
+  sobrescribia el color elegido en el navegador; se elimino, y el blanco por
+  defecto ahora viene del atributo, que si se puede cambiar.
+
+### Exportar: espaciado entre columnas
+- Las columnas de la leyenda y del indice ahora usan ancho POR COLUMNA (cada una
+  solo lo que necesita su contenido), asi el espaciado bajo las junta de verdad
+  y no quedan lejos por culpa del nombre mas largo. El valor por defecto bajo a
+  12 y admite hasta 0 (bien juntas).
+
 ## 1.10.2 - Colores de cuadrante y del panel
 
 ### Vista de cuadrante (Mendelow)

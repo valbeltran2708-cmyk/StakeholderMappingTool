@@ -62,9 +62,11 @@ def test_generate_end_to_end(tmp_path):
     out = tmp_path / 'out'
     res = generate(src, out)
 
-    html = (out / 'stakeholder_map.html').read_text(encoding='utf-8')
-    assert (out / 'stakeholder_map_coordinates.xlsx').exists()
-    assert (out / 'stakeholder_nodes_coordinates.csv').exists()
+    _html = list(out.glob('*stakeholder_map.html'))
+    assert _html, 'no se generó el HTML'
+    html = _html[0].read_text(encoding='utf-8')
+    assert list(out.glob('*stakeholder_map_coordinates.xlsx'))
+    assert list(out.glob('*stakeholder_nodes_coordinates.csv'))
 
     # Etiquetas de anillo: solo el nivel, sin el prefijo 'INTERÉS'
     labs = re.findall(r"class='ringlab'[^>]*>([^<]+)</text>", html)

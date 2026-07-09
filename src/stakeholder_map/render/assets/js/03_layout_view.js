@@ -270,6 +270,9 @@ function resetPositions(){document.querySelectorAll('.node').forEach(function(g)
   var nd=IDX[g.getAttribute('data-id')];var r=curR(g);var base=(nd&&nd.r)?nd.r:r;
   var c=g.querySelector('circle');if(c){c.setAttribute('r',r);}
   var mk=g.querySelector('.marker2');if(mk){mk.setAttribute('r',Math.max(4,r-5));}
+  var WF=1.35;
+  var rc=g.querySelector('.nrect');if(rc){var hw=r*WF;rc.setAttribute('x',-hw);rc.setAttribute('y',-r);rc.setAttribute('width',2*hw);rc.setAttribute('height',2*r);rc.setAttribute('rx',(r*0.28).toFixed(1));}
+  var rc2=g.querySelector('.nrect2');if(rc2){var r2=Math.max(4,r-5),hw2=r2*WF;rc2.setAttribute('x',-hw2);rc2.setAttribute('y',-r2);rc2.setAttribute('width',2*hw2);rc2.setAttribute('height',2*r2);rc2.setAttribute('rx',(r2*0.28).toFixed(1));}
   g.querySelectorAll('.lbl').forEach(function(lb){lb.setAttribute('transform','scale('+(r/base).toFixed(3)+')');});
 });}
 function curPos(g){var m=/translate\(([-\d.]+) *,? *([-\d.]+)\)/.exec(g.getAttribute('transform')||'');return m?{x:parseFloat(m[1]),y:parseFloat(m[2])}:nodePos(g);}
