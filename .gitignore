@@ -1,0 +1,25 @@
+# Resultados generados (nunca subir datos reales de proyecto)
+outputs/
+*.html
+!src/stakeholder_map/render/assets/template.html
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+
+# SO / editores
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Datos/plantillas generados localmente (no versionar; la herramienta
+# genera la plantilla en blanco con tools/make_template.py)
+examples/
+outputs/

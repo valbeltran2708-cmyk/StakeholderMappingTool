@@ -1,5 +1,24 @@
 # Changelog
 
+## No publicado - rama refactor/modular
+
+### Estructura (sin cambios de comportamiento; salida byte a byte idéntica)
+- El `app.js` monolítico (~1150 líneas) se dividió en módulos por
+  responsabilidad en `render/assets/js/`, que `render/html.py` concatena en
+  orden al generar: `01_boot`, `02_i18n`, `03_layout_view`, `04_interaction`,
+  `05_export`, `06_colors_labels`, `07_lang_init`. Ver `assets/js/README.md`.
+- `render/html.py` (~456 líneas) se dividió en `render/util.py` (assets/escape),
+  `render/typography.py` (color de letra, ajuste de fuente, salto de línea: "la
+  letra"), `render/svg_parts.py` (aristas, anillos, rejilla de cuadrante, nodos,
+  leyendas), `render/controls.py` (selectores de color del panel) y un
+  `render/html.py` que solo orquesta.
+- Objetivo: que un cambio de letra, formato, color, exportación o layout quede
+  contenido en su archivo y no arrastre el resto. Los tests generan el mismo
+  Hex/HTML que antes, así que la red de seguridad valida que nada cambió.
+- Se eliminó la carpeta `examples/` y los datos de muestra: la herramienta es
+  replicable y genérica; la plantilla en blanco se genera con
+  `tools/make_template.py` y cada quien trae sus propios datos.
+
 ## 1.9.7 (2026-07-08)
 
 ### Corregido

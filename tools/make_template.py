@@ -84,6 +84,8 @@ def _dv(ws, rng, formula, *, strict=False, prompt='', title=''):
 
 
 def build(path):
+    from pathlib import Path as _P
+    _P(path).parent.mkdir(parents=True, exist_ok=True)
     wb = Workbook()
 
     # ---------- 03_Config (se crea primero para poder referenciarla) ----------
@@ -276,6 +278,5 @@ def build(path):
 
 
 if __name__ == '__main__':
-    out = sys.argv[1] if len(sys.argv) > 1 else \
-        Path(__file__).resolve().parents[1] / 'examples' / 'stakeholder_input_TEMPLATE.xlsx'
+    out = sys.argv[1] if len(sys.argv) > 1 else 'stakeholder_input_TEMPLATE.xlsx'
     build(out)

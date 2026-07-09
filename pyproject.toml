@@ -28,7 +28,7 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.setuptools.package-data]
-"stakeholder_map.render" = ["assets/*"]
+"stakeholder_map.render" = ["assets/*", "assets/js/*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

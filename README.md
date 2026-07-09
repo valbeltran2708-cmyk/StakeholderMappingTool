@@ -122,35 +122,52 @@ stakeholder-map/
 │   │   ├── network.py              ← Vista de conexiones (radio adaptativo, sin solapes)
 │   │   └── quadrant.py             ← Coordenadas de cuadrante para los exports
 │   └── render/
-│       ├── html.py                 ← Ensamblado del HTML (SVG de nodos, anillos, leyendas)
+│       ├── html.py                 ← Orquestador: arma el HTML final desde las piezas
+│       ├── util.py                 ← Escape HTML y carga/ensamblado de assets
+│       ├── typography.py           ← "La letra": color de letra, ajuste de fuente, saltos
+│       ├── svg_parts.py            ← Piezas SVG: aristas, anillos, rejilla de cuadrante, nodos, leyendas
+│       ├── controls.py             ← Selectores de color del panel (anillos, zonas, celdas)
 │       └── assets/
 │           ├── template.html       ← Estructura y textos del panel izquierdo
 │           ├── styles.css          ← Aspecto (variables de color al inicio)
-│           └── app.js              ← Interacción Y motor de layout dinámico
-│                                     (reordena con cada filtro en las 3 vistas)
+│           └── js/                 ← JavaScript por módulos (se concatenan en orden)
+│               ├── 01_boot.js          Arranque, datos, índices
+│               ├── 02_i18n.js          Idiomas ES/EN, traducción de términos y nombres
+│               ├── 03_layout_view.js   Estado, geometría, layouts, posiciones, zoom
+│               ├── 04_interaction.js   Filtros, foco, vistas, ficha, buscador, actores clave
+│               ├── 05_export.js        Imagen para reporte, CSV, numeración e índice
+│               ├── 06_colors_labels.js Selector de color propio, color de cuadrante, etiqueta de nodo
+│               └── 07_lang_init.js     Aplicación de idioma, arranque y cierre
 ├── tools/
-│   └── make_template.py            Genera la plantilla Excel (sin datos de ejemplo)
+│   └── make_template.py            Genera la plantilla Excel en blanco (herramienta replicable)
 ├── tests/                          pytest: escalas, red sin solapes, config, end-to-end
-├── examples/                       Carpeta local para la plantilla generada (no versionada)
-└── docs/                           Presentación explicativa (.pptx) y material de apoyo
+└── docs/                           Material de apoyo
 ```
+
+Herramienta replicable: no incluye datos de ejemplo. Genera la plantilla en
+blanco con `python tools/make_template.py`, llénala con tus datos y corre
+`stakeholder-map -i tu_archivo.xlsx -o salida`.
 
 Casos típicos:
 
 - Cambiar el color de acento o el título: `config.py` (`ARUP_RED`, `THEME`,
   `APP_TITLE`).
-- Cambiar el idioma de los ejes del cuadrante: `config.py` (`UI_LANG`:
-  'es', 'en' o 'both'; textos en `AXIS_LABELS`).
+- Cambiar el idioma de los ejes del cuadrante: `config.py` (`UI_LANG`;
+  textos en `AXIS_LABELS`).
 - Cambiar tamaños de círculo o radios de anillos: `config.py` (`S_MIN`,
   `S_MAX`, `R_IN`, `R_OUT`).
+- Cambiar la letra de los nodos (color, ajuste al círculo): `render/typography.py`.
+- Cambiar una pieza SVG (anillos, cuadrante, leyendas): `render/svg_parts.py`.
+- Cambiar los selectores de color del panel: `render/controls.py`.
 - Cambiar textos o tarjetas del panel: `render/assets/template.html`.
 - Cambiar el aspecto (fuentes, bordes, sombras): `render/assets/styles.css`.
-- Cambiar el comportamiento interactivo: `render/assets/app.js`.
+- Cambiar el comportamiento interactivo: el módulo correspondiente en
+  `render/assets/js/` (interacción, exportación, colores, etc.).
 - Cambiar cómo se leen los Excel: `excel_io.py` y los mapeos de columnas
   al inicio de `core.py`.
 
 El HTML de salida sigue siendo un único archivo portable: los assets se
-incrustan al generar.
+incrustan al generar (los módulos JS se concatenan en orden).
 
 ## Tests
 
