@@ -23,19 +23,19 @@
     <section class='secpane hidden' data-sec='vista'>
       <h2 data-i18n='view'>Vista</h2>
     <div class='viewsel'>
-      <button class='viewbtn active' data-mode='radial' onclick='setMode("radial")' data-i18n='v_pi'>Poder–interés</button>
-      <button class='viewbtn' data-mode='network' onclick='setMode("network")' data-i18n='v_net'>Conexiones</button>
-      <button class='viewbtn' data-mode='quadrant' onclick='setMode("quadrant")' data-i18n='v_quad'>Cuadrante</button>
+      <button class='viewbtn active' data-mode='radial' onclick='setMode("radial")' data-tip='tip_pi' data-i18n='v_pi'>Poder–interés</button>
+      <button class='viewbtn' data-mode='network' onclick='setMode("network")' data-tip='tip_net' data-i18n='v_net'>Conexiones</button>
+      <button class='viewbtn' data-mode='quadrant' onclick='setMode("quadrant")' data-tip='tip_quad' data-i18n='v_quad'>Cuadrante</button>
     </div>
     <label class='formlabel' data-i18n='lbl_view'>Etiqueta de los nodos</label>
     <div class='seg'>
-      <button type='button' class='segbtn lblmode active' data-lm='alias' onclick='setLabelMode("alias")' data-i18n='lbl_alias'>Alias</button>
-      <button type='button' class='segbtn lblmode' data-lm='full' onclick='setLabelMode("full")' data-i18n='lbl_full'>Nombre completo</button>
+      <button type='button' class='segbtn lblmode active' data-lm='alias' data-tip='tip_lbl' onclick='setLabelMode("alias")' data-i18n='lbl_alias'>Alias</button>
+      <button type='button' class='segbtn lblmode' data-lm='full' data-tip='tip_lbl' onclick='setLabelMode("full")' data-i18n='lbl_full'>Nombre completo</button>
     </div>
-    <label class='chk'><input id='showEdges' type='checkbox' checked onchange='filters()'> <span data-i18n='c_edges'>Relaciones</span></label>
-    <label class='chk'><input id='showSub' type='checkbox' checked onchange='filters()'> <span data-i18n='c_subs'>Subdivisiones</span></label>
-    <label class='chk'><input id='showRings' type='checkbox' checked onchange='filters()'> <span data-i18n='c_rings'>Anillos de interés</span></label>
-    <label class='chk'><input id='polColor' type='checkbox' onchange='togglePolColor()'> <span data-i18n='c_pol'>Color por efecto (polaridad)</span></label>
+    <label class='chk' data-tip='tip_edges'><input id='showEdges' type='checkbox' checked onchange='filters()'> <span data-i18n='c_edges'>Relaciones</span></label>
+    <label class='chk' data-tip='tip_subs'><input id='showSub' type='checkbox' checked onchange='filters()'> <span data-i18n='c_subs'>Subdivisiones</span></label>
+    <label class='chk' data-tip='tip_rings'><input id='showRings' type='checkbox' checked onchange='filters()'> <span data-i18n='c_rings'>Anillos de interés</span></label>
+    <label class='chk' data-tip='tip_pol'><input id='polColor' type='checkbox' onchange='togglePolColor()'> <span data-i18n='c_pol'>Color por efecto (polaridad)</span></label>
     <label class='formlabel'><span data-i18n='spread'>Separación de anillos</span> <span id='spreadVal' class='small'>1.00×</span></label>
     <input id='spread' type='range' min='0.45' max='1.6' step='0.05' value='1' oninput='setSpread(this.value)'>
       %%COLOR_CONTROLS%%
@@ -43,8 +43,7 @@
     <section class='secpane hidden' data-sec='filtros'>
       <h2 data-i18n='filters'>Filtros</h2>
     <label data-i18n='f_sphere'>Esfera</label><select id='catF' onchange='filters()'><option value='' data-i18n='all_f'>Todas</option>%%OPTIONS_CAT%%</select>
-    <label data-i18n='f_dim'>Dimensión</label><select id='srcF' onchange='filters()'><option value='' data-i18n='all_consol'>Todas (consolidado)</option>%%OPTIONS_SRC%%</select>
-    <div class='small' style='margin-top:3px;color:#6b7480' data-i18n='dim_hint'>Elegir una dimensión reposiciona y redimensiona cada actor según su puntaje en ella.</div>
+    <label data-i18n='f_dim' data-tip='dim_hint'>Dimensión</label><select id='srcF' onchange='filters()'><option value='' data-i18n='all_consol'>Todas (consolidado)</option>%%OPTIONS_SRC%%</select>
     %%IMP_FILTER%%
     %%TAG_FILTER%%
     <label data-i18n='f_reltype'>Tipo de relación</label><select id='typF' onchange='filters()'><option value='' data-i18n='all_f'>Todas</option>%%TYPES_OPTS%%</select>
@@ -66,38 +65,22 @@
     <section class='secpane hidden' data-sec='leyendas'>
       <h2 data-i18n='legends'>Leyendas</h2>
     <div id='legendCard'>
-    <div class='hkey' data-i18n='l_spheres'>Esferas</div>%%LEGEND_CAT%%
-    <div class='hkey' style='margin-top:11px' data-i18n='l_dims'>Dimensiones (borde)</div>%%LEGEND_SRC%%
-    <div class='hkey' style='margin-top:11px' data-i18n='l_rels'>Relaciones</div>%%LEGEND_REL%%
-    <div class='hkey' style='margin-top:11px' data-i18n='l_effect'>Efecto (color por polaridad)</div>
+    <div class='hkey' data-tip='tip_l_sph' data-i18n='l_spheres'>Esferas</div>%%LEGEND_CAT%%
+    <div class='hkey' style='margin-top:11px' data-tip='tip_l_dim' data-i18n='l_dims'>Dimensiones (borde)</div>%%LEGEND_SRC%%
+    <div class='hkey' style='margin-top:11px' data-tip='tip_l_rel' data-i18n='l_rels'>Relaciones</div>%%LEGEND_REL%%
+    <div class='hkey' style='margin-top:11px' data-tip='tip_l_eff' data-i18n='l_effect'>Efecto (color por polaridad)</div>
     <div class='legend'><span class='line' style='border-top:3px solid #2e9e5b'></span><span data-i18n='l_pos'>Apoya / positiva</span></div>
     <div class='legend'><span class='line' style='border-top:3px solid #d64545'></span><span data-i18n='l_neg'>Se opone / negativa</span></div>
     <div class='legend'><span class='line' style='border-top:3px solid #9aa3af'></span><span data-i18n='l_neu'>Neutral</span></div>
     </div>
-      <div class='hkey' style='margin-top:13px' data-i18n='how_read'>Cómo leer</div>
-    <div class='howto'>
-      <div class='hkey' data-i18n='h_size'>Tamaño del círculo = poder</div>
-      <svg width='256' height='48' viewBox='0 0 256 48'>
-        <circle cx='26' cy='24' r='18' fill='#c7ccd3'/>
-        <circle cx='26' cy='24' r='13' fill='#8a94a0'/>
-        <circle cx='26' cy='24' r='8' fill='#4b5563'/>
-        <text id='hSizeTxt' x='54' y='28' font-size='10.5' fill='#6b7480'>de %%PW_LO%% (interior) a %%PW_HI%% (exterior)</text>
-      </svg>
-      <div class='hkey' data-i18n='h_dist'>Distancia al centro = interés</div>
-      <p class='small' id='hDistTxt' style='margin:1px 0 4px'>Más cerca del centro, mayor interés. Niveles: %%INTEREST_LEVELS%%.</p>
-      <div class='hkey' data-i18n='h_border'>Borde = dimensión</div>
-      <p class='small' style='margin:1px 0 4px' data-i18n='h_border_txt'>Línea punteada = subdivisión. Click en una entidad abre su mapa local.</p>
-      <div class='hkey' data-i18n='h_views'>Vistas</div>
-      <p class='small' style='margin:1px 0' data-i18n='h_views_txt'>Poder–interés: posición por interés y tamaño por poder. Conexiones: distribuye por relaciones, círculos iguales. Cuadrante: matriz de Mendelow, círculos de igual tamaño (la posición ya codifica interés y poder).</p>
     </section>
     <section class='secpane hidden' data-sec='exportar'>
       <h2 data-i18n='export'>Exportar</h2>
     <div class='btns'>
-      <button class='primary' onclick='openExport()' data-i18n='btn_report_img'>Imagen para reporte…</button>
+      <button class='primary' onclick='openExport()' data-tip='export_hint' data-i18n='btn_report_img'>Imagen para reporte…</button>
       <button onclick='downloadStrategy()' data-i18n='csv_strategy'>CSV estrategia</button>
       <button onclick='downloadNodes()' data-i18n='csv_nodes'>CSV nodos</button><button onclick='downloadEdges()' data-i18n='csv_edges'>CSV relaciones</button>
     </div>
-    <p class='small' style='margin-top:9px' data-i18n='export_hint'>La imagen exporta lo que está visible en el mapa (filtros incluidos); el diálogo controla formato, etiquetas, color, leyenda y pie de figura.</p>
     </section>
     <section class='secpane hidden' data-sec='validacion'>
       <h2><span data-i18n='validation'>Validación</span> (%%WARN_COUNT%%)</h2>
@@ -121,74 +104,92 @@
 <aside id='right' class='right rightHidden'><div class='card'><button class='xbtn' onclick='closeRight()' data-i18n-title='close' title='Cerrar'>×</button><div id='details'><div class='dtitle' data-i18n='d_select'>Selecciona un stakeholder</div><p class='small' data-i18n='d_select_txt'>Click en un nodo para resaltar sus conexiones. Si es una entidad con subdivisiones, se abre su mapa local.</p></div></div></aside>
 </div>
 <div id='expBack' class='modalBack hidden' onclick='if(event.target===this){closeExport();}'>
-  <div class='modal'>
+  <div class='modal expmodal'>
     <button class='xbtn' onclick='closeExport()' data-i18n-title='close' title='Cerrar'>×</button>
-    <h2 data-i18n='m_title'>Imagen para reporte</h2>
-    <p class='msub' data-i18n='m_sub'>Exporta lo visible en el mapa. Los filtros de actores se controlan en el panel izquierdo.</p>
-    <div class='mgrid'>
-      <div class='mrow'>
-        <label class='formlabel' data-i18n='m_titlelbl'>Título</label>
+    <div class='mhead'>
+      <h2 data-i18n='m_title'>Imagen para reporte</h2>
+      <div class='titrow'>
         <input id='expTitle' type='text' placeholder='Mapa de Stakeholders'>
-        <label class='formlabel' data-i18n='m_subtitle'>Subtítulo</label>
         <input id='expSubtitle' type='text' placeholder='Vista poder–interés · consolidado'>
       </div>
-      <div>
-        <label class='formlabel' data-i18n='m_labels'>Etiquetas de los círculos</label>
-        <label class='chk'><input type='radio' name='expLbl' value='alias' checked> <span data-i18n='m_alias'>Acrónimo</span></label>
-        <label class='chk'><input type='radio' name='expLbl' value='full'> <span data-i18n='m_fullname'>Nombre completo</span></label>
-        <label class='chk'><input type='radio' name='expLbl' value='num'> <span data-i18n='m_number'>Número</span></label>
-        <label class='chk'><input type='checkbox' id='expNum'> <span data-i18n='m_num_pre'>Numerar si supera</span> <input id='expNumLen' type='number' value='14' min='4' style='width:54px;display:inline-block;padding:3px;margin:0'> <span data-i18n='m_num_post'>caracteres</span></label>
-        <div style='display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap'>
-          <div><label class='formlabel' data-i18n='m_idx_cols'>Columnas del índice</label>
-            <select id='expIdxCols' style='width:120px'>
-              <option value='auto' data-i18n='m_auto'>Automático</option>
-              <option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option>
-            </select></div>
-          <div><label class='formlabel' data-i18n='m_idx_font'>Letra del índice (px)</label>
-            <input id='expIdxFont' type='number' value='12' min='7' max='20' style='width:80px'></div>
+    </div>
+    <div class='mbody'>
+      <div class='mtabs'>
+        <button type='button' class='mtab active' data-tab='contenido' onclick='expTab("contenido")' data-i18n='mt_content'>Contenido</button>
+        <button type='button' class='mtab' data-tab='etiquetas' onclick='expTab("etiquetas")' data-i18n='mt_labels'>Etiquetas</button>
+        <button type='button' class='mtab' data-tab='colores' onclick='expTab("colores")' data-i18n='mt_colors'>Colores</button>
+        <button type='button' class='mtab' data-tab='leyenda' onclick='expTab("leyenda")' data-i18n='mt_legend'>Leyenda</button>
+        <button type='button' class='mtab' data-tab='pie' onclick='expTab("pie")' data-i18n='mt_foot'>Pie</button>
+      </div>
+      <div class='mopts'>
+        <div class='mtabpane' data-tab='contenido'>
+          <div id='expRelBlock'>
+            <label class='formlabel' data-i18n='m_reltypes'>Tipos de relación a incluir en la imagen</label>
+            <div id='expRelTypes'></div>
+          </div>
+          <label class='formlabel' data-i18n='m_res'>Resolución PNG</label>
+          <label class='chk'><input type='radio' name='expScale' value='2' checked> <span data-i18n='m_2x'>2x (pantalla)</span></label>
+          <label class='chk'><input type='radio' name='expScale' value='3'> <span data-i18n='m_3x'>3x (impresión)</span></label>
+          <label class='formlabel' data-i18n='m_extra'>Extras</label>
+          <label class='chk'><input type='checkbox' id='expShowKey'> <span data-i18n='m_showkey'>Incluir nota de lectura</span></label>
         </div>
-        <label class='formlabel' data-i18n='m_idx_show'>El índice muestra</label>
-        <label class='chk'><input type='radio' name='expIdxLbl' value='both' checked> <span data-i18n='m_idx_both'>Nombre y sigla</span></label>
-        <label class='chk'><input type='radio' name='expIdxLbl' value='name'> <span data-i18n='m_idx_name'>Solo nombre completo</span></label>
-        <label class='chk'><input type='radio' name='expIdxLbl' value='alias'> <span data-i18n='m_idx_alias'>Solo acrónimo</span></label>
-        <label class='formlabel' data-i18n='m_color'>Color</label>
-        <label class='chk'><input type='radio' name='expColor' value='color' checked> <span data-i18n='m_color_on'>Color</span></label>
-        <label class='chk'><input type='radio' name='expColor' value='gray'> <span data-i18n='m_gray'>Escala de grises</span></label>
-        <label class='formlabel' data-i18n='m_font'>Tipografía</label>
-        <select id='expFont'>
-          <option value='arial'>Arial (sans serif)</option>
-          <option value='georgia'>Georgia (serif)</option>
-          <option value='times'>Times New Roman</option>
-          <option value='calibri'>Calibri / Segoe UI</option>
-        </select>
-      </div>
-      <div>
-        <label class='formlabel' data-i18n='m_legend'>Leyenda</label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='esf' checked> <span data-i18n='m_le_esf'>Esferas</span></label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='dim' checked> <span data-i18n='m_le_dim'>Dimensiones</span></label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='rel' checked> <span data-i18n='m_le_rel'>Relaciones</span></label>
-        <label class='chk'><input type='checkbox' class='expLeg' value='size' checked id='expLegSize'> <span data-i18n='m_le_size'>Tamaño = poder</span></label>
-        <label class='formlabel' data-i18n='m_legpos'>Posición de la leyenda</label>
-        <label class='chk'><input type='radio' name='expLegPos' value='bottom' checked> <span data-i18n='m_bottom'>Abajo</span></label>
-        <label class='chk'><input type='radio' name='expLegPos' value='right'> <span data-i18n='m_right'>Derecha</span></label>
-        <label class='formlabel' data-i18n='m_res'>Resolución PNG</label>
-        <label class='chk'><input type='radio' name='expScale' value='2' checked> <span data-i18n='m_2x'>2x (pantalla)</span></label>
-        <label class='chk'><input type='radio' name='expScale' value='3'> <span data-i18n='m_3x'>3x (impresión)</span></label>
-        <label class='formlabel' data-i18n='m_bg'>Fondo</label>
-        <label class='chk'><input type='radio' name='expBg' value='white' checked> <span data-i18n='m_white'>Blanco</span></label>
-        <label class='chk'><input type='radio' name='expBg' value='transparent'> <span data-i18n='m_transp'>Transparente</span></label>
-      </div>
-      <div class='mrow' id='expRelBlock'>
-        <label class='formlabel' data-i18n='m_reltypes'>Tipos de relación a incluir en la imagen</label>
-        <div id='expRelTypes'></div>
-      </div>
-      <div class='mrow'>
-        <label class='chk' style='margin:0 0 4px'><input type='checkbox' id='expFootOn' checked> <span data-i18n='m_foot'>Incluir pie de figura</span></label>
-        <div style='display:flex;gap:8px'>
-          <input id='expFigura' type='text' placeholder='Figura 1' style='flex:0 0 130px'>
-          <input id='expFuente' type='text' placeholder='Elaboración propia' data-i18n-ph='m_source_ph' style='flex:1'>
+        <div class='mtabpane hidden' data-tab='etiquetas'>
+          <label class='formlabel' data-i18n='m_labels'>Etiquetas de los círculos</label>
+          <label class='chk'><input type='radio' name='expLbl' value='alias' checked> <span data-i18n='m_alias'>Acrónimo</span></label>
+          <label class='chk'><input type='radio' name='expLbl' value='full'> <span data-i18n='m_fullname'>Nombre completo</span></label>
+          <label class='chk'><input type='radio' name='expLbl' value='num'> <span data-i18n='m_number'>Número</span></label>
+          <label class='chk'><input type='checkbox' id='expNum'> <span data-i18n='m_num_pre'>Numerar si supera</span> <input id='expNumLen' type='number' value='14' min='4' style='width:54px;display:inline-block;padding:3px;margin:0'> <span data-i18n='m_num_post'>caracteres</span></label>
+          <label class='formlabel' data-i18n='m_font'>Tipografía</label>
+          <select id='expFont'>
+            <option value='arial'>Arial (sans serif)</option>
+            <option value='georgia'>Georgia (serif)</option>
+            <option value='times'>Times New Roman</option>
+            <option value='calibri'>Calibri / Segoe UI</option>
+          </select>
         </div>
-        <label class='chk' style='margin-top:6px'><input type='checkbox' id='expFecha' checked> <span data-i18n='m_date'>Incluir fecha</span></label>
+        <div class='mtabpane hidden' data-tab='colores'>
+          <label class='formlabel' data-i18n='m_color'>Color</label>
+          <label class='chk'><input type='radio' name='expColor' value='color' checked> <span data-i18n='m_color_on'>Color</span></label>
+          <label class='chk'><input type='radio' name='expColor' value='gray'> <span data-i18n='m_gray'>Escala de grises</span></label>
+          <label class='formlabel' data-i18n='m_bg'>Fondo</label>
+          <label class='chk'><input type='radio' name='expBg' value='white' checked> <span data-i18n='m_white'>Blanco</span></label>
+          <label class='chk'><input type='radio' name='expBg' value='transparent'> <span data-i18n='m_transp'>Transparente</span></label>
+        </div>
+        <div class='mtabpane hidden' data-tab='leyenda'>
+          <label class='formlabel' data-i18n='m_legend'>Leyenda</label>
+          <label class='chk'><input type='checkbox' class='expLeg' value='esf' checked> <span data-i18n='m_le_esf'>Esferas</span></label>
+          <label class='chk'><input type='checkbox' class='expLeg' value='dim' checked> <span data-i18n='m_le_dim'>Dimensiones</span></label>
+          <label class='chk'><input type='checkbox' class='expLeg' value='rel' checked> <span data-i18n='m_le_rel'>Relaciones</span></label>
+          <label class='chk'><input type='checkbox' class='expLeg' value='size' checked id='expLegSize'> <span data-i18n='m_le_size'>Tamaño = poder</span></label>
+          <label class='formlabel' data-i18n='m_legpos'>Posición de la leyenda</label>
+          <label class='chk'><input type='radio' name='expLegPos' value='bottom' checked> <span data-i18n='m_bottom'>Abajo</span></label>
+          <label class='chk'><input type='radio' name='expLegPos' value='right'> <span data-i18n='m_right'>Derecha</span></label>
+          <div style='display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap'>
+            <div><label class='formlabel' data-i18n='m_idx_cols'>Columnas del índice</label>
+              <select id='expIdxCols' style='width:120px'>
+                <option value='auto' data-i18n='m_auto'>Automático</option>
+                <option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option>
+              </select></div>
+            <div><label class='formlabel' data-i18n='m_idx_font'>Letra del índice (px)</label>
+              <input id='expIdxFont' type='number' value='12' min='7' max='20' style='width:80px'></div>
+          </div>
+          <label class='formlabel' data-i18n='m_idx_show'>El índice muestra</label>
+          <label class='chk'><input type='radio' name='expIdxLbl' value='both' checked> <span data-i18n='m_idx_both'>Nombre y sigla</span></label>
+          <label class='chk'><input type='radio' name='expIdxLbl' value='name'> <span data-i18n='m_idx_name'>Solo nombre completo</span></label>
+          <label class='chk'><input type='radio' name='expIdxLbl' value='alias'> <span data-i18n='m_idx_alias'>Solo acrónimo</span></label>
+        </div>
+        <div class='mtabpane hidden' data-tab='pie'>
+          <label class='chk' style='margin:0 0 4px'><input type='checkbox' id='expFootOn' checked> <span data-i18n='m_foot'>Incluir pie de figura</span></label>
+          <div style='display:flex;gap:8px'>
+            <input id='expFigura' type='text' placeholder='Figura 1' style='flex:0 0 130px'>
+            <input id='expFuente' type='text' placeholder='Elaboración propia' data-i18n-ph='m_source_ph' style='flex:1'>
+          </div>
+          <label class='chk' style='margin-top:6px'><input type='checkbox' id='expFecha' checked> <span data-i18n='m_date'>Incluir fecha</span></label>
+        </div>
+      </div>
+      <div class='mpreview'>
+        <div class='plabel' data-i18n='m_preview'>Previsualización</div>
+        <div id='expPreview' class='pcanvas'></div>
       </div>
     </div>
     <div class='mactions'>
@@ -198,6 +199,7 @@
     </div>
   </div>
 </div>
+<div id='uiTip' class='uiTip hidden'></div>
 <div id='colorPop' class='colorPop hidden'>
   <div class='palette' id='paletteGrid'></div>
   <div class='hexrow'><span class='hx'>#</span><input id='hexIn' type='text' maxlength='7' spellcheck='false' autocomplete='off' onkeydown='if(event.key==="Enter"){applyHex();}'><button type='button' class='hexok' onclick='applyHex()' data-i18n='apply'>OK</button></div>

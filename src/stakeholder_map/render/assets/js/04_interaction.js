@@ -241,15 +241,32 @@ function keyRank(){
 }
 function buildSummary(){
   var box=document.getElementById("sphereStats"); if(!box){return;}
+  var h="";
   var counts={}, colors={};
   DATA.nodes.forEach(function(n){var c=n.category||""; if(!c){return;} counts[c]=(counts[c]||0)+1; if(!colors[c]){colors[c]=n.fill||"#999";}});
   var cats=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];});
-  if(!cats.length){box.innerHTML=""; return;}
-  var h="<div class=\"sphdr\">"+escHtml(t("by_sphere"))+"</div>";
-  cats.forEach(function(c){
-    h+="<div class=\"sphrow\"><span class=\"sphsw\" style=\"background:"+escHtml(colors[c])+"\"></span>"
-      +"<span class=\"sphn\">"+escHtml(term(c))+"</span><span class=\"sphc\">"+counts[c]+"</span></div>";
-  });
+  if(cats.length){
+    h+="<div class=\"sphdr\">"+escHtml(t("by_sphere"))+"</div>";
+    cats.forEach(function(c){h+="<div class=\"sphrow\"><span class=\"sphsw\" style=\"background:"+escHtml(colors[c])+"\"></span><span class=\"sphn\">"+escHtml(term(c))+"</span><span class=\"sphc\">"+counts[c]+"</span></div>";});
+  }
+  var zc={cm:0,ks:0,ki:0,mo:0,no:0};
+  DATA.nodes.forEach(function(n){zc[zoneKey(n.pr,n.ir)]++;});
+  var zorder=["cm","ks","ki","mo","no"].filter(function(k){return zc[k]>0;});
+  var zmax=Math.max.apply(null,zorder.map(function(k){return zc[k];}))||1;
+  if(zorder.length){
+    h+="<div class=\"sphdr\">"+escHtml(t("by_strategy"))+"</div>";
+    zorder.forEach(function(k){var pct=Math.round(zc[k]/zmax*100);
+      h+="<div class=\"dashrow\"><span class=\"dashn\">"+escHtml((ZONE[k]||{}).l||k)+"</span><span class=\"dashbar\"><span class=\"dashfill\" style=\"width:"+pct+"%\"></span></span><span class=\"dashc\">"+zc[k]+"</span></div>";});
+  }
+  var ef={pos:0,neg:0,neu:0};
+  DATA.edges.forEach(function(e){var pl=e.pol||"neu"; if(ef[pl]==null){ef[pl]=0;} ef[pl]++;});
+  var etot=(ef.pos||0)+(ef.neg||0)+(ef.neu||0), emax=Math.max(ef.pos||0,ef.neg||0,ef.neu||0)||1;
+  if(etot>0){
+    h+="<div class=\"sphdr\">"+escHtml(t("by_effect"))+"</div>";
+    [["pos","#2e9e5b","eff_pos"],["neg","#d64545","eff_neg"],["neu","#9aa3af","eff_neu"]].forEach(function(r){
+      if(!ef[r[0]]){return;} var pct=Math.round(ef[r[0]]/emax*100);
+      h+="<div class=\"dashrow\"><span class=\"dashn\">"+escHtml(t(r[2]))+"</span><span class=\"dashbar\"><span class=\"dashfill\" style=\"width:"+pct+"%;background:"+r[1]+"\"></span></span><span class=\"dashc\">"+ef[r[0]]+"</span></div>";});
+  }
   box.innerHTML=h;
 }
 function buildKeyActors(){
